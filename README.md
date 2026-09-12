@@ -56,8 +56,8 @@ ADetailer-Neo 等插件需要的偵測模型，會按照插件原有機制在需
 
 - Windows 10／11
 - Git
-- Python（依 Forge Neo 上游目前需求）
-- 支援的 NVIDIA 顯示卡與驅動程式
+- Python 3.13.12（目前 Forge Neo 上游測試版本）
+- 支援 CUDA 13 的 NVIDIA 顯示卡驅動程式
 
 ### 安裝
 
@@ -67,7 +67,9 @@ ADetailer-Neo 等插件需要的偵測模型，會按照插件原有機制在需
     cd sd-webui-forge-neo-zh-TW
     webui-user.bat
 
-首次啟動需要建立 Python 環境、安裝相依套件，並可能下載插件需要的檔案，因此時間會比較久。
+首次啟動會建立 `venv`，並由 Forge Neo 安裝器自動安裝目前預設的 PyTorch／CUDA 套件及其他相依套件。它不會自動安裝 Python 本體、NVIDIA 驅動程式或 Stable Diffusion 主模型。
+
+本整合版目前跟隨 Forge Neo 最新 `neo` 分支，不鎖定舊版核心；上游更新可能改變 Python、PyTorch 或 CUDA 需求。
 
 > [!NOTE]
 > 本專案不會下載 Stable Diffusion 主模型。請自行將模型放入對應的 `models` 子目錄，或設定外部模型路徑。
