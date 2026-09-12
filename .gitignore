@@ -5,6 +5,9 @@ __pycache__
 *.gguf
 *.onnx
 *.pth
+*.pt
+*.tflite
+*.task
 *.safetensors
 *.sft
 .DS_Store
@@ -14,7 +17,12 @@ __pycache__
 /config.json
 /config_states/
 /embeddings
-/extensions
+/extensions/*
+!/extensions/ADetailer-Neo/
+!/extensions/forge-neo-image2prompt/
+!/extensions/sd-webui-prompt-all-in-one-neo/
+!/extensions/stable-diffusion-webui-localization-zh_Hant/
+!/extensions/stable-diffusion-webui-tagger-fork/
 /models/**/*
 /output
 /outputs
@@ -30,3 +38,10 @@ __pycache__
 /webui-user.bat
 /webui-user.sh
 notification.mp3
+
+# DianNaoTou integration exclusions
+**/__pycache__/
+*.py[cod]
+*.bak
+*.log
+/extensions/**/.git/
