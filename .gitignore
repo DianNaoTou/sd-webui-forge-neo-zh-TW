@@ -21,7 +21,6 @@ __pycache__
 !/extensions/ADetailer-Neo/
 !/extensions/forge-neo-image2prompt/
 !/extensions/sd-webui-prompt-all-in-one-neo/
-!/extensions/stable-diffusion-webui-localization-zh_Hant/
 !/extensions/stable-diffusion-webui-tagger-fork/
 /models/**/*
 /output
