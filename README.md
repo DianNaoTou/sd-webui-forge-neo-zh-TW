@@ -90,6 +90,22 @@ ADetailer-Neo 等插件需要的偵測模型，會按照插件原有機制在需
 
 選擇繁體中文後套用設定並重新載入介面。
 
+## 選用放大模型下載
+
+本專案不直接收錄大型模型檔。若要安裝常用 ESRGAN／RealESRGAN 放大模型，請在專案根目錄執行：
+
+    download-upscalers.bat
+
+下載器會將下列模型放入 `models\ESRGAN`：
+
+- `RealESRGAN_x4plus.pth`
+- `RealESRGAN_x4plus_anime_6B.pth`
+- `4x-AnimeSharp.pth`
+- `4x-UltraSharp.pth`
+- `4x_foolhardy_Remacri.pth`
+
+已存在的模型會自動跳過；下載失敗時可重新執行下載器。完成後請重新啟動 Forge Neo，模型便會出現在放大演算法選單中。
+
 ## 更新與上游同步
 
 本專案會盡量同步 Forge Neo 與各插件的重要更新，但不保證與上游同日更新。
