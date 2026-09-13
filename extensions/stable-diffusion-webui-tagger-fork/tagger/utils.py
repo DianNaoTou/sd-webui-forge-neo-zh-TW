@@ -57,17 +57,21 @@ interrogators: Dict[str, Interrogator] = {
         repo_id='deepghs/ml-danbooru-onnx',
         model_path='TResnet-D-FLq_ema_6-30000.onnx'
     ),
-    'wd-vit-tagger-v3 ': WaifuDiffusionInterrogator(
-        'wd-vit-tagger-v3 ',
+    'wd-vit-tagger-v3': WaifuDiffusionInterrogator(
+        'wd-vit-tagger-v3',
         repo_id='SmilingWolf/wd-vit-tagger-v3'
     ),
-    'wd-swinv2-tagger-v3 ': WaifuDiffusionInterrogator(
-        'wd-swinv2-tagger-v3 ',
+    'wd-swinv2-tagger-v3': WaifuDiffusionInterrogator(
+        'wd-swinv2-tagger-v3',
         repo_id='SmilingWolf/wd-swinv2-tagger-v3'
     ),
-    'wd-convnext-tagger-v3 ': WaifuDiffusionInterrogator(
-        'wd-convnext-tagger-v3 ',
+    'wd-convnext-tagger-v3': WaifuDiffusionInterrogator(
+        'wd-convnext-tagger-v3',
         repo_id='SmilingWolf/wd-convnext-tagger-v3'
+    ),
+    'wd-eva02-large-tagger-v3': WaifuDiffusionInterrogator(
+        'wd-eva02-large-tagger-v3',
+        repo_id='SmilingWolf/wd-eva02-large-tagger-v3'
     ),
     'Z3D-E621-Convnext ': WaifuDiffusionInterrogator(
         'Z3D-E621-Convnext ',
