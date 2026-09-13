@@ -34,6 +34,14 @@ def scaled_dot_product_attention(q, k, v, *args, **kwargs):
     if kwargs.get("enable_gqa", False) and attn_mask is not None:
         k, v = repeat_kv_for_gqa(k, v, q.shape[-3], -3)
         kwargs["enable_gqa"] = False
+
+    # Work around intermittent non-finite fused SDPA output on Intel Arc XPU.
+    if q.device.type == "xpu":
+        from torch.nn.attention import SDPBackend, sdpa_kernel
+
+        with sdpa_kernel(SDPBackend.MATH):
+            return torch.nn.functional.scaled_dot_product_attention(q, k, v, *args, **kwargs)
+
     return torch.nn.functional.scaled_dot_product_attention(q, k, v, *args, **kwargs)
 
 
