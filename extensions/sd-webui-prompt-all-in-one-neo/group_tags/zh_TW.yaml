@@ -1,4 +1,4 @@
-# 👍提示詞整合來源 路過銀河(知乎)、未知作者(Google Drive)、互聯網等等，感謝這些作者的無私奉獻！
+# 👍提示詞整合來源 路过银河(知乎)、未知作者(Google Drive)、互聯網等等，感謝這些作者的無私奉獻！
 #
 # ⚠️建議不要修改本檔案內容，因為本檔案作者可能會不定期更新，如果修改了本檔案，可能會導致更新時出現衝突。
 # ⚠️如需要自定義關鍵詞組，請複製本檔案，重命名為 custom.yaml，然後在 custom.yaml 中修改。
@@ -453,13 +453,13 @@
         narrowed eyes: 眯起眼睛
         hidden eyes: 隱藏眼睛
         heart-shaped eyes: 心形眼睛
-        button eyes: 紐釦眼睛
+        button eyes: 紐扣眼睛
         cephalopod eyes: 頭足類眼睛
         eyes visible through hair: 透過頭髮看見眼睛
         glowing eyes: 發光的眼睛
         empty eyes: 空洞的眼睛
         rolling eyes: 翻白眼
-        cross eyed: 鬥雞眼
+        cross eyed: 斗雞眼
         blank eyes: 空白的眼睛
         no eyes: 沒有眼睛
         sparkling eyes: 閃閃發光的眼睛
@@ -477,11 +477,11 @@
         green eyeshadow: 綠色眼影
         bags under eyes: 眼袋
         ringed eyes: 眼圈
-        covered eyes: 矇住眼睛
+        covered eyes: 蒙住眼睛
         covering eyes: 遮住眼睛
         shading eyes: 擋著眼睛
         devil eyes: 魔鬼眼
-        slit pupils: 貓眼
+        slit pupils: 猫眼
         bloodshot eyes: 充血的眼睛
         tsurime: 眼尾上揚
         tareme: 眼尾下垂
@@ -511,12 +511,12 @@
         evil_eyes: 邪惡的眼睛
         crazy_eyes: 瘋狂的眼睛
         empty_eyes: 失去高光的眼睛
-        covered_eyes: 矇住的眼睛
+        covered_eyes: 蒙住的眼睛
         hollow_eyes: 星星狀瞳孔
         multicolored_eyes: 多彩多姿的眼睛
         ringed_eyes: 眼圈
         sanpaku: 三白症(瞳孔偏移)
-        mismatched_sclera: 錯配鞏膜
+        mismatched_sclera: 錯配巩膜
         eye_relfection: 眼睛反射(沒有效果)
         mechanical_eye: 機械眼
         cephalopod_eyes: 頭足類眼睛
@@ -533,7 +533,7 @@
         brown_eyes: 棕色的眼睛
         closed_eyes: 閉上的眼睛
         crying_with_eyes_open: 睜著眼落淚
-        extra_eyes: 多隻眼睛
+        extra_eyes: 多只眼睛
         eye_contact: 眼神交流
         eye_of_horus: 荷魯斯之眼
         eyeball: 眼球
@@ -551,7 +551,7 @@
         reflective_eyes:
         silver_eyes: 銀色的眼睛
         spiral_eyes: 漩渦眼
-        third_eye: 第三隻眼
+        third_eye: 第三只眼
         uneven_eyes: 大小眼
         flaming_eye: 焰目
         eyes_closed: 閉眼
@@ -562,16 +562,16 @@
         sharp_eyes: 銳利的眼
         slanted_eyes: 銳利的眼
         upturned_eyes: 上翹的眼睛
-        cross-eyed: 鬥雞眼
+        cross-eyed: 斗雞眼
         hair_over_eyes: 頭髮遮著雙眼
         eyes_visible_through_hair: 透過頭髮可以看到的眼睛
-        hair_over_one_eye: 頭髮遮住了一隻眼睛
-        one_eye_covered: 一隻眼被遮住
+        hair_over_one_eye: 頭髮遮住了一只眼睛
+        one_eye_covered: 一只眼被遮住
         bags_under_eyes: 眼袋
         eyepatch: 眼罩
         medical_eyepatch: 醫用眼罩
         scar_across_eye: 眼睛上的疤痕
-        no_blindfold: 去掉了（原本有的）矇眼要素
+        no_blindfold: 去掉了（原本有的）蒙眼要素
         no_eyepatch: 去掉了（原本有的）眼罩
         ahegao: 阿嘿顏
 
@@ -654,7 +654,7 @@
         chestnut_mouth: 栗子嘴
         cleave_gag: 被封住嘴
         closed_mouth: 閉著的嘴
-        covered_mouth: 矇住的嘴
+        covered_mouth: 蒙住的嘴
         extra_mouth: 有多張嘴巴
         hair_in_mouth: 嘴裡有頭髮
         hair_tie_in_mouth: 將繫頭髮的東西叼在嘴裡
@@ -1018,7 +1018,7 @@
         raimon_soccer_uniform: 雷門足球隊服
         ryouou_school_uniform: 陵櫻學園制服
         sailor_senshi_uniform: 美少女戰士制服
-        sakugawa_school_uniform: 柵川中學校服
+        sakugawa_school_uniform: 栅川中學校服
         sakuragaoka_high_school_uniform: 櫻丘女子高等學校校服
         saunders_military_uniform: 桑德斯軍裝
         saunders_school_uniform: 桑德斯附高校服
@@ -1056,7 +1056,7 @@
         cardigan: 開襟毛衣衫
         criss-cross_halter: 交叉吊帶衫
         frilled_shirt: 褶邊襯衫
-        sweatshirt: 長袖運動衛衣
+        sweatshirt: 長袖運動卫衣
         hawaiian_shirt: 夏威夷襯衫
         hoodie: 連帽衫
         Impossible shirt: 貼合程度不合邏輯的襯衫
@@ -1268,7 +1268,7 @@
         ribbed_dress: 羅紋連衣裙
         polka_dot_dress: 波點連衣裙
         print_dress: 印花連衣裙
-        vertical-striped_dress: 豎條紋連衣裙
+        vertical-striped_dress: 竖条纹连衣裙
         see-through_dress: 透視連衣裙
         skirt: 短裙
         microskirt: 超短裙
@@ -1309,7 +1309,7 @@
         flared_skirt: 傘裙
         floral_skirt: 花卉裙
 
-    - name: 與裙子互動
+    - name: 与裙子互動
       color: rgba(230, 84, 128, .4)
       tags:
         skirt_hold: 優雅地提著裙子
@@ -1370,7 +1370,7 @@
         leotard_aside: 把連衣褲襠部剝到一邊
         open_fly: 解開的褲子拉鍊
         pants_down: 褪下褲子
-        pants_rolled_up: 褲子捲起來
+        pants_rolled_up: 褲子卷起來
         pants_tucked_in: 褲子塞進去
         torn_jeans: 破損的牛仔褲
         torn_pants: 破損的褲子
@@ -1417,7 +1417,7 @@
         back-seamed_legwear: 中間有一條黑線的襪子
         animal_ear_legwear: 動物耳朵過膝襪
         striped_legwear: 橫條紋襪
-        vertical-striped_legwear: 豎條紋襪
+        vertical-striped_legwear: 竖條紋襪
         polka_dot_legwear: 圓斑襪
         print_legwear: 印花襪
         legwear_under_shorts: 短褲穿在襪子外
@@ -1510,7 +1510,7 @@
         pom_pom_(clothes): 小絨球（衣物掛件）
         drawstring: 衣服的抽繩
         full-length_zipper: 有整件衣物長的拉鍊
-        gathers: 褶襉（衣物）
+        gathers: 褶裥（衣物）
         gusset: 縫在衣服上襯料
         breast_pocket: 胸口的袋子
 
@@ -1524,10 +1524,10 @@
         horizontal_stripes: 水平條紋
         multicolored_stripes: 多彩條紋
         polka_dot_: 點裝紋
-        ribbed: 稜紋
+        ribbed: 棱紋
         striped: 橫條紋
         unmoving_pattern: 連續重複花紋
-        vertical_stripes: 豎條紋
+        vertical_stripes: 竖條紋
         plaid: 格子呢圖案
         animal_print: 動物印花
         cat_print: 貓咪印花
@@ -1766,7 +1766,7 @@
         plaid_scarf: 格子圍巾
         striped_scarf: 條紋圍巾
         print_scarf: 印花圍巾
-        vertical-striped_scarf: 豎條紋圍巾
+        vertical-striped_scarf: 竖條紋圍巾
         polka_dot_scarf: 波點圍巾
         argyle_scarf: 菱形圍巾
         beige_scarf: 米色圍巾
@@ -1800,7 +1800,7 @@
         black-framed_eyewear: 黑框眼鏡
         tinted_eyewear: 有色眼鏡
         medical_eyepatch: 醫用眼罩
-        bandage_over_one_eye: 用繃帶包紮一隻眼睛
+        bandage_over_one_eye: 用繃帶包紮一只眼睛
         crooked_eyewear: 歪斜的眼鏡
         eyewear_removed: 取下眼鏡
         sunglasses: 太陽鏡
@@ -1875,8 +1875,8 @@
         arm_out_of_sleeve: 袖子裡的手臂
         uneven_sleeves: 不均勻的袖子
         mismatched_sleeves: 不匹配的袖子
-        sleeve_rolled_up: 袖子捲起
-        sleeves_rolled_up: 單只袖子捲起
+        sleeve_rolled_up: 袖子卷起
+        sleeves_rolled_up: 單只袖子卷起
         feather-trimmed_sleeves: 羽毛裝飾的袖子
         hands_in_opposite_sleeves: 雙手交叉伸進袖子裡
         lace-trimmed_sleeves: 蕾絲邊袖子
@@ -1918,7 +1918,7 @@
         gloves: 手套
         gloves_removed: 脫下手套
         no_gloves: 去掉了(原設有的)手套
-        single_glove: 單隻手套
+        single_glove: 單只手套
         single_elbow_glove: 單手戴著過肘的手套
         long_gloves: 長手套
         elbow_gloves: 長袖手套（肘部手套）
@@ -2020,7 +2020,7 @@
         kerchief: 方頭巾
         mami_mogu_mogu: 麻美斷頭梗
         mob_cap: 頭巾式室內女帽
-        one_side_up: 只紮了一邊的頭髮
+        one_side_up: 只扎了一邊的頭髮
         owl: 貓頭鷹
         pier: 突碼頭
         pillow: 枕頭
@@ -2060,7 +2060,7 @@
         head_down: 低著頭
         head_mounted_display: 戴著頭戴顯示設備
         head_out_of_frame: 一部分頭部沒畫進框裡
-        head_rest: 枕著頭|託著頭
+        head_rest: 枕著頭|托著頭
         head_tilt: 歪著頭
         head_wings: 頭上有翅膀
         headgear: 頭部飾品(含一定科幻元素)
@@ -2127,10 +2127,10 @@
         hat_feather: 帶有羽毛的帽子
         hat_flower: 帶著花的帽子
         hat_ornament: 帶有飾物的帽子
-        hat_over_one_eye: 帽子遮住了一隻眼
+        hat_over_one_eye: 帽子遮住了一只眼
         hat_removed: 帽子被摘下|摘下帽子
         hat_ribbon: 帶有緞帶的帽子
-        hat_tip: 捏著帽簷
+        hat_tip: 捏著帽檐
         hatching_(texture): 線影法(紋理)
         hatsune_miku_(cosplay): cos成初音未來
         is_that_so: so-nanoka(是這樣啊的口癖)
@@ -2345,7 +2345,7 @@
       color: rgba(241, 229, 140, .4)
       tags:
         expressionless: 面無表情
-        sleepy: 睏乏的
+        sleepy: 困乏的
         drunk: 喝醉的
         bored: 無聊的
         confused: 使困惑
@@ -2467,7 +2467,7 @@
         hair_brushing: 梳頭
         hair_tucking: 撩頭髮
         hanging: 吊起來的
-        hitting: 擊打
+        hitting: 击打
         imagining: 在想像的
         jumping: 跳躍
         kicking: 踢
@@ -2577,7 +2577,7 @@
         waving_arms: 揮舞著手臂
         arm_at_side: 單手垂放
         arm_behind_back: 單手背到身後
-        shou: 單手託在腦後
+        shou: 單手托在腦後
         arm_cannon: 手炮
         arm_hug: 挽手
         arm_up: 舉著手
@@ -2610,7 +2610,7 @@
         shading_eyes: 遮陽手勢
         finger_biting: 咬手指
         finger_in_mouth: 吮吸手指
-        fingering_through_clothes: 隔著衣物指交
+        fingering_through_clothes: 隔着衣物指交
         fingers_together: 手指並攏
         hair_twirling: 手指捲著頭髮
         hands_clasped: 雙手手指交叉|雙手緊握
@@ -2643,8 +2643,8 @@
         covering_xx: 遮蓋xx
         self_fondle: 自我撫摸
         adjusting_thighhigh: 調整過膝襪
-        chin_rest: 託臉頰
-        head_rest: 託頭
+        chin_rest: 托臉頰
+        head_rest: 托頭
         take: 拿著
         _sheet_grab: 抓床單
         groping: 摸索
@@ -2657,7 +2657,7 @@
         kimono_lift: 掀起和服
         lifted_by_another: 被對方掀起衣物
         lifted_by_self: 掀起自己的衣物
-        shirt_lift: 拉起掀起捲起襯衫
+        shirt_lift: 拉起掀起卷起襯衫
         skirt_basket: 指掀起裙子時形成的籃子形狀
         skirt_flip: 被掀起裙子(含突發情況意義)
         bikini_lift: 往上剝開的比基尼
@@ -2768,7 +2768,7 @@
         holding_sword: 手持劍
         holding_syringe: 手持注射器
         holding_towel: 拿著毛巾
-        holding_tray: 託著盤子
+        holding_tray: 托著盤子
         holding_umbrella: 撐傘
         holding_wand: 握著棒子
         holding_whip: 握著鞭子
@@ -2804,15 +2804,15 @@
         hand_on_another's_: 手接觸到對方的臉
         hand_on_another's_cheek: 手摸著對方的臉頰
         hand_on_another's_chest: 手放在對方的胸前
-        hand_on_another's_chin: 手託著對方的下巴
+        hand_on_another's_chin: 手托著對方的下巴
         hand_on_another's_head: 手放在對方的頭上
         hand_on_another's_shoulder: 手放在對方的肩上
         hand_on_another's_stomach: 手放在對方的肚子上
         hand_on_ass: 手放在屁股上
         hand_on_head: 手放在頭上
         hand_on_headwear: 手觸碰帽子
-        hand_on_hilt: 手擱在刀柄上
-        hand_on_hip: 手叉著腰|手擱在腰上
+        hand_on_hilt: 手搁在刀柄上
+        hand_on_hip: 手叉著腰|手搁在腰上
         hand_on_own_: 把手放在自己臉上
         hand_on_own_cheek: 把手放在自己的臉頰上
         hand_on_own_chest: 把手放在自己的胸口
@@ -3308,7 +3308,7 @@
       tags:
         fantasy: 幻想風格
         ban: 科技幻想
-        cyberpunk: 賽博朋克
+        cyberpunk: 赛博朋克
         depth_of_field: 景深（畫法）
         blurry: 背景模糊
         blurry_foreground: 前景模糊
@@ -3597,7 +3597,7 @@
         church: 教堂
         shop: 商店
         street: 街道
-        cyberpunk city: 賽博朋克城市
+        cyberpunk city: 赛博朋克城市
         chinese style architecture: 古風建築
         gohei: 神社
         Bustling city: 繁華都市
@@ -3848,7 +3848,7 @@
       color: rgba(189, 182, 107, .4)
       tags:
         wristwatch: 手錶
-        folding_fan: 摺扇
+        folding_fan: 折扇
         paper_fan: 紙扇
         uchiwa: 團扇
         umbrella: 雨傘
@@ -4402,8 +4402,8 @@
     - name: 上衣
       color: rgba(178, 33, 34, .4)
       tags:
-        short coat: 短襖
-        long coat: 長襖
+        short coat: 短袄
+        long coat: 長袄
 
     - name: 裙子
       color: rgba(178, 33, 34, .4)
@@ -4562,7 +4562,7 @@
         too many fingers: 太多手指
         extra legs: 多餘的腿
         bad feet: 不好的腳
-        cross-eyed: 鬥雞眼
+        cross-eyed: 斗雞眼
 
     - name: Embeddings
       color:
