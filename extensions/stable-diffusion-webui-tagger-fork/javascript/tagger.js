@@ -69,6 +69,36 @@ function tag_clicked(tag, is_inverse) {
   $selectedTextarea.dispatchEvent(input_event2);
 }
 
+async function copy_tagger_tags(tags) {
+    const text = tags || '';
+
+    try {
+        await navigator.clipboard.writeText(text);
+    } catch (error) {
+        // Clipboard API may be unavailable on non-secure local connections.
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand('copy');
+        textarea.remove();
+    }
+
+    const button = gradioApp().querySelector('#tagger-copy-tags');
+    if (button) {
+        const originalText = button.textContent;
+        button.textContent = 'Copied!';
+        setTimeout(() => {
+            button.textContent = originalText;
+        }, 1200);
+    }
+
+    return [];
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     Promise.all([
         // option texts

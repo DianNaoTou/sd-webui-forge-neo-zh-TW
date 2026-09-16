@@ -186,7 +186,14 @@ def _connect_paste_params_buttons(binding: ParamBinding):
         )
 
     if binding.source_text_component is not None and fields is not None:
-        connect_paste(binding.paste_button, fields, binding.source_text_component, override_settings, binding.tabname)
+        source_text_fields = fields
+        if binding.paste_field_names:
+            source_text_fields = [
+                field for field in fields
+                if field.label in binding.paste_field_names
+            ]
+
+        connect_paste(binding.paste_button, source_text_fields, binding.source_text_component, override_settings, binding.tabname)
 
     if binding.source_tabname is not None and fields is not None:
         paste_field_names = [

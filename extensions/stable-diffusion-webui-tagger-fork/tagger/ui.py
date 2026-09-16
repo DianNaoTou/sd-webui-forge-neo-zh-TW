@@ -367,14 +367,20 @@ def on_ui_tabs():
                             elem_id='tags',
                         )
 
-                        # with gr.Row():
-                            # parameters_copypaste.bind_buttons(
-                                # parameters_copypaste.create_buttons(
-                                    # ["txt2img", "img2img"],
-                                # ),
-                                # None,
-                                # tags
-                            # )
+                        with gr.Row(variant='compact'):
+                            send_to_txt2img = gr.Button(
+                                value='傳送到 txt2img Prompt',
+                                variant='secondary'
+                            )
+                            send_to_img2img = gr.Button(
+                                value='傳送到 img2img Prompt',
+                                variant='secondary'
+                            )
+                            copy_tags = gr.Button(
+                                value='一鍵複製 Tags',
+                                variant='secondary',
+                                elem_id='tagger-copy-tags'
+                            )
                         rating_confidences = gr.Label(
                             label='Rating confidences',
                             elem_id='rating-confidences',
@@ -447,6 +453,28 @@ def on_ui_tabs():
 
         common_output = [tags, html_tags, discarded_tags, rating_confidences,
                          tag_confidences, excluded_tag_confidences, info]
+
+        # Defer cross-tab connections until WebUI renders all components.
+        for tabname, button in {
+            'txt2img': send_to_txt2img,
+            'img2img': send_to_img2img,
+        }.items():
+            parameters_copypaste.register_paste_params_button(
+                parameters_copypaste.ParamBinding(
+                    paste_button=button,
+                    tabname=tabname,
+                    source_text_component=tags,
+                    paste_field_names=['Prompt']
+                )
+            )
+
+        copy_tags.click(
+            fn=None,
+            inputs=[tags],
+            outputs=[],
+            _js='copy_tagger_tags',
+            show_progress=False
+        )
 
         # search input textbox
         for fun in [tag_search_selection.change, tag_search_selection.submit]:
