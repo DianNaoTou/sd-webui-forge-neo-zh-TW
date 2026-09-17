@@ -383,6 +383,10 @@ def on_ui_tabs():
                                 value='Send to img2img',
                                 variant='secondary'
                             )
+                            send_image_to_img2img = gr.Button(
+                                value='Send image and tags to img2img',
+                                variant='secondary'
+                            )
                             copy_tags = gr.Button(
                                 value='Copy tags',
                                 variant='secondary',
@@ -474,6 +478,16 @@ def on_ui_tabs():
                     paste_field_names=['Prompt']
                 )
             )
+
+        parameters_copypaste.register_paste_params_button(
+            parameters_copypaste.ParamBinding(
+                paste_button=send_image_to_img2img,
+                tabname='img2img',
+                source_text_component=tags,
+                source_image_component=image,
+                paste_field_names=['Prompt']
+            )
+        )
 
         copy_tags.click(
             fn=None,
