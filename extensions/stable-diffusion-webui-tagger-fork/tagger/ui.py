@@ -361,7 +361,14 @@ def on_ui_tabs():
                 with gr.Tabs():
                     with gr.TabItem(label='Ratings and included tags'):
                         # clickable tags to populate excluded tags
-                        tags = gr.State(value="")
+                        # Use a hidden frontend component instead of gr.State:
+                        # JavaScript-only events cannot reliably read server-side
+                        # State values in Gradio 4.
+                        tags = gr.Textbox(
+                            value='',
+                            visible=False,
+                            elem_id='tagger-tags-output'
+                        )
                         html_tags = gr.HTML(
                             label='Tags',
                             elem_id='tags',
@@ -369,15 +376,15 @@ def on_ui_tabs():
 
                         with gr.Row(variant='compact'):
                             send_to_txt2img = gr.Button(
-                                value='傳送到 txt2img Prompt',
+                                value='傳送到文生圖提示詞',
                                 variant='secondary'
                             )
                             send_to_img2img = gr.Button(
-                                value='傳送到 img2img Prompt',
+                                value='傳送到圖生圖提示詞',
                                 variant='secondary'
                             )
                             copy_tags = gr.Button(
-                                value='一鍵複製 Tags',
+                                value='一鍵複製標籤',
                                 variant='secondary',
                                 elem_id='tagger-copy-tags'
                             )

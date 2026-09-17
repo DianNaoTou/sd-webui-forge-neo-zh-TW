@@ -70,30 +70,44 @@ function tag_clicked(tag, is_inverse) {
 }
 
 async function copy_tagger_tags(tags) {
-    const text = tags || '';
+    const text = typeof tags === 'string' ? tags : '';
+    let copied = false;
 
-    try {
-        await navigator.clipboard.writeText(text);
-    } catch (error) {
-        // Clipboard API may be unavailable on non-secure local connections.
+    if (text) {
+      try {
+        // execCommand remains available on local HTTP pages where the modern
+        // Clipboard API is blocked for not being a secure context.
         const textarea = document.createElement('textarea');
         textarea.value = text;
         textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
         textarea.style.opacity = '0';
         document.body.appendChild(textarea);
         textarea.focus();
         textarea.select();
-        document.execCommand('copy');
+        copied = document.execCommand('copy');
         textarea.remove();
+      } catch (error) {
+        copied = false;
+      }
+
+      if (!copied && navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(text);
+          copied = true;
+        } catch (error) {
+          copied = false;
+        }
+      }
     }
 
     const button = gradioApp().querySelector('#tagger-copy-tags');
     if (button) {
         const originalText = button.textContent;
-        button.textContent = 'Copied!';
+        button.textContent = copied ? '已複製！' : '複製失敗';
         setTimeout(() => {
             button.textContent = originalText;
-        }, 1200);
+        }, 1500);
     }
 
     return [];
