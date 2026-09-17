@@ -69,6 +69,10 @@ function tag_clicked(tag, is_inverse) {
   $selectedTextarea.dispatchEvent(input_event2);
 }
 
+function tagger_get_translation(text) {
+    return window.localization?.[text] || text;
+}
+
 async function copy_tagger_tags(tags) {
     const text = typeof tags === 'string' ? tags : '';
     let copied = false;
@@ -104,7 +108,9 @@ async function copy_tagger_tags(tags) {
     const button = gradioApp().querySelector('#tagger-copy-tags');
     if (button) {
         const originalText = button.textContent;
-        button.textContent = copied ? '已複製！' : '複製失敗';
+        button.textContent = tagger_get_translation(
+            copied ? 'Copied!' : 'Copy failed'
+        );
         setTimeout(() => {
             button.textContent = originalText;
         }, 1500);

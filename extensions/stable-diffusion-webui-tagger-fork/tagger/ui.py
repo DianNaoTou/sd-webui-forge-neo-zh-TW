@@ -376,15 +376,15 @@ def on_ui_tabs():
 
                         with gr.Row(variant='compact'):
                             send_to_txt2img = gr.Button(
-                                value='傳送到文生圖提示詞',
+                                value='Send to txt2img',
                                 variant='secondary'
                             )
                             send_to_img2img = gr.Button(
-                                value='傳送到圖生圖提示詞',
+                                value='Send to img2img',
                                 variant='secondary'
                             )
                             copy_tags = gr.Button(
-                                value='一鍵複製標籤',
+                                value='Copy tags',
                                 variant='secondary',
                                 elem_id='tagger-copy-tags'
                             )
