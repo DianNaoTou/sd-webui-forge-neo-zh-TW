@@ -6602,6 +6602,8 @@
   "Send image and generation parameters to img2img tab.": "發送圖像和生成參數到圖生圖頁籤",
   "Send image and generation parameters to SVD tab.": "發送圖像和生成參數到SVD影片生成頁籤",
   "Send image and tags to img2img": "連同圖片傳送至圖生圖",
+  "Send tags to img2img": "傳送至圖生圖",
+  "Send tags to txt2img": "傳送至文生圖",
   "Send image to tag selection": "發送到 標籤 (Tag) 選擇",
   "Send interrupt": "發送中斷指令",
   "Send model from the cards CivitAI button to the browser, instead of showing a popup": "從 CivitAI 卡片按鈕發送模型到瀏覽器, 而不是彈出一個視窗",

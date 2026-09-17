@@ -376,11 +376,11 @@ def on_ui_tabs():
 
                         with gr.Row(variant='compact'):
                             send_to_txt2img = gr.Button(
-                                value='Send to txt2img',
+                                value='Send tags to txt2img',
                                 variant='secondary'
                             )
                             send_to_img2img = gr.Button(
-                                value='Send to img2img',
+                                value='Send tags to img2img',
                                 variant='secondary'
                             )
                             send_image_to_img2img = gr.Button(
