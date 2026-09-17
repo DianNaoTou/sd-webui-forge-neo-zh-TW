@@ -465,6 +465,11 @@ def on_ui_tabs():
         common_output = [tags, html_tags, discarded_tags, rating_confidences,
                          tag_confidences, excluded_tag_confidences, info]
 
+        # Expose the existing WD1.4 image input as a paste destination so
+        # WebUI pages such as PNG Info can send images here without creating a
+        # duplicate interrogation interface.
+        parameters_copypaste.add_paste_fields('tagger', image, [])
+
         # Defer cross-tab connections until WebUI renders all components.
         for tabname, button in {
             'txt2img': send_to_txt2img,

@@ -11,6 +11,7 @@ import gradio as gr
 import gradio.utils
 from PIL import Image, PngImagePlugin  # noqa: F401
 
+import modules.extensions as extensions
 import modules.infotext_utils as parameters_copypaste
 import modules.processing_scripts.comments as comments
 import modules.shared as shared
@@ -841,14 +842,17 @@ def create_ui():
                 generation_info = gr.Textbox(visible=False, elem_id="pnginfo_generation_info")
                 html2 = gr.HTML()
                 with gr.Row():
-                    buttons = parameters_copypaste.create_buttons(["txt2img", "img2img", "inpaint", "extras"])
+                    target_tabs = ["txt2img", "img2img", "inpaint", "extras"]
+                    if any(extension.canonical_name == "stable-diffusion-webui-tagger-fork" for extension in extensions.active()):
+                        target_tabs.append("tagger")
+                    buttons = parameters_copypaste.create_buttons(target_tabs)
 
                 for tabname, button in buttons.items():
                     parameters_copypaste.register_paste_params_button(
                         parameters_copypaste.ParamBinding(
                             paste_button=button,
                             tabname=tabname,
-                            source_text_component=generation_info,
+                            source_text_component=None if tabname == "tagger" else generation_info,
                             source_image_component=image,
                         )
                     )

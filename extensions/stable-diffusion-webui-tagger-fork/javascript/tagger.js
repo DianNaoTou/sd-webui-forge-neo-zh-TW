@@ -73,6 +73,20 @@ function tagger_get_translation(text) {
     return window.localization?.[text] || text;
 }
 
+function switch_to_tagger() {
+    const app = gradioApp();
+    const tabs = app.getElementById('tabs');
+    const targetId = 'tab_tagger';
+    const tabButtons = Array.from(tabs?.querySelector('div')?.querySelectorAll('button') || []);
+    const targetButton =
+        tabs?.querySelector(`button[aria-controls="${targetId}"]`) ||
+        tabButtons.find((button) => button.id?.includes('tagger')) ||
+        tabButtons.find((button) => /Tagger|WD\s*1\.4\s*標[籤記]器/i.test(button.textContent));
+
+    targetButton?.click();
+    return Array.from(arguments);
+}
+
 async function copy_tagger_tags(tags) {
     const text = typeof tags === 'string' ? tags : '';
     let copied = false;
