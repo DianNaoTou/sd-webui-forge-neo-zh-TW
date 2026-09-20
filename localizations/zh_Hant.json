@@ -9206,5 +9206,8 @@
   "Copy Metadata from": "複製中繼資料來源",
   "Include Merge Recipe": "包含合併配方",
   "Metadata in JSON Format": "JSON 格式的中繼資料",
-  "Preview Metadata from Models": "預覽模型中繼資料"
+  "Preview Metadata from Models": "預覽模型中繼資料",
+  "Preserve Aspect Ratio": "保持長寬比",
+  "Delay before a prompt edit is sent to Gradio": "提示詞編輯傳送至 Gradio 前的延遲",
+  "in ms ; reduce lag when typing prompts, may also affect Extensions that react to the prompt inputs": "單位為毫秒；可減少輸入提示詞時的延遲，也可能影響會回應提示詞輸入的擴充功能"
 }

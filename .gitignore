@@ -34,6 +34,7 @@ __pycache__
 /ui-config.json
 /user.css
 /venv
+/venv-intel-arc
 /webui-user.bat
 /webui-user.sh
 notification.mp3

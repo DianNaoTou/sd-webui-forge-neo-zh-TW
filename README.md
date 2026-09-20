@@ -16,12 +16,15 @@
 
 Stable Diffusion WebUI Forge Neo 是以 AUTOMATIC1111 Stable Diffusion WebUI 為基礎的圖像生成介面，著重於模型相容性、顯存管理、推論效能與易用性。
 
-這個整合版的目標，是提供一套可直接安裝的 **台灣繁體中文 Forge Neo**：
+這個整合版的目標，是提供一套可直接安裝、同時維護 **NVIDIA** 與
+**Intel Arc** 執行環境的台灣繁體中文 Forge Neo：
 
 - 完整台灣繁體中文介面。
 - 補齊 Forge Neo 設定頁面的翻譯。
 - 整合常用插件及其繁體中文化修正。
 - 保留原專案的安裝與自動下載機制。
+- 依顯示卡選擇啟動檔，首次啟動會自動建立環境並安裝對應的 PyTorch。
+- Intel Arc 使用獨立虛擬環境及 XPU 相容性修正，不影響 NVIDIA 環境。
 - 不附帶任何生成模型或使用者輸出內容。
 
 ## 整合內容
@@ -50,6 +53,17 @@ Stable Diffusion WebUI Forge Neo 是以 AUTOMATIC1111 Stable Diffusion WebUI 為
 
 ADetailer-Neo 等插件需要的偵測模型，會按照插件原有機制在需要時自動下載。Stable Diffusion 主模型請使用者自行準備。
 
+## 顯示卡支援
+
+| 平台 | 啟動檔 | PyTorch | 狀態 |
+|---|---|---|---|
+| NVIDIA | `webui-user.bat` | Forge Neo 上游預設 CUDA 版本 | 跟隨上游維護 |
+| Intel Arc | `webui-user-intel-arc.bat` | PyTorch XPU | 整合 XPU Math SDPA 相容性修正 |
+
+兩種啟動方式共用同一套 Forge Neo、繁體中文、內建插件與模型目錄，但使用不同的虛擬環境，避免 CUDA 與 XPU 套件互相覆蓋。
+
+Intel Arc B580 是目前實際驗證的 Intel 機型；Intel 啟動方式並未寫死 B580 型號，其他 Arc 顯示卡仍取決於驅動程式與 PyTorch XPU 的硬體支援。
+
 ## Windows 安裝方式
 
 ### 需求
@@ -57,17 +71,35 @@ ADetailer-Neo 等插件需要的偵測模型，會按照插件原有機制在需
 - Windows 10／11
 - Git
 - Python 3.13.12（目前 Forge Neo 上游測試版本）
-- 支援 CUDA 13 的 NVIDIA 顯示卡驅動程式
+- NVIDIA：支援上游目前 CUDA 版本的驅動程式
+- Intel Arc：近期 Intel Graphics Driver
 
-### 安裝
+### 下載專案
 
 在命令提示字元中執行：
 
-    git clone https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW.git
-    cd sd-webui-forge-neo-zh-TW
-    webui-user.bat
+```bat
+git clone https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW.git
+cd sd-webui-forge-neo-zh-TW
+```
 
-首次啟動會建立 `venv`，並由 Forge Neo 安裝器自動安裝目前預設的 PyTorch／CUDA 套件及其他相依套件。它不會自動安裝 Python 本體、NVIDIA 驅動程式或 Stable Diffusion 主模型。
+### NVIDIA
+
+```bat
+webui-user.bat
+```
+
+使用上游預設的 `venv`、PyTorch 與 CUDA 安裝流程。
+
+### Intel Arc
+
+```bat
+webui-user-intel-arc.bat
+```
+
+使用獨立的 `venv-intel-arc`，並由 Forge Neo 安裝器自動安裝 PyTorch XPU 與其他相依套件。完整說明請參閱 [`INTEL_ARC_SETUP.md`](./INTEL_ARC_SETUP.md)。
+
+兩種版本都保留 Forge Neo 原本的安裝體驗：首次啟動會建立對應的虛擬環境，並由安裝器自動安裝 PyTorch、核心相依套件與插件相依套件。它不會自動安裝 Python 本體、顯示卡驅動程式或 Stable Diffusion 主模型。
 
 本整合版目前跟隨 Forge Neo 最新 `neo` 分支，不鎖定舊版核心；上游更新可能改變 Python、PyTorch 或 CUDA 需求。
 

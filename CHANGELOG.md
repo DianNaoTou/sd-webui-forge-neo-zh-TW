@@ -14,6 +14,16 @@
 - 整合 sd-webui-prompt-all-in-one-neo，包含繁體中文翻譯。
 - 整合 stable-diffusion-webui-tagger-fork，包含介面與相容性修正。
 - 增加繁體中文 README，並保留上游英文原文。
+- 新增 Intel Arc 通用啟動檔，沿用 Forge Neo 原始自動安裝流程並安裝 PyTorch XPU。
+- NVIDIA 與 Intel Arc 使用獨立虛擬環境，避免 CUDA 與 XPU 套件互相覆蓋。
+- Intel Arc 環境加入 XPU Math SDPA 相容性修正；Arc B580 為目前已驗證機型。
+
+### 上游同步
+
+- 同步 Forge Neo 上游至 `41359cd4`。
+- 新增提示詞輸入防抖與 img2img 保持長寬比模式。
+- 整合模型載入、dtype、量化 metadata、RoPE、LoRA 與 ControlNet 修正。
+- `comfy-kitchen` 更新至 0.2.35。
 
 ### 安全與容量
 
@@ -25,4 +35,5 @@
 
 - 跟隨 Forge Neo 最新上游需求。
 - 目前上游測試環境為 Python 3.13.12。
-- PyTorch／CUDA 套件由 Forge Neo 安裝器於首次啟動時自動安裝。
+- NVIDIA 的 PyTorch／CUDA 套件由 Forge Neo 安裝器於首次啟動時自動安裝。
+- Intel Arc 的 PyTorch XPU 套件由相同安裝流程於首次啟動時自動安裝。
