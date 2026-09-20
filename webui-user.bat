@@ -1,8 +1,16 @@
 @echo off
+cd /d "%~dp0"
 
-:: set PYTHON=
+call bootstrap-python.bat
+if errorlevel 1 (
+    echo.
+    echo Python setup failed. Forge Neo was not started.
+    pause
+    exit /b 1
+)
+
 :: set GIT=
-:: set VENV_DIR=
+set "VENV_DIR=%~dp0venv-nvidia"
 
 set COMMANDLINE_ARGS=
 

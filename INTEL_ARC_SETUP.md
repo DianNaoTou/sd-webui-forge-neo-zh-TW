@@ -2,13 +2,13 @@
 
 Intel Arc 版本沿用 Forge Neo 原本的自動安裝流程。第一次啟動時會建立獨立的
 `venv-intel-arc`，自動安裝 PyTorch XPU、Forge Neo 核心相依套件及內建插件的相依套件。
+啟動器也會在專案內自動準備固定版本的 Python 3.13.12，不使用或修改系統 Python。
 
 ## 前置條件
 
 - Windows 10／11 64 位元
 - Intel Arc 顯示卡與近期驅動程式
 - Git
-- Python 3.13.12（目前 Forge Neo 上游測試版本）
 - 至少一個 Stable Diffusion checkpoint，放入 `models\Stable-diffusion`
 
 ## 安裝與啟動
@@ -21,13 +21,15 @@ webui-user-intel-arc.bat
 
 第一次啟動會自動：
 
-1. 建立獨立的 `venv-intel-arc`。
-2. 從 PyTorch XPU wheel index 安裝 `torch` 與 `torchvision`。
-3. 安裝 Forge Neo 核心及內建插件所需的相依套件。
-4. 確認 PyTorch 能辨識可用的 XPU 裝置。
-5. 啟動繁體中文 Forge Neo。
+1. 將專案專用的 `uv` 與 Python 3.13.12 安裝到 `runtime`。
+2. 使用該 Python 建立獨立的 `venv-intel-arc`。
+3. 從 PyTorch XPU wheel index 安裝 `torch` 與 `torchvision`。
+4. 安裝 Forge Neo 核心及內建插件所需的相依套件。
+5. 確認 PyTorch 能辨識可用的 XPU 裝置。
+6. 啟動繁體中文 Forge Neo。
 
 Intel Arc 與 NVIDIA 使用不同的虛擬環境，因此不會互相覆蓋 PyTorch 套件。
+專案內 Python 不會加入 PATH 或 Windows Registry；電腦原有的 Python 版本不受影響。
 
 ## 預設參數
 

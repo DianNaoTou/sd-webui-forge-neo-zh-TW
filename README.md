@@ -23,7 +23,7 @@ Stable Diffusion WebUI Forge Neo 是以 AUTOMATIC1111 Stable Diffusion WebUI 為
 - 補齊 Forge Neo 設定頁面的翻譯。
 - 整合常用插件及其繁體中文化修正。
 - 保留原專案的安裝與自動下載機制。
-- 依顯示卡選擇啟動檔，首次啟動會自動建立環境並安裝對應的 PyTorch。
+- 依顯示卡選擇啟動檔，首次啟動會自動準備專案專用 Python、建立環境並安裝對應的 PyTorch。
 - Intel Arc 使用獨立虛擬環境及 XPU 相容性修正，不影響 NVIDIA 環境。
 - 不附帶任何生成模型或使用者輸出內容。
 
@@ -70,9 +70,11 @@ Intel Arc B580 是目前實際驗證的 Intel 機型；Intel 啟動方式並未�
 
 - Windows 10／11
 - Git
-- Python 3.13.12（目前 Forge Neo 上游測試版本）
 - NVIDIA：支援上游目前 CUDA 版本的驅動程式
 - Intel Arc：近期 Intel Graphics Driver
+
+不需要另外安裝或更改系統 Python。啟動檔會在專案的 `runtime` 目錄內自動準備
+Python 3.13.12；電腦原有的 Python、PATH 與 Windows Registry 都不會被修改。
 
 ### 下載專案
 
@@ -89,7 +91,7 @@ cd sd-webui-forge-neo-zh-TW
 webui-user.bat
 ```
 
-使用上游預設的 `venv`、PyTorch 與 CUDA 安裝流程。
+使用獨立的 `venv-nvidia`，並由 Forge Neo 安裝器自動安裝上游預設的 PyTorch 與 CUDA 套件。
 
 ### Intel Arc
 
@@ -99,7 +101,11 @@ webui-user-intel-arc.bat
 
 使用獨立的 `venv-intel-arc`，並由 Forge Neo 安裝器自動安裝 PyTorch XPU 與其他相依套件。完整說明請參閱 [`INTEL_ARC_SETUP.md`](./INTEL_ARC_SETUP.md)。
 
-兩種版本都保留 Forge Neo 原本的安裝體驗：首次啟動會建立對應的虛擬環境，並由安裝器自動安裝 PyTorch、核心相依套件與插件相依套件。它不會自動安裝 Python 本體、顯示卡驅動程式或 Stable Diffusion 主模型。
+兩種版本都保留 Forge Neo 原本的安裝體驗：首次啟動會先以專案內的 `uv` 準備固定版本 Python 3.13.12，再建立對應的虛擬環境，並由 Forge Neo 安裝器自動安裝 PyTorch、核心相依套件與插件相依套件。它不會修改系統 Python，也不會自動安裝顯示卡驅動程式或 Stable Diffusion 主模型。
+
+第一次啟動需要網路連線，下載內容會存放在專案的 `runtime`、`venv-nvidia` 或
+`venv-intel-arc` 目錄。日後啟動會直接重用；若曾經用錯誤的系統 Python 建立舊
+`venv`，新版啟動檔也不會使用或刪除它。
 
 本整合版目前跟隨 Forge Neo 最新 `neo` 分支，不鎖定舊版核心；上游更新可能改變 Python、PyTorch 或 CUDA 需求。
 
