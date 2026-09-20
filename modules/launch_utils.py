@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any, Final, NamedTuple
 
 from modules import cmd_args, errors
+from modules.dependency_utils import pip_constraint_args, requirements_met, torch_backend
 from modules.paths_internal import extensions_builtin_dir, extensions_dir, script_path
 from modules.timer import startup_timer
 from modules_forge import forge_version
@@ -124,6 +125,9 @@ def repo_dir(name):
 def run_pip(command, desc=None, live=default_command_live):
     if args.skip_install:
         return
+
+    if command.lstrip().startswith("install "):
+        command += " " + pip_constraint_args()
 
     index_url_line = f" --index-url {index_url}" if index_url != "" else ""
     return run(f'"{python}" -m pip {command} --prefer-binary{index_url_line}', desc=f"Installing {desc}", errdesc=f"Couldn't install {desc}", live=live)
@@ -245,44 +249,6 @@ def run_extensions_installers(settings_file):
                 startup_timer.record(dirname_extension)
 
 
-re_requirement = re.compile(r"\s*(\S+)\s*==\s*([^\s;]+)\s*")
-
-
-def requirements_met(requirements_file):
-    """
-    Does a simple parse of a requirements.txt file to determine
-    whether all dependencies are already installed.
-    """
-
-    import importlib.metadata
-
-    import packaging.version
-
-    with open(requirements_file, "r", encoding="utf8") as file:
-        for line in file:
-            if line.strip() == "":
-                continue
-
-            if (m := re.match(re_requirement, line)) is None:
-                continue
-
-            package = m.group(1)
-            version_required = m.group(2)
-
-            try:
-                version_installed = importlib.metadata.version(package)
-            except Exception:
-                return False
-
-            if version_installed is None:
-                return False
-
-            if packaging.version.parse(version_installed) < packaging.version.parse(version_required):
-                return False
-
-    return True
-
-
 def prepare_environment():
     torch_index_url = os.environ.get("TORCH_INDEX_URL", "https://download.pytorch.org/whl/cu130")
     torch_command = os.environ.get("TORCH_COMMAND", f"pip install torch==2.13.0+cu130 torchvision==0.28.0+cu130 --extra-index-url {torch_index_url}")
@@ -363,6 +329,10 @@ assert cuda or xpu or mps
         triton_package = os.environ.get("TRITION_PACKAGE", f"triton=={ver_TRITON}")
         nunchaku_package = os.environ.get("NUNCHAKU_PACKAGE", f"https://github.com/nunchaku-ai/nunchaku/releases/download/v{ver_NUNCHAKU}/nunchaku-{ver_NUNCHAKU}+{v_CUDA}torch{v_TORCH}-{ver_PY}-{ver_PY}-linux_x86_64.whl")
 
+    cuda_build = torch_backend() == "cuda"
+    if not cuda_build and any((args.xformers, args.sage, args.flash, args.nunchaku, args.onnxruntime_gpu)):
+        raise RuntimeError("CUDA-only options cannot be used with this PyTorch build")
+
     if args.xformers and (not is_installed("xformers") or args.reinstall_xformers):
         run_pip(f"install -U -I --no-deps {xformers_package}", "xformers")
         startup_timer.record("install xformers")
@@ -417,7 +387,12 @@ assert cuda or xpu or mps
         run_pip(f'install -r "{requirements_file}"', "requirements")
         startup_timer.record("install requirements")
 
+    if args.onnxruntime_gpu:
+        os.environ["FORGE_ORT_CUDA13"] = "1"
+
     if args.onnxruntime_gpu and not is_installed("onnxruntime-gpu"):
+        if is_installed("onnxruntime"):
+            raise RuntimeError("Use a clean CUDA venv for --onnxruntime-gpu; CPU ONNX Runtime is already installed")
         # https://onnxruntime.ai/docs/install/#nightly-for-cuda-13x
         _deps = "coloredlogs flatbuffers numpy packaging protobuf sympy"
         onnxruntime_package = os.environ.get("ONNX_PACKAGE", "onnxruntime-gpu --pre --index-url https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/ort-cuda-13-nightly/pypi/simple/")

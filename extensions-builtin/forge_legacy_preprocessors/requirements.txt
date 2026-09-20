@@ -2,8 +2,7 @@ addict
 ftfy
 fvcore
 mediapipe
-onnx
-onnxruntime
+onnx>=1.23.0,<2
 opencv-python
 svglib
 timm

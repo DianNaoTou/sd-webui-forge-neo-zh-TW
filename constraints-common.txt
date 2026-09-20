@@ -1,0 +1,14 @@
+# Applied by run_pip to the launcher and all bundled extension installers.
+# Gradio 4.40 requires Pillow <11; HEIF 0.22 retains Python 3.13 support.
+Pillow==10.4.0
+pillow-heif==0.22.0
+protobuf>=6.31.1,<7
+huggingface-hub>=0.34.0,<1.0
+transformers==4.57.6
+gradio==4.40.0
+gradio-rangeslider==0.0.8
+numpy==2.3.5
+pydantic==2.10.6
+pydantic-core==2.27.2
+onnx>=1.23.0,<2
+tensorflow>=2.21,<2.22

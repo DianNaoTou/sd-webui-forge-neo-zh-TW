@@ -1,11 +1,14 @@
 import os
-from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Final, Optional, TypeVar
 
 from PIL import Image, ImageDraw
-from torch.hub import download_url_to_file
+from tempfile import NamedTemporaryFile
+from urllib.request import Request, urlopen
+
+from filelock import FileLock
+from tqdm import tqdm
 
 from modules.shared import cmd_opts
 
@@ -28,32 +31,56 @@ def _scan_models(path: Path) -> list[Path]:
     return [
         obj
         for obj in path.rglob("*")
-        if (obj.is_file() and obj.suffix in (".pt", ".tflite", ".task"))
+        if (obj.is_file() and obj.stat().st_size > 0 and obj.suffix in (".pt", ".tflite", ".task"))
     ]
 
 
 def _download_model(url: URL, filename: os.PathLike):
-    if not os.path.isfile(filename):
-        download_url_to_file(url=url, dst=filename, progress=False)
+    target = Path(filename)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    # A second WebUI process must not delete an active download's partial file.
+    with FileLock(str(target) + ".lock", timeout=120):
+        for stale in target.parent.glob(target.name + ".*.partial"):
+            stale.unlink()
+            print(f'Removed interrupted download: {stale.name}')
+        if target.is_file() and target.stat().st_size > 0:
+            return
+        print(f'Downloading model: {target.name}')
+        temporary = None
+        try:
+            request = Request(str(url), headers={"User-Agent": "Forge-Neo-ADetailer"})
+            # Bound connection/read stalls, including before the first byte.
+            with urlopen(request, timeout=30) as response:
+                total = int(response.headers.get("Content-Length", "0")) or None
+                with NamedTemporaryFile(dir=target.parent, prefix=target.name + ".",
+                                        suffix=".partial", delete=False) as output:
+                    temporary = Path(output.name)
+                    received = 0
+                    with tqdm(total=total, desc=target.name, unit="B", unit_scale=True,
+                              mininterval=1.0) as progress:
+                        while chunk := response.read(1024 * 1024):
+                            output.write(chunk)
+                            received += len(chunk)
+                            progress.update(len(chunk))
+                    if not received or (total is not None and received != total):
+                        raise OSError(f"Incomplete download: {received}/{total} bytes")
+                    output.flush()
+                    os.fsync(output.fileno())
+            os.replace(temporary, target)
+            print(f'Download complete: {target.name} ({received:,} bytes)')
+        finally:
+            if temporary is not None:
+                temporary.unlink(missing_ok=True)
 
 
 def _download(folder: os.PathLike, names: dict[str, URL]):
-
-    with ThreadPoolExecutor(max_workers=4) as executor:
-        futures: list[Future] = [
-            executor.submit(
-                _download_model,
-                url=url,
-                filename=os.path.join(folder, file),
-            )
-            for file, url in names.items()
-        ]
-
-    for file, future in zip(names.keys(), futures):
+    # One named progress bar at a time stays readable in Windows terminals.
+    for file, url in names.items():
         try:
-            future.result()
-        except Exception:
-            print(f'Failed to download "{file}"')
+            _download_model(url, os.path.join(folder, file))
+        except Exception as exc:
+            print(f'Download failed: {file}: {type(exc).__name__}: {exc}. '
+                  'The next launch will retry this model.')
 
 
 def get_models(ad_dir: str, *extra_dirs: str) -> dict[str, os.PathLike]:

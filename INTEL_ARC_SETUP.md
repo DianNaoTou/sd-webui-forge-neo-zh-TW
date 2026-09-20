@@ -9,7 +9,7 @@ Intel Arc 版本沿用 Forge Neo 原本的自動安裝流程。第一次啟動�
 - Windows 10／11 64 位元
 - Intel Arc 顯示卡與近期驅動程式
 - Git
-- 至少一個 Stable Diffusion checkpoint，放入 `models\Stable-diffusion`
+- 啟動 UI 不需要 checkpoint；需要主模型推論時才將 checkpoint 放入 `models\Stable-diffusion`
 
 ## 安裝與啟動
 
@@ -57,7 +57,7 @@ Encountered NaN in Latent
 - https://github.com/pytorch/pytorch/issues/192158
 - https://docs.pytorch.org/docs/stable/generated/torch.nn.attention.sdpa_kernel.html
 
-## 已驗證環境
+## 先前使用者實測環境（不代表本次修正已通過實機驗收）
 
 - Windows 10
 - Python 3.13.12
@@ -70,3 +70,7 @@ Encountered NaN in Latent
 
 Arc B580 是目前實際驗證的機型，不代表此啟動方式僅支援 B580。其他 Intel Arc
 型號仍取決於顯示驅動程式與 PyTorch XPU 對該硬體的支援狀態。
+
+## 本次全新安裝驗收
+
+請依 [INSTALLATION_TESTS.md](INSTALLATION_TESTS.md) 建立全新測試副本，確認依賴、空 checkpoint 啟動、首次下载和第二次啟動。

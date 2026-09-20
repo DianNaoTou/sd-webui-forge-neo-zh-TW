@@ -33,7 +33,8 @@ use_cpu = False
 
 # https://onnxruntime.ai/docs/execution-providers/
 # https://github.com/toriato/stable-diffusion-webui-wd14-tagger/commit/e4ec460122cf674bbf984df30cdb10b4370c1224#r92654958
-onnxrt_providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
+onnxrt_providers = (['CUDAExecutionProvider', 'CPUExecutionProvider']
+                    if torch.version.cuda else ['CPUExecutionProvider'])
 
 if shared.cmd_opts.additional_device_ids is not None:
     m = re_match(r'([cg])pu:\d+$', shared.cmd_opts.additional_device_ids)
@@ -42,7 +43,7 @@ if shared.cmd_opts.additional_device_ids is not None:
         raise ValueError('--device-id is not cpu:<nr> or gpu:<nr>')
         print('DEVICE_NAME=CPU01')
     if m.group(1) == 'c':
-        onnxrt_providers.pop(0)
+        onnxrt_providers = ['CPUExecutionProvider']
         print('DEVICE_NAME=GPU02')
     TF_DEVICE_NAME = f'/{shared.cmd_opts.additional_device_ids}'
 else:
@@ -52,7 +53,7 @@ else:
     else:
         TF_DEVICE_NAME = '/cpu:0'
         print('DEVICE_NAME=CPU03')
-        onnxrt_providers.pop(0)  # GPUが利用できない場合、CUDAExecutionProviderを削除
+        onnxrt_providers = ['CPUExecutionProvider']  # GPUが利用できない場合、CUDAExecutionProviderを削除
 
 print(f'== WD14 tagger {TF_DEVICE_NAME} ==')
 
@@ -345,30 +346,15 @@ class DeepDanbooruInterrogator(Interrogator):
         raise NotImplementedError()
 
 
-# FIXME this is silly, in what scenario would the env change from MacOS to
-# another OS? TODO: remove if the author does not respond.
 def get_onnxrt():
-    try:
-        import onnxruntime
-        return onnxruntime
-    except ImportError:
-        # only one of these packages should be installed at one time in an env
-        # https://onnxruntime.ai/docs/get-started/with-python.html#install-onnx-runtime
-        # TODO: remove old package when the environment changes?
-        from launch import is_installed, run_pip
-        if not is_installed('onnxruntime'):
-            if system() == "Darwin":
-                package_name = "onnxruntime-silicon"
-            else:
-                package_name = "onnxruntime-gpu"
-            package = os.environ.get(
-                'ONNXRUNTIME_PACKAGE',
-                package_name
-            )
-
-            run_pip(f'install {package}', 'onnxruntime')
-
+    # Installation belongs to install.py; inference must not mutate the venv.
     import onnxruntime
+    if torch.version.cuda and hasattr(onnxruntime, "preload_dlls"):
+        # The stable ORT extras provide that release's matching DLLs.
+        if os.environ.get("FORGE_ORT_CUDA13") != "1":
+            onnxruntime.preload_dlls(directory="")
+        else:
+            onnxruntime.preload_dlls()
     return onnxruntime
 
 

@@ -1,7 +1,7 @@
+from pathlib import Path
 import launch
+from modules.dependency_utils import requirements_met
 
-if not launch.is_installed("ultralytics"):
-    launch.run_pip("install ultralytics==8.3.253", "ultralytics")
-
-if not launch.is_installed("mediapipe"):
-    launch.run_pip("install mediapipe==0.10.35", "mediapipe")
+req_file = Path(__file__).with_name('requirements.txt')
+if not requirements_met(req_file):
+    launch.run_pip(f'install -r "{req_file}"', 'ADetailer-Neo requirements')

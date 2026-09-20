@@ -3,6 +3,7 @@ from pathlib import Path
 from modules.errors import display
 
 import launch
+from modules.dependency_utils import ensure_onnxruntime, requirement_met
 
 repo_root = Path(__file__).parent
 main_req_file = repo_root / "requirements.txt"
@@ -13,9 +14,9 @@ def install_requirements(req_file):
         for package in file.readlines():
             try:
                 package = package.strip()
-                if not launch.is_installed(package):
+                if package and not package.startswith("#") and not requirement_met(package):
                     launch.run_pip(
-                        f"install {package}",
+                        f'install "{package}"',
                         f"{package} (for ControlNet Preprocessor)",
                     )
             except Exception as e:
@@ -23,6 +24,7 @@ def install_requirements(req_file):
                 display(e, f"cnet-{package}")
 
 
+ensure_onnxruntime(launch.run_pip)
 install_requirements(main_req_file)
 
 if not launch.is_installed("insightface"):
