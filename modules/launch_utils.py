@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any, Final, NamedTuple
 
 from modules import cmd_args, errors
-from modules.dependency_utils import pip_constraint_args, requirements_met, torch_backend
+from modules.dependency_utils import ensure_onnxruntime, pip_constraint_args, requirements_met, torch_backend
 from modules.paths_internal import extensions_builtin_dir, extensions_dir, script_path
 from modules.timer import startup_timer
 from modules_forge import forge_version
@@ -402,6 +402,11 @@ assert cuda or xpu or mps
 
     if not args.skip_install:
         run_extensions_installers(settings_file=args.ui_settings_file)
+        # Some extension dependencies can reintroduce the CPU ONNX Runtime
+        # distribution into a CUDA venv. Reconcile the provider once after all
+        # bundled/extra installers have finished so the selected hardware
+        # backend remains consistent.
+        ensure_onnxruntime(run_pip)
 
     if args.update_all_extensions:
         git_pull_recursive(extensions_dir)
