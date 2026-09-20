@@ -70,11 +70,35 @@ def ensure_onnxruntime(run_pip):
     backend = torch_backend()
     wanted = 'onnxruntime-gpu' if backend == 'cuda' else 'onnxruntime'
     other = 'onnxruntime' if backend == 'cuda' else 'onnxruntime-gpu'
-    if requirement_met(other):
-        raise RuntimeError(f'{other} is installed in a {backend} environment. Use a clean hardware-specific venv; do not install both ONNX Runtime distributions.')
+    wanted_was_installed = requirement_met(wanted)
+    conflict = requirement_met(other)
+
+    if conflict:
+        # CPU and GPU ONNX Runtime distributions install the same Python package
+        # namespace. A bundled extension (notably insightface or one of its
+        # dependencies) can pull the CPU distribution into an otherwise clean
+        # CUDA venv. Remove only the incompatible distribution and repair the
+        # selected provider if both distributions had overlapped.
+        print(f'Removing incompatible {other} from {backend} environment...')
+        run_pip(f'uninstall -y "{other}"', f'remove incompatible {other}')
+
     spec = onnx_requirement(backend)
-    # Respect the launcher's explicit CUDA 13 nightly provider when installed.
-    if backend == 'cuda' and os.environ.get('FORGE_ORT_CUDA13') == '1' and requirement_met(wanted):
+
+    # Respect the launcher's explicit CUDA 13 nightly provider. If a conflicting
+    # CPU runtime overlapped an already-installed GPU runtime, reinstall the GPU
+    # package once so files removed by pip are restored.
+    if backend == 'cuda' and os.environ.get('FORGE_ORT_CUDA13') == '1':
+        if conflict and wanted_was_installed:
+            package = os.environ.get(
+                'ONNX_PACKAGE',
+                'onnxruntime-gpu --pre --index-url https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/ort-cuda-13-nightly/pypi/simple/',
+            )
+            run_pip(f'install --force-reinstall {package}', 'repair ONNX Runtime (cuda)')
+        elif requirement_met(wanted):
+            return
         return
-    if not requirement_met(spec):
+
+    if conflict and wanted_was_installed:
+        run_pip(f'install --force-reinstall "{spec}"', f'repair ONNX Runtime ({backend})')
+    elif not requirement_met(spec):
         run_pip(f'install "{spec}"', f'ONNX Runtime ({backend})')
