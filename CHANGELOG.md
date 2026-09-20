@@ -37,5 +37,6 @@
 - 跟隨 Forge Neo 最新上游需求。
 - 目前上游測試環境為 Python 3.13.12。
 - NVIDIA 使用 `venv-nvidia`，Intel Arc 使用 `venv-intel-arc`；兩者共用專案內的 Python 3.13.12 runtime。
+- `uv` 下載支援斷點續傳、自動重試、Astral／GitHub 雙來源與 PowerShell 備援。
 - NVIDIA 的 PyTorch／CUDA 套件由 Forge Neo 安裝器於首次啟動時自動安裝。
 - Intel Arc 的 PyTorch XPU 套件由相同安裝流程於首次啟動時自動安裝。

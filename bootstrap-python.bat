@@ -46,12 +46,66 @@ echo Downloading project-local uv %FORGE_UV_VERSION%...
 if not exist "%FORGE_UV_ROOT%" mkdir "%FORGE_UV_ROOT%"
 if errorlevel 1 exit /b 1
 
-set "FORGE_UV_URL=https://github.com/astral-sh/uv/releases/download/%FORGE_UV_VERSION%/uv-x86_64-pc-windows-msvc.zip"
-powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='Stop'; [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -UseBasicParsing -Uri $env:FORGE_UV_URL -OutFile $env:FORGE_UV_ZIP; $actual=(Get-FileHash -Algorithm SHA256 -LiteralPath $env:FORGE_UV_ZIP).Hash.ToLowerInvariant(); if ($actual -ne $env:FORGE_UV_SHA256) { throw 'uv download checksum mismatch' }; Expand-Archive -LiteralPath $env:FORGE_UV_ZIP -DestinationPath $env:FORGE_UV_ROOT -Force"
+set "FORGE_UV_PRIMARY_URL=https://releases.astral.sh/github/uv/releases/download/%FORGE_UV_VERSION%/uv-x86_64-pc-windows-msvc.zip"
+set "FORGE_UV_FALLBACK_URL=https://github.com/astral-sh/uv/releases/download/%FORGE_UV_VERSION%/uv-x86_64-pc-windows-msvc.zip"
+
+call :download_uv_curl "%FORGE_UV_PRIMARY_URL%"
+if errorlevel 1 (
+    echo Primary download source failed. Trying GitHub Releases...
+    call :download_uv_curl "%FORGE_UV_FALLBACK_URL%"
+)
+if errorlevel 1 (
+    echo curl download failed. Trying the PowerShell fallback...
+    call :download_uv_powershell "%FORGE_UV_FALLBACK_URL%"
+)
+if errorlevel 1 exit /b 1
+
+call :verify_uv_zip
+if errorlevel 1 (
+    echo Download checksum mismatch. Retrying once with a clean file...
+    del /q "%FORGE_UV_ZIP%" >nul 2>nul
+    call :download_uv_curl "%FORGE_UV_FALLBACK_URL%"
+    if errorlevel 1 call :download_uv_powershell "%FORGE_UV_FALLBACK_URL%"
+    if errorlevel 1 exit /b 1
+    call :verify_uv_zip
+    if errorlevel 1 (
+        del /q "%FORGE_UV_ZIP%" >nul 2>nul
+        exit /b 1
+    )
+)
+
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='Stop'; Expand-Archive -LiteralPath $env:FORGE_UV_ZIP -DestinationPath $env:FORGE_UV_ROOT -Force"
 if errorlevel 1 exit /b 1
 
 del /q "%FORGE_UV_ZIP%" >nul 2>nul
 if not exist "%FORGE_UV_EXE%" exit /b 1
+exit /b 0
+
+:download_uv_curl
+where curl.exe >nul 2>nul
+if errorlevel 1 exit /b 1
+
+set "FORGE_CURL_RETRY_OPTION=--retry-all-errors"
+curl.exe --help all 2>nul | findstr /C:"--retry-all-errors" >nul
+if errorlevel 1 set "FORGE_CURL_RETRY_OPTION=--retry-connrefused"
+
+echo Download source: %~1
+curl.exe --location --fail --retry 10 --retry-delay 3 %FORGE_CURL_RETRY_OPTION% --retry-max-time 900 --connect-timeout 30 --speed-limit 1024 --speed-time 60 --continue-at - --output "%FORGE_UV_ZIP%" "%~1"
+if errorlevel 1 exit /b 1
+exit /b 0
+
+:download_uv_powershell
+set "FORGE_UV_URL=%~1"
+for /L %%R in (1,1,3) do (
+    echo PowerShell download attempt %%R of 3...
+    powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='Stop'; [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -UseBasicParsing -Uri $env:FORGE_UV_URL -OutFile $env:FORGE_UV_ZIP"
+    if not errorlevel 1 exit /b 0
+)
+exit /b 1
+
+:verify_uv_zip
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='Stop'; $actual=(Get-FileHash -Algorithm SHA256 -LiteralPath $env:FORGE_UV_ZIP).Hash.ToLowerInvariant(); if ($actual -ne $env:FORGE_UV_SHA256) { throw 'uv download checksum mismatch' }"
+if errorlevel 1 exit /b 1
 exit /b 0
 
 :runtime_error
