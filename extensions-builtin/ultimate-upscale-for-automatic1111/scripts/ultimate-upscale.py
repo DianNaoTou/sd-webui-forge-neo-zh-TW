@@ -5,6 +5,7 @@ from modules import processing, shared, images, devices, scripts
 from modules.processing import StableDiffusionProcessing
 from modules.processing import Processed
 from modules.shared import opts, state
+from modules.upscaler_ui import upscaler_choices
 from enum import Enum
 
 elem_id_prefix = "ultimateupscale"
@@ -456,7 +457,7 @@ class Script(scripts.Script):
 
         gr.HTML("<p style=\"margin-bottom:0.75em\">Redraw options:</p>")
         with gr.Row():
-            upscaler_index = gr.Radio(label='Upscaler', elem_id=f"{elem_id_prefix}_upscaler_index", choices=[x.name for x in shared.sd_upscalers],
+            upscaler_index = gr.Radio(label='Upscaler', elem_id=f"{elem_id_prefix}_upscaler_index", choices=upscaler_choices(shared.sd_upscalers),
                                 value=shared.sd_upscalers[0].name, type="index")
         with gr.Row():
             redraw_mode = gr.Dropdown(label="Type", elem_id=f"{elem_id_prefix}_redraw_mode", choices=[k for k in redrow_modes], type="index", value=next(iter(redrow_modes)))

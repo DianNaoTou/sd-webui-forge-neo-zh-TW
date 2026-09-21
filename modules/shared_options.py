@@ -7,6 +7,7 @@ from modules import localization, shared, shared_gradio_themes, shared_items, ui
 from modules.options import OptionDiv, OptionHTML, OptionInfo, OptionRow, categories, options_section
 from modules.paths_internal import data_path, default_output_dir
 from modules.shared_cmd_options import cmd_opts
+from modules.upscaler_ui import upscaler_choices
 from modules_forge import presets as forge_presets
 from modules_forge import shared_options as forge_shared_options
 
@@ -139,7 +140,7 @@ options_templates.update(
             "ESRGAN_tile": OptionInfo(256, "Tile Size for Upscalers", gr.Slider, {"minimum": 0, "maximum": 512, "step": 16}).info("0 = no tiling"),
             "ESRGAN_tile_overlap": OptionInfo(16, "Tile Overlap for Upscalers", gr.Slider, {"minimum": 0, "maximum": 64, "step": 4}).info("low values = visible seam"),
             "composite_tiles_on_gpu": OptionInfo(False, "Composite the Tiles on GPU").info("improve performance and resource utilization"),
-            "upscaler_for_img2img": OptionInfo("None", "Upscaler for img2img", gr.Dropdown, lambda: {"choices": [x.name for x in shared.sd_upscalers]}).info("for resizing the input image if the image resolution is smaller than the generation resolution"),
+            "upscaler_for_img2img": OptionInfo("None", "Upscaler for img2img", gr.Dropdown, lambda: {"choices": upscaler_choices(shared.sd_upscalers)}).info("for resizing the input image if the image resolution is smaller than the generation resolution"),
             "upscaling_max_images_in_cache": OptionInfo(4, "Number of upscaled images to cache", gr.Slider, {"minimum": 0, "maximum": 8, "step": 1}),
             "set_scale_by_when_changing_upscaler": OptionInfo(True, 'Automatically set the "Scale by" factor based on the name of the selected Upscaler'),
             "prefer_fp16_upscalers": OptionInfo(False, "Prefer to load Upscaler in half precision").info("increase speed; reduce quality; will try <b>fp16</b>, then <b>bf16</b>, then fall back to <b>fp32</b> if not supported").needs_restart(),

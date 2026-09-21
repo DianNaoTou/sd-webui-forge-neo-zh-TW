@@ -384,6 +384,13 @@ assert cuda or xpu or mps
         run_pip(f'install -r "{requirements_file}"', "requirements")
         startup_timer.record("install requirements")
 
+    if not args.skip_install:
+        from modules.upscaler_models import ensure_upscaler_models
+
+        upscaler_result = ensure_upscaler_models(args.esrgan_models_path)
+        if upscaler_result.installed:
+            startup_timer.record("install upscaler models")
+
     if args.onnxruntime_gpu:
         os.environ["FORGE_ORT_CUDA13"] = "1"
 

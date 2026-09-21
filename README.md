@@ -133,13 +133,9 @@ webui-user-intel-arc.bat
 
 本專案已內建終極 SD 放大，可在圖生圖的「腳本」選單直接使用，不必另外安裝擴充。它適合高解析度圖片放大與分塊式 img2img 重繪，能降低一次處理超大圖片造成的 VRAM 壓力，並比原生 SD Upscale 提供更多分塊與接縫控制。原生 SD Upscale 仍完整保留。
 
-## 選用放大模型下載
+## 共用放大模型
 
-本專案不直接收錄大型模型檔。若要安裝常用 ESRGAN／RealESRGAN 放大模型，請在專案根目錄執行：
-
-    download-upscalers.bat
-
-下載器會將下列模型放入 `models\ESRGAN`：
+本專案不把大型模型檔提交進 Git；NVIDIA 與 Intel Arc 的首次安裝流程會共用同一套下載器，將下列模型放入 `models\ESRGAN`：
 
 - `RealESRGAN_x4plus.pth`
 - `RealESRGAN_x4plus_anime_6B.pth`
@@ -147,7 +143,11 @@ webui-user-intel-arc.bat
 - `4x-UltraSharp.pth`
 - `4x_foolhardy_Remacri.pth`
 
-已存在的模型會自動跳過；下載失敗時可重新執行下載器。完成後請重新啟動 Forge Neo，模型便會出現在放大演算法選單中。
+五個模型合計約 274 MB，只會下載缺少的檔案。
+
+已存在的同名模型會直接跳過且不覆寫；新下載檔會先以 SHA-256 驗證，再以完整檔名啟用。單一模型下載失敗只會顯示警告，不會阻止 Forge Neo 啟動，之後可在專案根目錄執行 `download-upscalers.bat` 重試。
+
+這些模型只儲存一份，並由內建圖片放大、圖生圖／SD Upscale、Hires. fix 與終極 SD 放大共用。介面保留原始模型識別值，並在選單中加上繁中用途提示。
 
 ## 更新與上游同步
 
