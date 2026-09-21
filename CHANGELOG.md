@@ -35,6 +35,7 @@
 
 ### 執行環境
 
+- 修正共用 `run_pip()` 將安裝專用參數附加到 `pip uninstall` 的問題，讓 CUDA／XPU 環境可正常移除衝突的 ONNX Runtime 套件。
 - 跟隨 Forge Neo 最新上游需求。
 - 目前上游測試環境為 Python 3.13.12。
 - NVIDIA 使用 `venv-nvidia`，Intel Arc 使用 `venv-intel-arc`；兩者共用專案內的 Python 3.13.12 runtime。
