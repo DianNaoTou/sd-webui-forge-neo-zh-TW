@@ -5,6 +5,9 @@
   <a href="./README.md"><b>繁體中文</b></a> ｜ <a href="./README_EN.md">English（官方原文）</a>
 </p>
 
+> [!NOTE]
+> **English edition:** An English edition of this integration is currently in testing and will be released in a future update.
+
 <p align="center"><img src="html/ui.webp" width="512" alt="Stable Diffusion WebUI Forge Neo 介面"></p>
 
 > [!IMPORTANT]
