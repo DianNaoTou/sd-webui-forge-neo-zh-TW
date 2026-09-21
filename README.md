@@ -36,6 +36,7 @@ Stable Diffusion WebUI Forge Neo 是以 AUTOMATIC1111 Stable Diffusion WebUI 為
 | forge-neo-image2prompt | 圖片反推提示詞 | 包含相容性修正 |
 | sd-webui-prompt-all-in-one-neo | 提示詞管理與編輯 | 包含繁體中文翻譯 |
 | stable-diffusion-webui-tagger-fork | 圖片標籤反推 | 包含介面與相容性修正 |
+| Ultimate SD Upscale（終極 SD 放大） | 高解析度分塊放大與重繪 | 內建並整合繁體中文介面 |
 | zh_Hant 語言檔 | Forge Neo 與插件介面翻譯 | 由 DianNaoTou 整合維護 |
 
 實際收錄版本與變更內容會記錄於 `CHANGELOG.md`。
@@ -128,6 +129,10 @@ webui-user-intel-arc.bat
 
 選擇繁體中文後套用設定並重新載入介面。
 
+## 終極 SD 放大（Ultimate SD Upscale）
+
+本專案已內建終極 SD 放大，可在圖生圖的「腳本」選單直接使用，不必另外安裝擴充。它適合高解析度圖片放大與分塊式 img2img 重繪，能降低一次處理超大圖片造成的 VRAM 壓力，並比原生 SD Upscale 提供更多分塊與接縫控制。原生 SD Upscale 仍完整保留。
+
 ## 選用放大模型下載
 
 本專案不直接收錄大型模型檔。若要安裝常用 ESRGAN／RealESRGAN 放大模型，請在專案根目錄執行：
@@ -172,6 +177,7 @@ webui-user-intel-arc.bat
 - [Adeliox/forge-neo-image2prompt](https://github.com/Adeliox/forge-neo-image2prompt)
 - [eduardoabreu81/sd-webui-prompt-all-in-one-neo](https://github.com/eduardoabreu81/sd-webui-prompt-all-in-one-neo)
 - [Kataragi/stable-diffusion-webui-tagger-fork](https://github.com/Kataragi/stable-diffusion-webui-tagger-fork)
+- [Coyote-A/ultimate-upscale-for-automatic1111](https://github.com/Coyote-A/ultimate-upscale-for-automatic1111)
 - [bluelovers/stable-diffusion-webui-localization-zh_Hant](https://github.com/bluelovers/stable-diffusion-webui-localization-zh_Hant)
 - 所有原始翻譯作者、插件維護者與測試使用者。
 

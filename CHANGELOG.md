@@ -13,6 +13,7 @@
 - 整合 forge-neo-image2prompt，包含本機相容性修正。
 - 整合 sd-webui-prompt-all-in-one-neo，包含繁體中文翻譯。
 - 整合 stable-diffusion-webui-tagger-fork，包含介面與相容性修正。
+- 內建 Ultimate SD Upscale，保留原生 SD Upscale，並加入完整台灣繁體中文介面。
 - 增加繁體中文 README，並保留上游英文原文。
 - 新增 Intel Arc 通用啟動檔，沿用 Forge Neo 原始自動安裝流程並安裝 PyTorch XPU。
 - NVIDIA 與 Intel Arc 使用獨立虛擬環境，避免 CUDA 與 XPU 套件互相覆蓋。
