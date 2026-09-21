@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any, Final, NamedTuple
 
 from modules import cmd_args, errors
-from modules.dependency_utils import ensure_onnxruntime, pip_constraint_args, requirements_met, torch_backend
+from modules.dependency_utils import ensure_onnxruntime, prepare_pip_command, requirements_met, torch_backend
 from modules.paths_internal import extensions_builtin_dir, extensions_dir, script_path
 from modules.timer import startup_timer
 from modules_forge import forge_version
@@ -126,11 +126,8 @@ def run_pip(command, desc=None, live=default_command_live):
     if args.skip_install:
         return
 
-    if command.lstrip().startswith("install "):
-        command += " " + pip_constraint_args()
-
-    index_url_line = f" --index-url {index_url}" if index_url != "" else ""
-    return run(f'"{python}" -m pip {command} --prefer-binary{index_url_line}', desc=f"Installing {desc}", errdesc=f"Couldn't install {desc}", live=live)
+    command = prepare_pip_command(command, index_url)
+    return run(f'"{python}" -m pip {command}', desc=f"Running pip for {desc}", errdesc=f"Couldn't complete pip operation for {desc}", live=live)
 
 
 def check_run_python(code: str, *, return_error: bool = False) -> bool | tuple[bool, str]:
@@ -386,6 +383,13 @@ assert cuda or xpu or mps
     if not requirements_met(requirements_file):
         run_pip(f'install -r "{requirements_file}"', "requirements")
         startup_timer.record("install requirements")
+
+    if not args.skip_install:
+        from modules.upscaler_models import ensure_upscaler_models
+
+        upscaler_result = ensure_upscaler_models(args.esrgan_models_path)
+        if upscaler_result.installed:
+            startup_timer.record("install upscaler models")
 
     if args.onnxruntime_gpu:
         os.environ["FORGE_ORT_CUDA13"] = "1"

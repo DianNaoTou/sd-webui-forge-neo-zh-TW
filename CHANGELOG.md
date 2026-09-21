@@ -6,6 +6,7 @@
 
 ### 新增
 
+- 首次安裝自動下載並驗證共用放大模型，提供下載進度條，且在內建放大、SD Upscale 與終極 SD 放大顯示繁中用途說明。
 - 以 Forge Neo 最新 `neo` 分支為基礎建立 DianNaoTou 台灣繁體中文整合版。
 - 加入完整 `zh_Hant` 語言檔，共 9,142 條介面翻譯。
 - 全新安裝預設使用台灣繁體中文介面。
@@ -13,6 +14,7 @@
 - 整合 forge-neo-image2prompt，包含本機相容性修正。
 - 整合 sd-webui-prompt-all-in-one-neo，包含繁體中文翻譯。
 - 整合 stable-diffusion-webui-tagger-fork，包含介面與相容性修正。
+- 內建 Ultimate SD Upscale，保留原生 SD Upscale，並加入完整台灣繁體中文介面。
 - 增加繁體中文 README，並保留上游英文原文。
 - 新增 Intel Arc 通用啟動檔，沿用 Forge Neo 原始自動安裝流程並安裝 PyTorch XPU。
 - NVIDIA 與 Intel Arc 使用獨立虛擬環境，避免 CUDA 與 XPU 套件互相覆蓋。
@@ -34,6 +36,7 @@
 
 ### 執行環境
 
+- 修正共用 `run_pip()` 將安裝專用參數附加到 `pip uninstall` 的問題，讓 CUDA／XPU 環境可正常移除衝突的 ONNX Runtime 套件。
 - 跟隨 Forge Neo 最新上游需求。
 - 目前上游測試環境為 Python 3.13.12。
 - NVIDIA 使用 `venv-nvidia`，Intel Arc 使用 `venv-intel-arc`；兩者共用專案內的 Python 3.13.12 runtime。

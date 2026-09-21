@@ -1,6 +1,7 @@
 """Shared dependency policy for the launcher and bundled extensions."""
 import importlib.metadata as metadata
 import os
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -11,6 +12,28 @@ def pip_constraint_args():
     # Bundled extension installers all call the launcher's run_pip wrapper.
     return ' '.join(f'--constraint "{ROOT / name}"' for name in
                     ('constraints-common.txt', 'requirements.txt'))
+
+
+def prepare_pip_command(command, index_url=''):
+    """Add resolver options only to pip install operations.
+
+    ``--prefer-binary``, constraints, and package indexes are install options;
+    passing them to commands such as ``uninstall`` makes pip reject the entire
+    operation.  Upgrade operations use ``pip install --upgrade`` and therefore
+    intentionally follow the install path.
+    """
+    stripped = command.lstrip()
+    operation = stripped.split(maxsplit=1)[0].lower() if stripped else ''
+    if operation != 'install':
+        return command
+
+    prepared = f'{command} {pip_constraint_args()}'
+    if not re.search(r'(^|\s)--prefer-binary(?=\s|$)', command, re.IGNORECASE):
+        prepared += ' --prefer-binary'
+    has_index = re.search(r'(^|\s)(--index-url(?:=|\s)|-i(?:=|\s))', command, re.IGNORECASE)
+    if index_url and not has_index:
+        prepared += f' --index-url {index_url}'
+    return prepared
 
 
 def requirement_met(spec):

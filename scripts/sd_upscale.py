@@ -6,6 +6,7 @@ import modules.scripts as scripts
 from modules import devices, images, processing, shared
 from modules.processing import Processed
 from modules.shared import opts, state
+from modules.upscaler_ui import upscaler_choices
 from PIL import Image
 
 
@@ -25,7 +26,7 @@ class SDUpscale(scripts.Script):
         with gr.Row():
             upscaler_index = gr.Dropdown(
                 label="Upscaler",
-                choices=[x.name for x in shared.sd_upscalers],
+                choices=upscaler_choices(shared.sd_upscalers),
                 value=shared.sd_upscalers[0].name,
                 type="index",
                 elem_id=self.elem_id("upscaler_index"),

@@ -46,28 +46,60 @@ class DependencyPolicyTests(unittest.TestCase):
     def test_onnx_fresh_and_second_launch(self):
         for backend, wanted, other in [('xpu', 'onnxruntime', 'onnxruntime-gpu'), ('cuda', 'onnxruntime-gpu', 'onnxruntime')]:
             installed = {}
+            commands = []
             def version(name):
                 if name in installed:
                     return installed[name]
                 raise deps.metadata.PackageNotFoundError(name)
             def install(command, description):
-                self.assertNotIn('uninstall', command)
-                self.assertIn(wanted, command)
-                installed[wanted] = '1.30.0'
+                commands.append(command)
+                if command.startswith('uninstall'):
+                    self.assertIn(other, command)
+                    installed.pop(other, None)
+                else:
+                    self.assertIn(wanted, command)
+                    installed[wanted] = '1.30.0'
             runner = Mock(side_effect=install)
             with patch.object(deps, 'torch_backend', return_value=backend), patch.object(deps.metadata, 'version', side_effect=version), patch.object(deps.metadata, 'requires', return_value=[]), patch.dict('os.environ', {}, clear=True):
                 deps.ensure_onnxruntime(runner)
                 deps.ensure_onnxruntime(runner)
                 self.assertEqual(runner.call_count, 1)
                 installed[other] = '1.30.0'
-                with self.assertRaises(RuntimeError):
-                    deps.ensure_onnxruntime(runner)
+                deps.ensure_onnxruntime(runner)
+                self.assertEqual(runner.call_count, 3)
+                self.assertTrue(commands[-2].startswith('uninstall'))
+                self.assertIn('--force-reinstall', commands[-1])
 
     def test_constraints_quote_paths_with_spaces(self):
         with patch.object(deps, 'ROOT', Path('/project with spaces')):
             self.assertEqual(deps.pip_constraint_args(),
                              '--constraint "/project with spaces/constraints-common.txt" '
                              '--constraint "/project with spaces/requirements.txt"')
+
+    def test_pip_options_only_apply_to_install_operations(self):
+        constraints = deps.pip_constraint_args()
+        install = deps.prepare_pip_command('install package', 'https://index.example/simple')
+        self.assertIn(constraints, install)
+        self.assertIn('--prefer-binary', install)
+        self.assertIn('--index-url https://index.example/simple', install)
+
+        upgrade = deps.prepare_pip_command('install --upgrade package', 'https://index.example/simple')
+        self.assertIn(constraints, upgrade)
+        self.assertIn('--prefer-binary', upgrade)
+
+        uninstall = deps.prepare_pip_command('uninstall -y package', 'https://index.example/simple')
+        self.assertEqual(uninstall, 'uninstall -y package')
+
+    def test_explicit_install_index_is_preserved(self):
+        command = 'install --pre package --index-url https://nightly.example/simple/'
+        prepared = deps.prepare_pip_command(command, 'https://default.example/simple')
+        self.assertIn('--index-url https://nightly.example/simple/', prepared)
+        self.assertNotIn('https://default.example/simple', prepared)
+        self.assertEqual(prepared.count('--prefer-binary'), 1)
+
+    def test_existing_prefer_binary_is_not_duplicated(self):
+        prepared = deps.prepare_pip_command('install --prefer-binary package')
+        self.assertEqual(prepared.count('--prefer-binary'), 1)
 
     def test_empty_checkpoint_and_vae_defaults(self):
         tree = ast.parse((ROOT / 'extensions/ADetailer-Neo/lib_adetailer/ui.py').read_text())
