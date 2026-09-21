@@ -2,6 +2,7 @@
 
 import hashlib
 import io
+from contextlib import redirect_stdout
 from pathlib import Path
 import tempfile
 import types
@@ -13,6 +14,10 @@ from modules.upscaler_ui import named_upscaler_choices, upscaler_choices, upscal
 
 
 class FakeResponse(io.BytesIO):
+    def __init__(self, body, length=None):
+        super().__init__(body)
+        self.headers = {"Content-Length": str(len(body) if length is None else length)}
+
     def __enter__(self):
         return self
 
@@ -35,6 +40,17 @@ class UpscalerModelInstallTests(unittest.TestCase):
                 upscaler_models.download_upscaler_model(self.model(), target)
             self.assertEqual(target.read_bytes(), b"model")
             self.assertFalse(target.with_name("test.pth.partial").exists())
+
+    def test_download_displays_progress_bar(self):
+        body = b"x" * (2 * 1024 * 1024)
+        with tempfile.TemporaryDirectory() as folder, io.StringIO() as console:
+            target = Path(folder) / "test.pth"
+            with patch.object(upscaler_models, "urlopen", return_value=FakeResponse(body)), redirect_stdout(console):
+                upscaler_models.download_upscaler_model(self.model(body), target)
+            output = console.getvalue()
+        self.assertIn("[########################]", output)
+        self.assertIn("100.0%", output)
+        self.assertIn("2.0/2.0 MB", output)
 
     def test_hash_failure_cleans_partial(self):
         with tempfile.TemporaryDirectory() as folder:

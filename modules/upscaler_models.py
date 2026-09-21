@@ -60,6 +60,21 @@ DEFAULT_UPSCALER_MODELS = (
 )
 
 
+def print_download_progress(filename: str, downloaded: int, total: int) -> None:
+    downloaded_mb = downloaded / (1024 * 1024)
+    if total > 0:
+        ratio = min(downloaded / total, 1.0)
+        width = 24
+        filled = round(width * ratio)
+        bar = "#" * filled + "-" * (width - filled)
+        total_mb = total / (1024 * 1024)
+        message = f"\r[Upscalers] [{bar}] {ratio * 100:5.1f}%  {downloaded_mb:.1f}/{total_mb:.1f} MB  {filename}"
+    else:
+        message = f"\r[Upscalers] Downloaded {downloaded_mb:.1f} MB  {filename}"
+
+    print(message, end="", flush=True)
+
+
 def download_upscaler_model(model: UpscalerModel, destination: Path) -> None:
     """Atomically download and verify one model without replacing an existing file."""
     if destination.exists():
@@ -69,13 +84,19 @@ def download_upscaler_model(model: UpscalerModel, destination: Path) -> None:
     partial = destination.with_name(f"{destination.name}.partial")
     partial.unlink(missing_ok=True)
     request = Request(model.url, headers={"User-Agent": "Forge-Neo-zh-TW/upscaler-installer"})
+    progress_started = False
 
     try:
         digest = hashlib.sha256()
         with urlopen(request, timeout=60) as response, partial.open("wb") as output:
+            total = int(response.headers.get("Content-Length", 0) or 0)
+            downloaded = 0
             for chunk in iter(lambda: response.read(1024 * 1024), b""):
                 output.write(chunk)
                 digest.update(chunk)
+                downloaded += len(chunk)
+                print_download_progress(model.filename, downloaded, total)
+                progress_started = True
 
         actual_hash = digest.hexdigest()
         if actual_hash != model.sha256:
@@ -83,6 +104,8 @@ def download_upscaler_model(model: UpscalerModel, destination: Path) -> None:
 
         os.replace(partial, destination)
     finally:
+        if progress_started:
+            print()
         partial.unlink(missing_ok=True)
 
 
