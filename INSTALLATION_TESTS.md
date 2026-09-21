@@ -1,6 +1,6 @@
-# 全新安裝修正與驗收（dianaotou-zh-tw）
+# 全新安裝修正與驗收
 
-本次修改只供測試分支。未合併或推送至 `neo`。
+本文件記錄本次全新安裝修正的驗證方式、已知限制與相容邊界。相關修改先在 `dianaotou-zh-tw` 完成驗證，再晉級至正式 `neo` 分支。
 
 ## 修正原因與檔案
 
@@ -23,7 +23,7 @@
 | `webui-user.bat` | 明確使用 CUDA index／原有 CUDA 版本組合，避免繼承先前 Intel 啟動留下的 TORCH_COMMAND。兩個 BAT 都清除 ORT nightly 內部旗標。 |
 | `tools/check-installation.py`（新增） | 唯讀驗收：pip check、各 requirements、版本、GPU build／可用性、NVIDIA 套件、ONNX provider。 |
 | `tests/test_installation_policy.py`（新增） | CPU 可執行的依賴政策／下載／空模型回歸測試。 |
-| `INTEL_ARC_SETUP.md` | 說明沒有 checkpoint 也可啟動 UI，並區分先前使用者實測和本次尚待實機驗收。 |
+| `INTEL_ARC_SETUP.md` | 說明沒有 checkpoint 也可啟動 UI，並記錄實機驗收範圍。 |
 
 ### 依賴來源
 
@@ -44,7 +44,7 @@
 - CUDA 解析 165 個套件，torch 2.13.0+cu130／torchvision 0.28.0+cu130／onnxruntime-gpu 1.30.0，保留 NVIDIA 依賴。
 - 兩組皆解析為 protobuf 6.33.6、Hub 0.36.2、Pillow 10.4.0、pillow-heif 0.22.0、Gradio 4.40.0、TensorFlow 2.21.0。
 - Python 語法與 diff 空白檢查通過（保留既有 CRLF 檔案）。
-- 這些是**依賴解析、靜態檢查與模擬回歸測試**。沒有 Windows／B580／RTX 5060 Ti GPU 實機，未宣稱已啟動 UI、實際載入 ONNX CUDA 模型，或完整安裝後 pip check 已通過。
+- 上述自動化項目是**依賴解析、靜態檢查與模擬回歸測試**；GPU、UI 與 ONNX 實際推論仍應以各台 Windows 實機執行 `tools\\check-installation.py` 及功能測試的結果為準，不因分支晉級而自動視為全部通過。
 - 主流程以外的可選 InsightFace、Depth Anything 外部 wheel、翻譯服務的動態依賴沒有完成 Windows 安裝驗證。它們仍受主版本 constraints 約束；若不相容會報錯，不會默默改壞共通套件。
 - 最初 pip 的「僅 binary、跨平台 dry-run」卡在 filterpy 沒有 binary wheel；之後改用能解析 source metadata 的 uv 完成上述解析。這不代表已驗證 Windows 的 source build。
 
