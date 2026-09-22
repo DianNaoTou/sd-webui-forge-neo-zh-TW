@@ -343,6 +343,9 @@ def resize_image(resize_mode, im, width, height, upscaler_name=None, force_RGBA=
         new_h = sRound(im.height * ratio)
         res = resize(im, new_w, new_h)
 
+    else:
+        raise ValueError(f"Invalid resize mode: {resize_mode!r}")
+
     return res
 
 
