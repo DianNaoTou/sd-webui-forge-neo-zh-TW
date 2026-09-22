@@ -74,11 +74,21 @@ def requirements_met(path):
 
 
 def torch_backend():
-    import torch
-    # Inspect the build, not GPU availability (a driver error must not select CUDA).
-    if getattr(torch.version, 'xpu', None):
+    """Return the installed PyTorch backend without importing torch.
+
+    Importing torch can initialize/cache CUDA allocator configuration before
+    Forge processes --cuda-malloc.  Inspect the wheel version instead so
+    cudaMallocAsync can still be selected before the first torch import.
+    """
+    try:
+        version = metadata.version('torch').lower()
+    except metadata.PackageNotFoundError:
+        return 'cpu'
+
+    local = version.partition('+')[2]
+    if 'xpu' in local:
         return 'xpu'
-    if getattr(torch.version, 'cuda', None):
+    if re.search(r'(^|[._-])cu\\d+', local):
         return 'cuda'
     return 'cpu'
 
