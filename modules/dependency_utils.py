@@ -88,7 +88,7 @@ def torch_backend():
     local = version.partition('+')[2]
     if 'xpu' in local:
         return 'xpu'
-    if re.search(r'(^|[._-])cu\\d+', local):
+    if re.search(r'(^|[._-])cu\d+', local):
         return 'cuda'
     return 'cpu'
 
