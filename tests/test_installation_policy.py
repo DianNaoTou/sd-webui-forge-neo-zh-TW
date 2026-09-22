@@ -36,12 +36,33 @@ class DependencyPolicyTests(unittest.TestCase):
         with patch.object(deps.metadata, 'version', side_effect=version), patch.object(deps.metadata, 'requires', return_value=['nvidia-cudnn-cu12; extra == "cudnn"']):
             self.assertFalse(deps.requirement_met('onnxruntime-gpu[cudnn]>=1.21,<2'))
 
-    def test_xpu_never_selects_cuda_when_driver_unavailable(self):
-        fake = types.SimpleNamespace(version=types.SimpleNamespace(xpu='2026', cuda=None))
-        with patch.dict('sys.modules', {'torch': fake}):
-            self.assertEqual(deps.torch_backend(), 'xpu')
+    def test_torch_backend_does_not_import_torch(self):
+        import builtins
+        real_import = builtins.__import__
+
+        def reject_torch(name, *args, **kwargs):
+            if name == 'torch' or name.startswith('torch.'):
+                raise AssertionError('torch_backend must not import torch')
+            return real_import(name, *args, **kwargs)
+
+        cases = [
+            ('2.14.0+xpu', 'xpu'),
+            ('2.13.0+cu130', 'cuda'),
+            ('2.13.0+cpu', 'cpu'),
+            ('2.13.0', 'cpu'),
+        ]
+        for version, expected in cases:
+            with self.subTest(version=version), \
+                    patch.object(deps.metadata, 'version', return_value=version), \
+                    patch.object(builtins, '__import__', side_effect=reject_torch):
+                self.assertEqual(deps.torch_backend(), expected)
+
         self.assertNotIn('gpu', deps.onnx_requirement('xpu'))
         self.assertIn('[cuda,cudnn]', deps.onnx_requirement('cuda'))
+
+    def test_torch_backend_missing_package_is_cpu(self):
+        with patch.object(deps.metadata, 'version', side_effect=deps.metadata.PackageNotFoundError):
+            self.assertEqual(deps.torch_backend(), 'cpu')
 
     def test_onnx_fresh_and_second_launch(self):
         for backend, wanted, other in [('xpu', 'onnxruntime', 'onnxruntime-gpu'), ('cuda', 'onnxruntime-gpu', 'onnxruntime')]:
