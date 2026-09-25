@@ -23,6 +23,12 @@
 
 ### 上游同步
 
+- 測試分支同步 Forge Neo 上游至 `e33f40e4`（2.29.1 開發分支）。
+- LLLite ControlNet 配合 MultiDiffusion 分塊處理控制圖片；涵蓋 SDXL 與 Anima 路徑。
+- 調整提示詞權重解析、LoRA Control、PNG Info 負面提示詞讀取及模型載入細節。
+- 保留 `BREAK` 不算文字權重的判斷，避免 PNG Info 誤套用 Emphasis。
+- MultiDiffusion 分塊設定加入固定介面識別碼；既有繁中翻譯可沿用。
+- `README_EN.md` 更新至本次上游英文原文，繁中整合版說明維持於 `README.md`。
 - 同步 Forge Neo 上游至 `41359cd4`。
 - 新增提示詞輸入防抖與 img2img 保持長寬比模式。
 - 整合模型載入、dtype、量化 metadata、RoPE、LoRA 與 ControlNet 修正。
