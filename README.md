@@ -111,7 +111,7 @@ webui-user-intel-arc.bat
 `venv-intel-arc` 目錄。日後啟動會直接重用；若曾經用錯誤的系統 Python 建立舊
 `venv`，新版啟動檔也不會使用或刪除它。
 
-本整合版目前跟隨 Forge Neo 最新 `neo` 分支，不鎖定舊版核心；上游更新可能改變 Python、PyTorch 或 CUDA 需求。
+本整合版定期同步 Forge Neo 上游的 `neo` 分支。更新會先進入本專案的 `neo-test` 測試分支，確認可用後才合併至正式的 `neo` 分支；兩者版本可能不同。上游更新也可能改變 Python、PyTorch 或 CUDA 需求。
 
 > [!NOTE]
 > 本專案不會下載 Stable Diffusion 主模型。請自行將模型放入對應的 `models` 子目錄，或設定外部模型路徑。
@@ -155,6 +155,8 @@ webui-user-intel-arc.bat
 ## 更新與上游同步
 
 本專案會盡量同步 Forge Neo 與各插件的重要更新，但不保證與上游同日更新。
+
+想測試尚未進入正式版的更新，請使用 [`neo-test`](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/tree/neo-test) 分支，並在獨立資料夾安裝。RTX 5060 Ti 與 Intel Arc B580 的全新安裝指令及驗收項目見 [`INSTALLATION_TESTS.md`](./INSTALLATION_TESTS.md)。
 
 由於本整合版包含中文化及相容性修改，直接使用插件內建更新功能，可能會覆蓋部分修改。更新前建議先備份，並查看本專案的更新紀錄。
 

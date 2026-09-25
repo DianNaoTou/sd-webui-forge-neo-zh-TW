@@ -1,6 +1,6 @@
 # 全新安裝修正與驗收
 
-本文件記錄本次全新安裝修正的驗證方式、已知限制與相容邊界。相關修改先在 `dianaotou-zh-tw` 完成驗證，再晉級至正式 `neo` 分支。
+本文件記錄全新安裝修正的驗證方式、已知限制與相容邊界。測試分支現名為 `neo-test`（原 `dianaotou-zh-tw`）；先在測試分支驗證，再晉級至正式 `neo` 分支。
 
 ## 修正原因與檔案
 
@@ -38,6 +38,8 @@
 
 ## 已做驗證與限制
 
+以下安裝檢查記錄來自先前的修正。2026-09-25 同步上游後的 GPU 生圖與介面操作尚待兩台 Windows 實機驗證，不能把先前測試結果視為新版已通過。
+
 - 11 項 CPU 回歸測試通過：版本上限／固定版本／marker、missing package、extras、XPU build 判斷、兩種 ORT 首次及第二次啟動、混裝拒絕、含空格的 constraint 路徑、空 checkpoint／VAE、下載成功快取／殘留清理、截斷後重試、逾時後繼續下一檔、Ctrl+C 清理。部分情境在同一項測試內。
 - 用 uv 針對 **Windows x64、Python 3.13** 解析主 requirements、ADetailer、WD14、內建 preprocessor requirements，以及各硬體的 PyTorch／torchvision／ORT。
 - XPU 解析 178 個套件，torch 2.14.0+xpu／torchvision 0.29.0+xpu／onnxruntime 1.30.0，沒有 nvidia-* 套件。
@@ -53,7 +55,7 @@
 請使用全新資料夾，保留目前已成功的環境；不要複製舊 venv、設定或模型進來。
 
 ```bat
-git clone --branch dianaotou-zh-tw --single-branch https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW.git forge-neo-b580-clean
+git clone --branch neo-test --single-branch https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW.git forge-neo-b580-clean
 cd forge-neo-b580-clean
 webui-user-intel-arc.bat
 ```
@@ -71,7 +73,7 @@ venv-intel-arc\Scripts\python.exe tools\check-installation.py --backend xpu
 ## RTX 5060 Ti 全新安裝（Windows CMD）
 
 ```bat
-git clone --branch dianaotou-zh-tw --single-branch https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW.git forge-neo-nvidia-clean
+git clone --branch neo-test --single-branch https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW.git forge-neo-nvidia-clean
 cd forge-neo-nvidia-clean
 webui-user.bat
 ```
@@ -90,7 +92,7 @@ venv-nvidia\Scripts\python.exe tools\check-installation.py --backend cuda
 2. 已符合版本的套件不應重裝，尤其不應看到 onnxruntime uninstall/install 迴圈。
 3. 已有 ADetailer 模型不應再出現 Downloading；必要時比較檔案修改時間。
 4. 測試中斷下載只能在這個全新測試副本進行：第一次下載時 Ctrl+C，再啟動；應清除 partial 並重抓該未完成模型。可保留 `.lock` 空檔，它不是模型或未完成下載。
-5. 額外放入 checkpoint 後確認可載入；本次沒有修改生成演算法。
+5. 額外放入 checkpoint 後確認可載入；本文件中的安裝修正未改動生成演算法，但測試分支另有 2026-09-25 的上游更新。
 
 僅執行 pip check 或查看版本：
 
