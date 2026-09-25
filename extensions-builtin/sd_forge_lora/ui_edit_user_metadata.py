@@ -163,21 +163,22 @@ class LoraUserMetadataEditor(ui_extra_networks_user_metadata.UserMetadataEditor)
     def create_extra_default_items_in_left_column(self):
         import network
 
-        self.select_sd_version = gr.Dropdown(choices=network.SD_VERSION, value="Unknown", label="Preset", interactive=True)
+        preset_choices = [("未知", "Unknown") if value == "Unknown" else value for value in network.SD_VERSION]
+        self.select_sd_version = gr.Dropdown(choices=preset_choices, value="Unknown", label="模型預設", interactive=True)
 
     def create_editor(self):
         self.create_default_editor_elems()
 
-        self.taginfo = gr.HighlightedText(label="Training Dataset Tags")
-        self.edit_activation_text = gr.Textbox(label="Activation Text", info="append to positive prompt along with Lora", lines=1, max_lines=2)
-        self.slider_preferred_weight = gr.Textbox(label="Preferred Weight", info='set to 0 to use "Default Weight for Extra Networks" in Settings', lines=1, max_lines=1)
-        self.edit_negative_text = gr.Textbox(label="Negative Prompt", info="append to negative prompt", lines=1, max_lines=2)
+        self.taginfo = gr.HighlightedText(label="訓練資料集標籤")
+        self.edit_activation_text = gr.Textbox(label="觸發詞", info="與 LoRA 一起加到正向提示詞", lines=1, max_lines=2)
+        self.slider_preferred_weight = gr.Textbox(label="偏好權重", info='設為 0 時，使用設定中的「額外網路預設權重」', lines=1, max_lines=1)
+        self.edit_negative_text = gr.Textbox(label="負向提示詞", info="加到負向提示詞", lines=1, max_lines=2)
 
         with gr.Row() as row_random_prompt:
-            random_prompt = gr.Textbox(label="Random Prompt", lines=4, max_lines=4, interactive=False, scale=9)
-            generate_random_prompt = gr.Button("Generate", size="lg", scale=1)
+            random_prompt = gr.Textbox(label="隨機提示詞", lines=4, max_lines=4, interactive=False, scale=9)
+            generate_random_prompt = gr.Button("產生", size="lg", scale=1)
 
-        self.edit_notes = gr.TextArea(label="Notes", lines=2, max_lines=4)
+        self.edit_notes = gr.TextArea(label="備註", lines=2, max_lines=4)
 
         generate_random_prompt.click(fn=self.generate_random_prompt, inputs=[self.edit_name_input], outputs=[random_prompt], show_progress=False)
 

@@ -1,0 +1,38 @@
+# Changelog
+
+## [1.2.0] - 2026-07-29
+- Add an option to select Save folder before download
+  - Works for sub folders too
+- Model Info will now show Base Model
+
+## [1.1.5] - 2026-06-19
+- Script will now be able to scan sub-folders for missing info or model updates
+
+## [1.1.4] - 2026-04-17
+- Add support for the new Civitai.red domain
+- New option: Pick which Civitai domain to use
+- New option: Show model title instead of filename
+- Fix an issue where the card buttons sometimes weren't showing up on webUI load
+
+## [1.1.3] - 2026-01-11
+- Populate SD WebUI info file with the model's activation words and description when downloading a model
+
+## [1.1.2] - 2025-12-30
+- Add option to pick which preview image to use as thumbnail when downloading a model
+
+## [1.1.1] - 2025-08-04
+- Downloader will now filter for .safetensors, .pth or .ckpt files to avoid downloading the wrong file
+
+## [1.1.0] - 2025-06-14
+- Add a button to check for missing info (preview image, metadata file)
+- Add a button to check for model updates
+
+## [1.0.1] - 2025-06-09
+- Fix for preview images not considering the correct model ID
+
+## [1.0.0] - 2024-06-08
+- Initial release of otacoo SD WebUI Civitai Downloader extension.
+- Adds a new tab for Model Downloader.
+- Card buttons to Open URL and Delete with settings to enable/disable.
+- Native SD WebUI notifications from JS via hidden Gradio components.
+- Support for Civitai key API.

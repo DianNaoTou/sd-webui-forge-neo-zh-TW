@@ -36,6 +36,7 @@ Stable Diffusion WebUI Forge Neo 是以 AUTOMATIC1111 Stable Diffusion WebUI 為
 |---|---|---|
 | Forge Neo | Stable Diffusion WebUI 主程式 | 基於官方 `neo` 分支 |
 | ADetailer-Neo | 自動偵測、遮罩與局部重繪 | 整合繁體中文介面 |
+| Civitai Model Downloader | 在介面中檢查並下載 Civitai 模型 | 測試分支整合繁體中文介面 |
 | forge-neo-image2prompt | 圖片反推提示詞 | 包含相容性修正 |
 | sd-webui-prompt-all-in-one-neo | 提示詞管理與編輯 | 包含繁體中文翻譯 |
 | stable-diffusion-webui-tagger-fork | 圖片標籤反推 | 包含介面與相容性修正 |
@@ -179,6 +180,7 @@ webui-user-intel-arc.bat
 - [Haoming02/sd-webui-forge-classic](https://github.com/Haoming02/sd-webui-forge-classic)
 - [AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
 - [Haoming02/ADetailer-Neo](https://github.com/Haoming02/ADetailer-Neo)
+- [otacoo/sd-webui-civitai-downloader](https://github.com/otacoo/sd-webui-civitai-downloader)
 - [Adeliox/forge-neo-image2prompt](https://github.com/Adeliox/forge-neo-image2prompt)
 - [eduardoabreu81/sd-webui-prompt-all-in-one-neo](https://github.com/eduardoabreu81/sd-webui-prompt-all-in-one-neo)
 - [Kataragi/stable-diffusion-webui-tagger-fork](https://github.com/Kataragi/stable-diffusion-webui-tagger-fork)

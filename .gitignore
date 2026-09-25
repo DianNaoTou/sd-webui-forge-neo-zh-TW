@@ -19,6 +19,7 @@ __pycache__
 /embeddings
 /extensions/*
 !/extensions/ADetailer-Neo/
+!/extensions/sd-webui-civitai-downloader/
 !/extensions/forge-neo-image2prompt/
 !/extensions/sd-webui-prompt-all-in-one-neo/
 !/extensions/stable-diffusion-webui-tagger-fork/
