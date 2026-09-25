@@ -1100,6 +1100,7 @@
   "Auto": "自動",
   "auto": "自動",
   "Auto det_size : Will load model twice and test faces on each if needed (old behaviour). Takes more VRAM. Precedence over fixed det_size": "自動 det_size : 如有需要可啟用，將載入模型兩次以在每個模型上測試臉部 (舊版行為)。會佔用更多顯存。優先於固定 det_size",
+  "Auto detect size from image": "從圖片自動偵測尺寸",
   "Auto detect size from img2img": "從圖生圖自動檢測圖像尺寸",
   "Auto enable when loading the PNG Info of a generation that used FreeU": "在辨識 PNG 圖像資訊時載入到使用過 FreeU 的圖像後自動啟用 FreeU",
   "Auto face size adjustment by model": "通過模型自動調整臉部大小",

@@ -28,6 +28,7 @@
 - 調整提示詞權重解析、LoRA Control、PNG Info 負面提示詞讀取及模型載入細節。
 - 保留 `BREAK` 不算文字權重的判斷，避免 PNG Info 誤套用 Emphasis。
 - MultiDiffusion 分塊設定加入固定介面識別碼；既有繁中翻譯可沿用。
+- 補上 MultiDiffusion「從圖片自動偵測尺寸」按鈕提示的繁中翻譯。
 - `README_EN.md` 更新至本次上游英文原文，繁中整合版說明維持於 `README.md`。
 - 同步 Forge Neo 上游至 `41359cd4`。
 - 新增提示詞輸入防抖與 img2img 保持長寬比模式。
