@@ -167,7 +167,7 @@ def _connect_paste_params_buttons(binding: ParamBinding):
     dest_width: gr.Slider = next(iter([field for field, name in fields if name == "Size-1"] if fields else []), None)
     dest_height: gr.Slider = next(iter([field for field, name in fields if name == "Size-2"] if fields else []), None)
 
-    if binding.source_image_component and dest_image:
+    if binding.source_image_component is not None and dest_image is not None:
         need_dimensions: bool = binding.tabname != "inpaint" and (dest_width and dest_height)
 
         if isinstance(binding.source_image_component, gr.Gallery):
