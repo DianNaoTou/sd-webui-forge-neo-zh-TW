@@ -7,9 +7,10 @@ class Emphasis:
     name: str = ""
     description: str = ""
 
-    def __call__(self, z: torch.Tensor, multipliers: torch.Tensor):
-
-        pass
+    def __call__(self, z: torch.Tensor, multipliers: torch.Tensor) -> torch.Tensor:
+        # Default: leave z unchanged (used by the "None" and "Ignore" modes).
+        # The caller (sd_engine.process_tokens) always uses the return value.
+        return z
 
 
 class EmphasisNone(Emphasis):
