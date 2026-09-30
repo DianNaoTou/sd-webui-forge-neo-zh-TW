@@ -295,7 +295,7 @@ elif is_intel_xpu():
 SUPPORT_FP8_OPS: bool = None
 
 if is_amd():
-    AMD_RDNA2_AND_OLDER_ARCH = ("gfx1030", "gfx1031", "gfx1010", "gfx1011", "gfx1012", "gfx906", "gfx900", "gfx803")
+    AMD_RDNA2_AND_OLDER_ARCH = ("gfx1030", "gfx1031", "gfx1032", "gfx1033", "gfx1034", "gfx1035", "gfx1036", "gfx1010", "gfx1011", "gfx1012", "gfx906", "gfx900", "gfx803")
 
     try:
         arch = torch.cuda.get_device_properties(get_torch_device()).gcnArchName
@@ -1328,6 +1328,19 @@ def supports_mxfp8_compute(device: torch.device = None) -> bool:
 
     props = torch.cuda.get_device_properties(device)
     if props.major < 10:
+        return False
+
+    return True
+
+
+def supports_int8_compute(device: torch.device = None) -> bool:
+    if (device is not None and is_device_mps(device)) or mps_mode():
+        return False
+
+    if is_intel_xpu():
+        return False
+
+    if is_directml_enabled():
         return False
 
     return True
