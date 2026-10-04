@@ -16,7 +16,8 @@
 - 減少 Lumina／SVDQ 不必要的張量複製操作；統一 Anima、Flux.2 與 Z-Image 的 Qwen 文字引擎屬性名稱。
 - `comfy-kitchen` 更新至 0.2.37。
 - 本整合版另外修正 Pillow、pillow-heif 與 protobuf 的依賴衝突，詳見「執行環境」。
-- 驗證狀態：依賴政策測試 12 項通過；尚待 Windows Python 3.13、NVIDIA RTX 5060 Ti 與 Intel Arc B580 實機啟動及生成驗證。本次僅更新測試分支，尚未發布為正式版。
+- Intel XPU 的 Math SDPA 加入 query 分片，保留全長 K/V、遮罩與 GQA 行為，降低高解析度生成時完整注意力矩陣的記憶體尖峰；保留避免融合 SDPA 非有限輸出的相容性路徑。此為待 B580 實機驗證的候選修正。
+- 驗證狀態：依賴政策測試 12 項通過；使用者回報 Windows／RTX 5060 Ti 啟動與生成正常，Intel Arc B580 啟動與基本生成正常，但高解析度修復第二輪採樣 OOM。XPU query 分片完成語法與 NumPy 模擬驗證，PyTorch 數值測試及 B580 高解析度修復重測仍待完成。本次僅更新測試分支，尚未發布為正式版。
 
 ### 新增
 
