@@ -14,6 +14,34 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class DependencyPolicyTests(unittest.TestCase):
+
+    def test_requirement_pins_satisfy_common_constraints(self):
+        # Catch upstream merges that overwrite our compatible dependency pins.
+        from packaging.requirements import Requirement
+        from packaging.utils import canonicalize_name
+
+        constraints = {}
+        for line in (ROOT / 'constraints-common.txt').read_text().splitlines():
+            if line.strip() and not line.lstrip().startswith('#'):
+                req = Requirement(line)
+                constraints[canonicalize_name(req.name)] = req
+
+        for line in (ROOT / 'requirements.txt').read_text().splitlines():
+            if not line.strip() or line.lstrip().startswith('#'):
+                continue
+            req = Requirement(line)
+            constraint = constraints.get(canonicalize_name(req.name))
+            if constraint is None:
+                continue
+            for spec in req.specifier:
+                if spec.operator == '==' and '*' not in spec.version:
+                    with self.subTest(package=req.name, version=spec.version):
+                        self.assertTrue(constraint.specifier.contains(spec.version),
+                                        f'{req} conflicts with {constraint}')
+            # Bounds must also remain in sync for policy-managed packages.
+            if req.name == 'protobuf':
+                self.assertEqual(req.specifier, constraint.specifier)
+
     def test_version_bounds_pins_and_markers(self):
         with patch.object(deps.metadata, 'version', return_value='1.1.0'):
             self.assertFalse(deps.requirement_met('huggingface-hub>=0.34,<1'))
