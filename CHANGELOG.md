@@ -4,6 +4,20 @@
 
 ## 尚未發布
 
+### 2.29.2 測試版（2026-10-04）
+
+- 上游同步至 [`d70373e`](https://github.com/Haoming02/sd-webui-forge-classic/commit/d70373ebcf1a96d210b78cd6f77196459e783e2a)，版本由 2.29.1 更新至 2.29.2。
+- 修正 Klein、Krea2、Qwen Image 與 Z-Image 文字編碼器的單段／多段提示詞分詞處理，調整 SD／SDXL 分詞設定。
+- Never OOM 的 UNet 強制卸載改為獨立控制；切換設定時只卸載相關 UNet，不再切換全域 VRAM 狀態或卸載所有模型。
+- 依實際注意力實作與運算精度調整顯存需求估算。
+- 將生成預覽更新移至採樣回呼，移除介面與 API 進度查詢中的重複更新。
+- Refiner 卸載模型時加入找不到 UNet 的保護。
+- 儲存 grouped INT8 量化權重時補齊 group_size 與 convrot_groupsize 參數。
+- 減少 Lumina／SVDQ 不必要的張量複製操作；統一 Anima、Flux.2 與 Z-Image 的 Qwen 文字引擎屬性名稱。
+- `comfy-kitchen` 更新至 0.2.37。
+- 本整合版另外修正 Pillow、pillow-heif 與 protobuf 的依賴衝突，詳見「執行環境」。
+- 驗證狀態：依賴政策測試 12 項通過；尚待 Windows Python 3.13、NVIDIA RTX 5060 Ti 與 Intel Arc B580 實機啟動及生成驗證。本次僅更新測試分支，尚未發布為正式版。
+
 ### 新增
 
 - 測試分支整合 Civitai Model Downloader v1.2.0，加入下載器、設定頁、狀態訊息與模型卡片操作的繁體中文翻譯。
