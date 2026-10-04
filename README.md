@@ -14,6 +14,8 @@
 
 目前正式發布版本：**2.29.2-tw.1**（上游 2.29.2）。
 
+- [2.29.2-tw.1 正式發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.29.2-tw.1)（固定版本 ZIP 與繁中更新說明）
+- [2.29.1-tw.1 首個穩定版發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.29.1-tw.1)
 - [最新正式版 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo.zip)
 - [首個穩定版 2.29.1-tw.1 固定 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/fecbe6bf666a102680fcfe0626eae91a60fe0122.zip)
 - [測試版 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo-test.zip)

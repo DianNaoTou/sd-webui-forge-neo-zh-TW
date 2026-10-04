@@ -10,7 +10,12 @@
 | 首個穩定版：2.29.1-tw.1 | 保留更新前行為或回退比對 | [固定提交 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/fecbe6bf666a102680fcfe0626eae91a60fe0122.zip) |
 | 測試版：neo-test | 協助驗證尚未正式發布的修改 | [測試分支 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo-test.zip) |
 
-正式與測試分支 ZIP 重新下載時會取得當下分支內容；已下載的 ZIP 不會自動更新。首個穩定版固定提交 ZIP 永遠指向相同程式。兩個版本的 Tag／GitHub Release 尚待建立，目前先提供可用的分支與固定提交下載。
+正式與測試分支 ZIP 重新下載時會取得當下分支內容；已下載的 ZIP 不會自動更新。首個穩定版固定提交 ZIP 永遠指向相同程式。兩個版本均已建立固定 Tag／GitHub Release。進入下列發布頁，展開 Assets 並選擇 Source code (zip)，即可下載固定版本：
+
+- [2.29.2-tw.1 正式發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.29.2-tw.1)
+- [2.29.1-tw.1 首個穩定版發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.29.1-tw.1)
+
+固定版本 ZIP 不會跟隨分支更新；需要後续更新時，請使用正式分支或下載下一次發布。
 
 ## 本次與歷史說明
 
