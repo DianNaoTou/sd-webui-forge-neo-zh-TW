@@ -45,6 +45,8 @@
 
 ### 執行環境
 
+- 修正 2.29.2 上游合併後 requirements 與共用 constraints 衝突：沿用 Gradio 4.40 相容政策，統一 Pillow 10.4.0、pillow-heif 0.22.0 與 protobuf >=6.31.1,<7；新增跨檔鎖定一致性測試。
+
 - 修正共用 `run_pip()` 將安裝專用參數附加到 `pip uninstall` 的問題，讓 CUDA／XPU 環境可正常移除衝突的 ONNX Runtime 套件。
 - 跟隨 Forge Neo 最新上游需求。
 - 目前上游測試環境為 Python 3.13.12。
