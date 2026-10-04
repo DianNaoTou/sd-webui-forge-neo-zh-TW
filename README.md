@@ -1,12 +1,7 @@
 # Stable Diffusion WebUI Forge Neo
 ## DianNaoTou 台灣繁體中文整合版
 
-<p align="center">
-  <a href="./README.md"><b>繁體中文</b></a> ｜ <a href="./README_EN.md">English（官方原文）</a>
-</p>
-
-> [!NOTE]
-> **English edition:** An English edition of this integration is currently in testing and will be released in a future update.
+> 本整合版目前以繁體中文使用者為主要對象；上游英文原文保留於 [README_EN.md](./README_EN.md)。其他語言使用者可參考 [Forge Neo 上游專案](https://github.com/Haoming02/sd-webui-forge-classic)。
 
 <p align="center"><img src="html/ui.webp" width="512" alt="Stable Diffusion WebUI Forge Neo 介面"></p>
 
@@ -14,6 +9,18 @@
 > 本專案是由 **DianNaoTou** 維護的非官方台灣繁體中文整合版，以
 > [Haoming02/sd-webui-forge-classic](https://github.com/Haoming02/sd-webui-forge-classic)
 > 的 `neo` 分支為基礎。Forge Neo 與各插件的著作權仍屬原作者所有。
+
+## 版本與下載
+
+目前正式發布版本：**2.29.2-tw.1**（上游 2.29.2）。
+
+- [最新正式版 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo.zip)
+- [首個穩定版 2.29.1-tw.1 固定 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/fecbe6bf666a102680fcfe0626eae91a60fe0122.zip)
+- [測試版 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo-test.zip)
+
+[版本選擇與更新方式](./RELEASES.md) ｜ [本次更新與已知限制](./docs/releases/2.29.2-tw.1.md) ｜ [完整更新紀錄](./CHANGELOG.md)
+
+Intel B580 高解析度修復使用查詢分塊以降低注意力記憶體尖峰，可能較慢；連續生成穩定性仍待驗證，詳見本次更新說明。
 
 ## 專案介紹
 
@@ -36,7 +43,7 @@ Stable Diffusion WebUI Forge Neo 是以 AUTOMATIC1111 Stable Diffusion WebUI 為
 |---|---|---|
 | Forge Neo | Stable Diffusion WebUI 主程式 | 基於官方 `neo` 分支 |
 | ADetailer-Neo | 自動偵測、遮罩與局部重繪 | 整合繁體中文介面 |
-| Civitai Model Downloader | 在介面中檢查並下載 Civitai 模型 | 測試分支整合繁體中文介面 |
+| Civitai Model Downloader | 在介面中檢查並下載 Civitai 模型 | 整合繁體中文介面 |
 | forge-neo-image2prompt | 圖片反推提示詞 | 包含相容性修正 |
 | sd-webui-prompt-all-in-one-neo | 提示詞管理與編輯 | 包含繁體中文翻譯 |
 | stable-diffusion-webui-tagger-fork | 圖片標籤反推 | 包含介面與相容性修正 |
@@ -86,7 +93,7 @@ Python 3.13.12；電腦原有的 Python、PATH 與 Windows Registry 都不會被
 在命令提示字元中執行：
 
 ```bat
-git clone https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW.git
+git clone --branch neo https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW.git
 cd sd-webui-forge-neo-zh-TW
 ```
 
