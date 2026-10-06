@@ -273,7 +273,14 @@ def prepare_environment():
     print(f"Python {sys.version}")
     print(f"Version: {tag}")
 
-    if args.reinstall_torch or not is_installed("torch") or not is_installed("torchvision"):
+    expected_torch_backend = "cuda" if os.environ.get("TORCH_COMMAND") and ("+cu" in torch_command or "download.pytorch.org/whl/cu" in torch_command) else None
+    installed_torch_backend = torch_backend() if is_installed("torch") else None
+    repair_torch_backend = expected_torch_backend is not None and installed_torch_backend != expected_torch_backend
+
+    if repair_torch_backend:
+        print(f"PyTorch backend mismatch: expected {expected_torch_backend}, found {installed_torch_backend or 'unknown'}. Reinstalling PyTorch...")
+
+    if args.reinstall_torch or repair_torch_backend or not is_installed("torch") or not is_installed("torchvision"):
         # TODO: Yeet Nunchaku...
         if args.nunchaku:
             torch_command = os.environ.get("TORCH_COMMAND", f"pip install torch==2.11.0+cu130 torchvision==0.26.0+cu130 --extra-index-url {torch_index_url}")
