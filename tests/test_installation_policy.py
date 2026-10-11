@@ -120,10 +120,18 @@ class DependencyPolicyTests(unittest.TestCase):
                 self.assertIn('--force-reinstall', commands[-1])
 
     def test_constraints_quote_paths_with_spaces(self):
-        with patch.object(deps, 'ROOT', Path('/project with spaces')):
-            self.assertEqual(deps.pip_constraint_args(),
-                             '--constraint "/project with spaces/constraints-common.txt" '
-                             '--constraint "/project with spaces/requirements.txt"')
+        # Cover both environments explicitly; do not depend on whether the
+        # machine running this test happens to have PyTorch installed.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / 'project with spaces'
+            for pins in ([], ['torch==2.13.0+cu130']):
+                with self.subTest(pins=pins), patch.object(deps, 'ROOT', root), \
+                        patch.object(deps, 'installed_torch_pins', return_value=pins):
+                    expected = (f'--constraint "{root / "constraints-common.txt"}" '
+                                f'--constraint "{root / "requirements.txt"}"')
+                    if pins:
+                        expected += f' --constraint "{root / "tmp" / "constraints-torch.txt"}"'
+                    self.assertEqual(deps.pip_constraint_args(), expected)
 
     def test_pip_options_only_apply_to_install_operations(self):
         constraints = deps.pip_constraint_args()
