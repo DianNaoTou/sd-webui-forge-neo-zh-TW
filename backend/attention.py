@@ -380,19 +380,22 @@ def attention_flash(q, k, v, heads, mask=None, attn_precision=None, skip_reshape
         if mask.ndim == 3:
             mask = mask.unsqueeze(1)
 
-    try:
-        assert mask is None
-        out = flash_attn_wrapper(
-            q.transpose(1, 2),
-            k.transpose(1, 2),
-            v.transpose(1, 2),
-            dropout_p=0.0,
-            causal=False,
-        ).transpose(1, 2)
-        _fallback = False
-    except Exception as e:
-        logger.error(f"Error running flash_attn: {e}")
-        _fallback = True
+    # FlashAttention cannot represent an arbitrary explicit mask. Keep it for
+    # SDPA, including Qwen 2.1's offset causal segments. Do not use assert here:
+    # Python -O removes assertions and would silently discard the mask.
+    _fallback = mask is not None
+    if not _fallback:
+        try:
+            out = flash_attn_wrapper(
+                q.transpose(1, 2),
+                k.transpose(1, 2),
+                v.transpose(1, 2),
+                dropout_p=0.0,
+                causal=False,
+            ).transpose(1, 2)
+        except Exception as e:
+            logger.error(f"Error running flash_attn: {e}")
+            _fallback = True
 
     if _fallback:
         out = operations.scaled_dot_product_attention(q, k, v, attn_mask=mask, dropout_p=0.0, is_causal=False)
