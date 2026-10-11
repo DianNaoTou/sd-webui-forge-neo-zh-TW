@@ -9210,7 +9210,7 @@
   "Preview Metadata from Models": "預覽模型中繼資料",
   "Preserve Aspect Ratio": "保持長寬比",
   "Delay before a prompt edit is sent to Gradio": "提示詞編輯傳送至 Gradio 前的延遲",
-  "in ms ; reduce lag when typing prompts, may also affect Extensions that react to the prompt inputs": "單位為毫秒；可減少輸入提示詞時的延遲，也可能影響會回應提示詞輸入的擴充功能",
+  "(in ms ; reduce lag when typing prompts, may also affect Extensions that react to the prompt inputs)": "（單位為毫秒；可減少輸入提示詞時的延遲，也可能影響會回應提示詞輸入的擴充功能）",
   "DeGrid": "DeGrid（去網格紋）",
   "0.0 for Auto": "設為 0.0 時自動判定",
   "[Qwen 2.1] Enable Reference": "[Qwen 2.1] 啟用參考圖片",

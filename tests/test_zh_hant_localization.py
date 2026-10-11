@@ -7,6 +7,7 @@ options) stay translated.
 
 import json
 import pathlib
+import re
 import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -48,6 +49,21 @@ class ZhHantLocalizationTests(unittest.TestCase):
         data = dict(_load_pairs())
         missing = [k for k in REQUIRED_2_30 if k not in data]
         self.assertEqual(missing, [])
+
+    def test_option_info_translations_include_parentheses(self):
+        """OptionInfo.info() renders as '(text)' and localization.js matches
+        the exact text, so a translated info key must include parentheses."""
+        data = dict(_load_pairs())
+        pattern = re.compile(r"""\.info\(\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)')\s*\)""")
+        bad = []
+        for folder in ("modules", "modules_forge", "extensions-builtin"):
+            for path in (ROOT / folder).rglob("*.py"):
+                text = path.read_text(encoding="utf-8", errors="ignore")
+                for match in pattern.finditer(text):
+                    info = match.group(1) or match.group(2)
+                    if info in data and f"({info})" not in data:
+                        bad.append(info)
+        self.assertEqual(sorted(set(bad)), [], "Info translations missing parentheses")
 
 
 if __name__ == "__main__":
