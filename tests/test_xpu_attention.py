@@ -2,12 +2,16 @@
 import unittest
 from unittest.mock import patch
 
-import torch
-from torch.nn.attention import SDPBackend, sdpa_kernel
+try:
+    import torch
+    from torch.nn.attention import SDPBackend, sdpa_kernel
 
-from backend.xpu_attention import math_sdpa
+    from backend.xpu_attention import math_sdpa
+except ImportError:  # torch is not installed in CPU-only CI/test venvs
+    torch = None
 
 
+@unittest.skipIf(torch is None, "requires torch")
 class XPUMathAttentionTests(unittest.TestCase):
     def compare(self, q, k, v, **kwargs):
         original = torch.nn.functional.scaled_dot_product_attention

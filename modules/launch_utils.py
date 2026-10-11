@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 from typing import Any, Final, NamedTuple
 
-from modules import cmd_args, errors
+from modules import cmd_args, dependency_utils, errors
 from modules.dependency_utils import ensure_onnxruntime, prepare_pip_command, requirements_met, torch_backend
 from modules.paths_internal import extensions_builtin_dir, extensions_dir, script_path
 from modules.timer import startup_timer
@@ -273,9 +273,9 @@ def prepare_environment():
     print(f"Python {sys.version}")
     print(f"Version: {tag}")
 
-    expected_torch_backend = "cuda" if os.environ.get("TORCH_COMMAND") and ("+cu" in torch_command or "download.pytorch.org/whl/cu" in torch_command) else None
+    expected_torch_backend = dependency_utils.expected_torch_backend(torch_command, explicit=bool(os.environ.get("TORCH_COMMAND")))
     installed_torch_backend = torch_backend() if is_installed("torch") else None
-    repair_torch_backend = expected_torch_backend is not None and installed_torch_backend != expected_torch_backend
+    repair_torch_backend = dependency_utils.torch_backend_mismatch(expected_torch_backend, installed_torch_backend)
 
     if repair_torch_backend:
         print(f"PyTorch backend mismatch: expected {expected_torch_backend}, found {installed_torch_backend or 'unknown'}. Reinstalling PyTorch...")
@@ -288,6 +288,11 @@ def prepare_environment():
 
         run(f'"{python}" -m {torch_command}', "Installing PyTorch", "Couldn't install PyTorch", live=True)
         startup_timer.record("install torch")
+
+        # Never continue silently on a CPU-only (or wrong-backend) build after
+        # installing/repairing: e.g. RTX users ending up with torch 2.x+cpu.
+        if dependency_utils.torch_backend_mismatch(expected_torch_backend, torch_backend()):
+            raise RuntimeError(f"PyTorch backend is still {torch_backend()} after installation, expected {expected_torch_backend}. Check TORCH_COMMAND / network and delete the venv to reinstall.")
 
     if not args.skip_torch_cuda_test:
         TORCH_CHECK: str = """

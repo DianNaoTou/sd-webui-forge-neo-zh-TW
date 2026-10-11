@@ -2,6 +2,13 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.30-tw.1-test（2026-10-11）
+
+- `neo-test` 併入上游 Forge Neo 2.30（`ce6848b8`）：新增 Qwen-Image-2.1 支援、SDPA 注意力調整、DeGrid 腳本與多項小修；版本資訊改為 `neo 2.30-tw.1-test`。
+- 保留本整合版修改：Intel XPU Math SDPA、Gradio 4.40／Pillow 10.4.0 相依組合、None／Ignore 提示詞權重修正與 SD 放大模型選單。
+- 強化 PyTorch 後端防護（延續 Issue #4／`7e1b13e5`、`2007f401`）：Intel Arc 流程同樣偵測非 XPU 版 PyTorch 並自動重裝；重裝後仍非預期後端即停止啟動，不再改用 CPU；之後的插件安裝以已安裝的 torch／torchvision 版本為約束，避免被替換成 CPU 版。
+- 新增 CPU 環境可執行的回歸測試；尚待 RTX 與 Intel Arc 實機驗證，正式版仍為 `neo 2.29.2-tw.1`。
+
 ## 2.29.2-tw.1-test（2026-10-05）
 
 - `neo-test` 的啟動與介面版本資訊改為 `neo 2.29.2-tw.1-test`，以 `-test` 後綴區分測試版。
