@@ -4,7 +4,7 @@ import torch
 import torch.nn.functional as F
 from PIL import Image
 
-from modules import scripts_postprocessing
+from modules import devices, scripts_postprocessing
 from modules.ui_components import InputAccordion
 
 
@@ -28,7 +28,15 @@ class ScriptPostprocessingDegrid(scripts_postprocessing.ScriptPostprocessing):
         image = np.asarray(pp.image, dtype=np.float32)
         image = torch.from_numpy(np.clip(image / 255.0, 0.0, 1.0))
 
-        image = degrid(image.cuda(), degrid_threshold)
+        # Use Forge's selected device (CUDA / XPU / MPS / CPU) instead of
+        # hard-coding CUDA, which broke Extras on Intel Arc (XPU) setups.
+        try:
+            image = degrid(image.to(devices.device), degrid_threshold)
+        except Exception as e:
+            if devices.device.type == "cpu":
+                raise
+            print(f"[DeGrid] {devices.device} failed ({e}); retrying on CPU")
+            image = degrid(image.to(devices.cpu), degrid_threshold)
 
         image = image.detach().clone().cpu().numpy()
         pp.image = Image.fromarray(np.clip((image * 255.0).round(), 0, 255).astype(np.uint8))
