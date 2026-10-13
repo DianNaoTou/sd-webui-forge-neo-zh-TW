@@ -1,7 +1,7 @@
 name: CPU regressions
 on:
   pull_request:
-    branches: [neo-test]
+    branches: [neo, neo-test]
   push:
     branches: ['chatgpt/vae-flash-review-20261011']
 permissions:

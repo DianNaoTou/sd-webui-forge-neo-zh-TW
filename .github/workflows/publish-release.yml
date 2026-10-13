@@ -1,0 +1,87 @@
+name: Publish formal release
+on:
+  push:
+    branches: [neo]
+permissions:
+  contents: read
+concurrency:
+  group: formal-release
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install isolated CPU test dependencies
+        run: |
+          python -m pip install torch==2.14.1+cpu --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install packaging filelock tqdm Pillow==10.4.0 numpy
+      - name: Validate release and run regressions
+        run: |
+          python - <<'PY'
+          import ast, pathlib, re
+          values = {n.targets[0].id: ast.literal_eval(n.value) for n in ast.parse(pathlib.Path('modules_forge/forge_version.py').read_text()).body if isinstance(n, ast.Assign)}
+          release = values['release']
+          assert re.fullmatch(r'\d+\.\d+(?:\.\d+)?-tw\.\d+', release), 'Only formal version numbers can be published'
+          assert pathlib.Path(f'docs/releases/{release}.md').is_file(), 'Release notes missing'
+          PY
+          python -m compileall -q backend modules modules_forge scripts tests
+          python -m unittest discover -s tests -v
+          python -O -m unittest discover -s tests -p test_vae_flash_regressions.py -v
+  publish:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create fixed tag and release without overwriting existing versions
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const source = fs.readFileSync('modules_forge/forge_version.py', 'utf8');
+            const match = source.match(/^release = "(\d+\.\d+(?:\.\d+)?-tw\.\d+)"$/m);
+            if (!match) throw new Error('Invalid formal version');
+            const tag = match[1];
+            const repo = context.repo;
+            const path = require('path').posix;
+            const body = fs.readFileSync(`docs/releases/${tag}.md`, 'utf8').replace(
+              /\]\((?!https?:|#)([^)]+)\)/g,
+              (_, link) => `](https://github.com/${repo.owner}/${repo.repo}/blob/${context.sha}/${path.normalize(path.join('docs/releases', link))})`
+            );
+            let existing;
+            try {
+              existing = (await github.rest.repos.getReleaseByTag({...repo, tag})).data;
+            } catch (error) {
+              if (error.status !== 404) throw error;
+            }
+            // Later documentation commits with the same version must not move
+            // the fixed tag or replace the already published release notes.
+            if (existing) {
+              core.info(`Preserving existing release: ${existing.html_url}`);
+              return;
+            }
+            let ref;
+            try {
+              ref = (await github.rest.git.getRef({...repo, ref: `tags/${tag}`})).data;
+            } catch (error) {
+              if (error.status !== 404) throw error;
+            }
+            if (ref && (ref.object.type !== 'commit' || ref.object.sha !== context.sha)) {
+              throw new Error(`Existing tag ${tag} does not point to this validated commit`);
+            }
+            if (!ref) {
+              await github.rest.git.createRef({...repo, ref: `refs/tags/${tag}`, sha: context.sha});
+            }
+            const result = await github.rest.repos.createRelease({
+              ...repo, tag_name: tag, target_commitish: context.sha,
+              name: `${tag}｜繁中整合版：Qwen 2.1 支援與相容性修正`,
+              body, draft: false, prerelease: false, make_latest: 'true'
+            });
+            core.info(`Published: ${result.data.html_url}`);
