@@ -2,6 +2,36 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.30-tw.1（2026-10-13）
+
+將已測試的 2.30-tw.1-test 升為正式版；完整新增功能、Bug 修正、驗證與已知限制見 [本次發布說明](docs/releases/2.30-tw.1.md)。
+
+- 新增 Qwen-Image-2.1、DeGrid、正向／反向條件批次計算，以及 VAE／文字編碼器檔名顯示設定。
+- 正式納入 NVIDIA CPU-only PyTorch 自動修復與 Intel XPU 後端防護；插件共用安裝流程約束 torch／torchvision 版本。
+- 修正 DeGrid 寫死 CUDA、Qwen 2.1 分塊 VAE 四通道配置、Flash 遮罩在 Python -O 下被忽略，以及批次提示詞生成資訊。
+- 補齊 2.30 新增繁中介面，修正提示詞延遲說明翻譯。
+- 保留既有 XPU 查詢分塊與相依政策；未納入 ede60e1a causal Flash 優化，也未追加尚未測試的上游更新。
+- B580 仍有 OUT_OF_DEVICE_MEMORY／DEVICE_LOST，本次未修復；依維護者決定列為已知限制後發布。
+- 保留 2.29.2-tw.1／2.29.1-tw.1 固定 Tag 與 Release，另封存更新前正式分支。新增正式合併後的回歸與固定 Tag／Release 發布流程；neo-test 保持測試版標示。
+
+## 2.30-tw.1-test（2026-10-11）
+
+- 候選 PR：納入上游 `58700b99` 的 2D 分塊 VAE 解碼通道數修補，支援 Qwen 2.1 四通道輸出；新增數值回歸測試。
+- 候選 PR：Flash Attention 有明確遮罩時保留 SDPA 分流，改用不受 Python `-O` 影響的保護；上游 `ede60e1a` causal 優化因套件版本／非方形對齊／任意遮罩風險保留待審。詳見 [技術審查](docs/reviews/2026-10-11-vae-flash.md)。
+- `neo-test` 併入上游 Forge Neo 2.30（`ce6848b8`）：新增 Qwen-Image-2.1 支援、SDPA 注意力調整、DeGrid 腳本與多項小修；版本資訊改為 `neo 2.30-tw.1-test`。
+- 保留本整合版修改：Intel XPU Math SDPA、Gradio 4.40／Pillow 10.4.0 相依組合、None／Ignore 提示詞權重修正與 SD 放大模型選單。
+- 強化 PyTorch 後端防護（延續 Issue #4／`7e1b13e5`、`2007f401`）：Intel Arc 流程同樣偵測非 XPU 版 PyTorch 並自動重裝；重裝後仍非預期後端即停止啟動，不再改用 CPU；之後的插件安裝以已安裝的 torch／torchvision 版本為約束，避免被替換成 CPU 版。
+- 修正上游新增的 DeGrid 後處理寫死 CUDA（`cf4f2e73`）：改用 Forge 偵測到的裝置（CUDA／XPU／CPU），該裝置失敗時自動改用 CPU，修正 Intel Arc 在「附加功能」處理圖片／影片時出錯；並新增測試，禁止主程式寫死 `.cuda()`。
+- 補齊 2.30 新增介面的繁體中文翻譯（`85cdb821`）：DeGrid、Qwen 2.1 參考圖片、批次套用正向/反向調整、VAE／文字編碼器下拉選單顯示方式等。
+- 修正「提示詞編輯傳送至 Gradio 前的延遲」說明翻譯未生效（`0feba725`），並新增語系檔格式、重複鍵與設定說明括號的檢查測試。
+- 新增 CPU 環境可執行的回歸測試；尚待 RTX 與 Intel Arc 實機驗證，正式版仍為 `neo 2.29.2-tw.1`。
+
+## 2.29.2-tw.1-test（2026-10-05）
+
+- `neo-test` 的啟動與介面版本資訊改為 `neo 2.29.2-tw.1-test`，以 `-test` 後綴區分測試版。
+- 本次僅調整版本標示與說明，生成行為及相依套件不變；正式版仍為 `neo 2.29.2-tw.1`。
+- 正式發布前應移除 `-test`，並依當次更新調整上游版本及 `tw` 修訂號。
+
 ## 2.29.2-tw.1（2026-10-04）
 
 本次正式分支更新由 2.29.1 升至 2.29.2-tw.1；上游版本為 2.29.2。更新內容、實測及已知限制見 [本次發布說明](docs/releases/2.29.2-tw.1.md)。

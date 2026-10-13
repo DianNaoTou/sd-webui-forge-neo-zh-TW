@@ -6,20 +6,23 @@
 
 | 選項 | 適用情況 | 下載 |
 |---|---|---|
-| 最新正式版：2.29.2-tw.1 | 一般安裝與更新 | [正式分支 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo.zip) |
+| 最新正式版：2.30-tw.1 | 一般安裝與更新 | [正式分支 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo.zip) |
+| 上一正式版：2.29.2-tw.1 | 回退或比對上一版本 | [固定版本 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/tags/2.29.2-tw.1.zip) |
 | 首個穩定版：2.29.1-tw.1 | 保留更新前行為或回退比對 | [固定提交 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/fecbe6bf666a102680fcfe0626eae91a60fe0122.zip) |
 | 測試版：neo-test | 協助驗證尚未正式發布的修改 | [測試分支 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo-test.zip) |
 
-正式與測試分支 ZIP 重新下載時會取得當下分支內容；已下載的 ZIP 不會自動更新。首個穩定版固定提交 ZIP 永遠指向相同程式。兩個版本均已建立固定 Tag／GitHub Release。進入下列發布頁，展開 Assets 並選擇 Source code (zip)，即可下載固定版本：
+正式與測試分支 ZIP 重新下載時會取得當下分支內容；已下載的 ZIP 不會自動更新。首個穩定版固定提交 ZIP 永遠指向相同程式。正式發布使用固定 Tag／GitHub Release，舊版本原樣保留。進入下列發布頁，展開 Assets 並選擇 Source code (zip)，即可下載固定版本：
 
-- [2.29.2-tw.1 正式發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.29.2-tw.1)
+- [2.30-tw.1 正式發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.30-tw.1)
+- [2.29.2-tw.1 上一正式版發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.29.2-tw.1)
 - [2.29.1-tw.1 首個穩定版發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.29.1-tw.1)
 
 固定版本 ZIP 不會跟隨分支更新；需要後续更新時，請使用正式分支或下載下一次發布。
 
 ## 本次與歷史說明
 
-- [2.29.2-tw.1：本次更新與已知限制](docs/releases/2.29.2-tw.1.md)
+- [2.30-tw.1：本次更新與已知限制](docs/releases/2.30-tw.1.md)
+- [2.29.2-tw.1：歷史更新與已知限制](docs/releases/2.29.2-tw.1.md)
 - [2.29.1-tw.1：首個穩定版保存紀錄](docs/releases/2.29.1-tw.1.md)
 - [完整更新紀錄](CHANGELOG.md)
 
@@ -45,8 +48,10 @@ git pull --ff-only
 
 ## 版本呈現
 
-新版啟動與介面資訊使用 `neo 2.29.2-tw.1`。舊版程式保持不變，仍顯示 `neo 2.29.1`，其整合版發布名稱為 `2.29.1-tw.1`。
+正式版啟動與介面資訊使用 `neo 2.30-tw.1`；測試分支目前使用 `neo 2.30-tw.1-test`。`-test` 表示測試分支，並非新的正式發布。正式發布前移除 `-test`，並依當次更新調整上游版本及 `tw` 修訂號。舊版程式保持不變，仍顯示 `neo 2.29.1`，其整合版發布名稱為 `2.29.1-tw.1`。
 
 ## 發布紀錄規則
 
 每次正式發布記錄上游基準、整合版新增／修正、實測結果及已知限制。正式版本使用固定 Tag／Release 保存；共同工作紀錄另記錄修改過程，不取代給使用者看的更新說明。
+
+更新前正式分支提交 `7008f298b9c113a954bbdba92859ad82d50ab68b` 保存於 `archive/2.29.2-tw.1`，原固定 Tag／Release 不移動。發布 workflow 僅在正式 `neo` 分支更新時執行，回歸通過後依版本檔與本版文件建立固定 Tag／Release；相同版本的既有 Release 不覆寫。

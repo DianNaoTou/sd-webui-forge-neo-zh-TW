@@ -380,19 +380,22 @@ def attention_flash(q, k, v, heads, mask=None, attn_precision=None, skip_reshape
         if mask.ndim == 3:
             mask = mask.unsqueeze(1)
 
-    try:
-        assert mask is None
-        out = flash_attn_wrapper(
-            q.transpose(1, 2),
-            k.transpose(1, 2),
-            v.transpose(1, 2),
-            dropout_p=0.0,
-            causal=False,
-        ).transpose(1, 2)
-        _fallback = False
-    except Exception as e:
-        logger.error(f"Error running flash_attn: {e}")
-        _fallback = True
+    # FlashAttention cannot represent an arbitrary explicit mask. Keep it for
+    # SDPA, including Qwen 2.1's offset causal segments. Do not use assert here:
+    # Python -O removes assertions and would silently discard the mask.
+    _fallback = mask is not None
+    if not _fallback:
+        try:
+            out = flash_attn_wrapper(
+                q.transpose(1, 2),
+                k.transpose(1, 2),
+                v.transpose(1, 2),
+                dropout_p=0.0,
+                causal=False,
+            ).transpose(1, 2)
+        except Exception as e:
+            logger.error(f"Error running flash_attn: {e}")
+            _fallback = True
 
     if _fallback:
         out = operations.scaled_dot_product_attention(q, k, v, attn_mask=mask, dropout_p=0.0, is_causal=False)
@@ -453,11 +456,15 @@ def slice_attention_vae(q, k, v):
     steps = 1
 
     if mem_required > mem_free_total:
-        steps = 2 ** (math.ceil(math.log(mem_required / mem_free_total, 2)))
+        steps = 2 ** (math.ceil(math.log2(mem_required / mem_free_total)))
+
+    if memory_management.is_device_mps(q.device):
+        if (elements := q.shape[0] * q.shape[1] * k.shape[2]) > (max_elements := 2**31 - 1):
+            steps = max(steps, 2 ** math.ceil(math.log2(elements / max_elements)))
 
     while True:
         try:
-            slice_size = q.shape[1] // steps if (q.shape[1] % steps) == 0 else q.shape[1]
+            slice_size = math.ceil(q.shape[1] / steps)
             for i in range(0, q.shape[1], slice_size):
                 end = i + slice_size
                 s1 = torch.bmm(q[:, i:end], k) * scale
@@ -469,7 +476,7 @@ def slice_attention_vae(q, k, v):
                 del s2
             break
         except Exception as e:
-            if not memory_management.is_oom(e):
+            if not (memory_management.is_oom(e) or "INT_MAX" in str(e)):
                 raise e
             if steps > 128:
                 raise e
