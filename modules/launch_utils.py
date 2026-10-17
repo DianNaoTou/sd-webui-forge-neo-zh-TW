@@ -281,11 +281,6 @@ def prepare_environment():
         print(f"PyTorch backend mismatch: expected {expected_torch_backend}, found {installed_torch_backend or 'unknown'}. Reinstalling PyTorch...")
 
     if args.reinstall_torch or repair_torch_backend or not is_installed("torch") or not is_installed("torchvision"):
-        # TODO: Yeet Nunchaku...
-        if args.nunchaku:
-            torch_command = os.environ.get("TORCH_COMMAND", f"pip install torch==2.11.0+cu130 torchvision==0.26.0+cu130 --extra-index-url {torch_index_url}")
-            print("(using an older version of PyTorch due to Nunchaku dependency...)")
-
         run(f'"{python}" -m {torch_command}', "Installing PyTorch", "Couldn't install PyTorch", live=True)
         startup_timer.record("install torch")
 
@@ -319,7 +314,6 @@ assert cuda or xpu or mps
     ver_SAGE = "2.2.0"
     ver_FLASH = "2.8.3"
     ver_TRITON = "3.7.1"
-    ver_NUNCHAKU = "1.2.1"
     ver_TORCH, ver_CUDA = _torch_version()
     v_TORCH = ver_TORCH.rsplit(".", 1)[0]
     v_CUDA = f"{ver_CUDA[0:-1]}.{ver_CUDA[-1]}"
@@ -330,13 +324,15 @@ assert cuda or xpu or mps
         sage_package = os.environ.get("SAGE_PACKAGE", f"https://github.com/woct0rdho/SageAttention/releases/download/v{ver_SAGE}-windows.post6/sageattention-{ver_SAGE}+{ver_CUDA}torch2.10.0andhigher.post6-cp310-abi3-win_amd64.whl")
         flash_package = os.environ.get("FLASH_PACKAGE", f"https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.9.52/flash_attn-{ver_FLASH}+{ver_CUDA}torch{v_TORCH}-{ver_PY}-{ver_PY}-win_amd64.whl")
         triton_package = os.environ.get("TRITION_PACKAGE", f"triton-windows=={ver_TRITON}")
-        nunchaku_package = os.environ.get("NUNCHAKU_PACKAGE", f"https://github.com/nunchaku-ai/nunchaku/releases/download/v{ver_NUNCHAKU}/nunchaku-{ver_NUNCHAKU}+{v_CUDA}torch{v_TORCH}-{ver_PY}-{ver_PY}-win_amd64.whl")
+        nunchaku_platform = "win_amd64"
 
     else:
         sage_package = os.environ.get("SAGE_PACKAGE", f"sageattention=={ver_SAGE}")
         flash_package = os.environ.get("FLASH_PACKAGE", f"https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.9.47/flash_attn-{ver_FLASH}+{ver_CUDA}torch{v_TORCH}-{ver_PY}-{ver_PY}-linux_x86_64.whl")
         triton_package = os.environ.get("TRITION_PACKAGE", f"triton=={ver_TRITON}")
-        nunchaku_package = os.environ.get("NUNCHAKU_PACKAGE", f"https://github.com/nunchaku-ai/nunchaku/releases/download/v{ver_NUNCHAKU}/nunchaku-{ver_NUNCHAKU}+{v_CUDA}torch{v_TORCH}-{ver_PY}-{ver_PY}-linux_x86_64.whl")
+        nunchaku_platform = "linux_x86_64"
+
+    nunchaku_package = os.environ.get("NUNCHAKU_PACKAGE") or dependency_utils.nunchaku_wheel(v_TORCH, v_CUDA, ver_PY, nunchaku_platform)
 
     cuda_build = torch_backend() == "cuda"
     if not cuda_build and any((args.xformers, args.sage, args.flash, args.nunchaku, args.onnxruntime_gpu)):
@@ -371,12 +367,15 @@ assert cuda or xpu or mps
             startup_timer.record("install flash_attn")
 
     if args.nunchaku and not is_installed("nunchaku"):
-        try:
-            run_pip(f"install {nunchaku_package}", "nunchaku")
-        except RuntimeError:
-            print("Failed to install nunchaku; Please manually install it")
+        if nunchaku_package is None:
+            print("No verified Nunchaku wheel for this PyTorch/CUDA/Python combination; skipping optional installation. PyTorch is unchanged. Set NUNCHAKU_PACKAGE only to a verified compatible wheel.")
         else:
-            startup_timer.record("install nunchaku")
+            try:
+                run_pip(f"install --no-deps {nunchaku_package}", "nunchaku")
+            except RuntimeError:
+                print("Failed to install nunchaku; Please manually install a compatible wheel")
+            else:
+                startup_timer.record("install nunchaku")
 
     if args.pynvml and not is_installed("pynvml"):
         run_pip(f"install {pynvml_package}", "pynvml")

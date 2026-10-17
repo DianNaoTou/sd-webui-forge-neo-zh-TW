@@ -2,6 +2,27 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.30-tw.2-test.1（2026-10-18）
+
+- 同步上游 `ce6848b8..f7f23149`，依實際 Diff 保留已整合 VAE 與我方 Flash 遮罩保護。
+- Spectrum 重寫：分批／條件獨立預測、擬合快取；補上 HR 步數為 0 的回退、純量條件防護及預測串流讀取前等待。
+- 修正權重錯誤分類、API 腳本預設參數重用，統一主模型／Refiner／HR／XYZ 模型清單刷新。
+- 更新 Callback 呼叫者查找、設定頁排版、輸入框高度與 comfy-kitchen 0.2.38；保留本地依賴約束及繁中翻譯。
+- Nunchaku 維持選用，移除自動降級 PyTorch；未確認相容 Wheel 的組合略過安裝，明確指定的 Wheel 以 `--no-deps` 安裝。
+- [完整審查、衝突與驗證限制](docs/reviews/2026-10-18-upstream-sync.md)。此版未經 GPU 推論實測；正式版維持 2.30-tw.1。
+
+## 2.30-tw.1（2026-10-13）
+
+將已測試的 2.30-tw.1-test 升為正式版；完整新增功能、Bug 修正、驗證與已知限制見 [本次發布說明](docs/releases/2.30-tw.1.md)。
+
+- 新增 Qwen-Image-2.1、DeGrid、正向／反向條件批次計算，以及 VAE／文字編碼器檔名顯示設定。
+- 正式納入 NVIDIA CPU-only PyTorch 自動修復與 Intel XPU 後端防護；插件共用安裝流程約束 torch／torchvision 版本。
+- 修正 DeGrid 寫死 CUDA、Qwen 2.1 分塊 VAE 四通道配置、Flash 遮罩在 Python -O 下被忽略，以及批次提示詞生成資訊。
+- 補齊 2.30 新增繁中介面，修正提示詞延遲說明翻譯。
+- 保留既有 XPU 查詢分塊與相依政策；未納入 ede60e1a causal Flash 優化，也未追加尚未測試的上游更新。
+- B580 仍有 OUT_OF_DEVICE_MEMORY／DEVICE_LOST，本次未修復；依維護者決定列為已知限制後發布。
+- 保留 2.29.2-tw.1／2.29.1-tw.1 固定 Tag 與 Release，另封存更新前正式分支。新增正式合併後的回歸與固定 Tag／Release 發布流程；neo-test 保持測試版標示。
+
 ## 2.30-tw.1-test（2026-10-11）
 
 - 候選 PR：納入上游 `58700b99` 的 2D 分塊 VAE 解碼通道數修補，支援 Qwen 2.1 四通道輸出；新增數值回歸測試。

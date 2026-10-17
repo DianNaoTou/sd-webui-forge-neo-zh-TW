@@ -12,17 +12,20 @@
 
 ## 版本與下載
 
-目前正式發布版本：**2.29.2-tw.1**（上游 2.29.2）。
+目前測試版本：**2.30-tw.2-test.1**（`neo-test`，尚待 Windows／RTX 5060 Ti／Arc B580 實測）。[本輪整合與測試說明](docs/reviews/2026-10-18-upstream-sync.md)。
 
-- [2.29.2-tw.1 正式發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.29.2-tw.1)（固定版本 ZIP 與繁中更新說明）
+目前正式發布版本：**2.30-tw.1**（上游 2.30）。
+
+- [2.30-tw.1 正式發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.30-tw.1)（固定版本 ZIP 與繁中更新說明）
+- [2.29.2-tw.1 上一正式版發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.29.2-tw.1)
 - [2.29.1-tw.1 首個穩定版發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.29.1-tw.1)
 - [最新正式版 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo.zip)
 - [首個穩定版 2.29.1-tw.1 固定 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/fecbe6bf666a102680fcfe0626eae91a60fe0122.zip)
 - [測試版 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo-test.zip)
 
-[版本選擇與更新方式](./RELEASES.md) ｜ [本次更新與已知限制](./docs/releases/2.29.2-tw.1.md) ｜ [完整更新紀錄](./CHANGELOG.md)
+[版本選擇與更新方式](./RELEASES.md) ｜ [本次更新與已知限制](./docs/releases/2.30-tw.1.md) ｜ [完整更新紀錄](./CHANGELOG.md)
 
-Intel B580 高解析度修復使用查詢分塊以降低注意力記憶體尖峰，可能較慢；連續生成穩定性仍待驗證，詳見本次更新說明。
+Intel B580 高解析度修復仍可能較慢，連續生成曾出現 OOM／DEVICE_LOST；本版保留為已知問題，未宣稱修復，詳見本次更新說明。
 
 ## 專案介紹
 

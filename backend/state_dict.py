@@ -29,6 +29,8 @@ def load_state_dict(model: torch.nn.Module, sd: dict[str, torch.Tensor], ignore_
         missing = [x for x in missing if not x.startswith(ignore_start)]
         unexpected = [x for x in unexpected if not x.startswith(ignore_start)]
 
+    unexpected = [x for x in unexpected if "comfy_attention" not in x]
+
     log_name = log_name or type(model).__name__
     if len(missing) > 0:
         print(f"{log_name} Missing: {missing}")

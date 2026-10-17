@@ -178,7 +178,7 @@ class LoraUserMetadataEditor(ui_extra_networks_user_metadata.UserMetadataEditor)
             random_prompt = gr.Textbox(label="隨機提示詞", lines=4, max_lines=4, interactive=False, scale=9)
             generate_random_prompt = gr.Button("產生", size="lg", scale=1)
 
-        self.edit_notes = gr.TextArea(label="備註", lines=2, max_lines=4)
+        self.edit_notes = gr.TextArea(label="備註", lines=1.05, max_lines=4)
 
         generate_random_prompt.click(fn=self.generate_random_prompt, inputs=[self.edit_name_input], outputs=[random_prompt], show_progress=False)
 

@@ -190,3 +190,22 @@ def ensure_onnxruntime(run_pip):
         run_pip(f'install --force-reinstall "{spec}"', f'repair ONNX Runtime ({backend})')
     elif not requirement_met(spec):
         run_pip(f'install "{spec}"', f'ONNX Runtime ({backend})')
+
+
+def nunchaku_wheel(torch_version, cuda_version, python_tag, platform_tag):
+    """Only generate URLs for verified v1.2.1 release assets (2026-10-18).
+
+    In particular, CUDA 13.0 alone does not imply PyTorch 2.13 ABI support.
+    Unknown combinations remain optional and must never downgrade PyTorch.
+    """
+    if python_tag not in ('cp310', 'cp311', 'cp312', 'cp313'):
+        return None
+    if platform_tag not in ('win_amd64', 'linux_x86_64'):
+        return None
+    supported = {'cu12.8': ('2.8', '2.9', '2.10', '2.11'),
+                 'cu13.0': ('2.9', '2.10', '2.11')}
+    if torch_version not in supported.get(cuda_version, ()):
+        return None
+    return (f'https://github.com/nunchux-ai/nunchaku/releases/download/v1.2.1/'
+            f'nunchaku-1.2.1+{cuda_version}torch{torch_version}-'
+            f'{python_tag}-{python_tag}-{platform_tag}.whl')
