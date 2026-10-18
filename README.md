@@ -12,7 +12,7 @@
 
 ## 版本與下載
 
-目前測試版本：**2.30-tw.2-test.1**（`neo-test`，尚待 Windows／RTX 5060 Ti／Arc B580 實測）。[本輪整合與測試說明](docs/reviews/2026-10-18-upstream-sync.md)。
+目前測試版本：**2.30-tw.2-test.2**（`neo-test`，尚待 Windows／RTX 5060 Ti／Arc B580 實測）。[ControlNet 修補與測試說明](docs/reviews/2026-10-18-controlnet-test2.md)。
 
 目前正式發布版本：**2.30-tw.1**（上游 2.30）。
 

@@ -841,6 +841,9 @@ def process_images(p: StableDiffusionProcessing) -> Processed:
             res = process_images_inner(p)
 
     finally:
+        cleanup = getattr(p.scripts, "cleanup_processing", None)
+        if cleanup is not None:
+            cleanup(p)
         # restore original options
         if p.override_settings_restore_afterwards:
             set_config(stored_opts, save_config=False)

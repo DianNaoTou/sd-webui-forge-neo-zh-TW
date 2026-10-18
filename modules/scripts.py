@@ -55,6 +55,10 @@ class OnComponent:
     component: gr.blocks.Block
 
 
+class ScriptAbortError(RuntimeError):
+    """An extension explicitly requires the current generation to stop."""
+
+
 class Script:
     name = None
     """script's internal name derived from title"""
@@ -294,6 +298,10 @@ class Script:
         args contains all values returned by components from ui()
         """
 
+        pass
+
+    def cleanup_processing(self, p):
+        """Release request resources on success or failure; called in process_images finally."""
         pass
 
     def before_component(self, component, **kwargs):
@@ -843,6 +851,8 @@ class ScriptRunner:
             try:
                 script_args = p.script_args[script.args_from : script.args_to]
                 script.process(p, *script_args)
+            except ScriptAbortError:
+                raise
             except Exception:
                 errors.report(f"Error running process: {script.filename}", exc_info=True)
 
@@ -851,6 +861,8 @@ class ScriptRunner:
             try:
                 script_args = p.script_args[script.args_from : script.args_to]
                 script.process_before_every_sampling(p, *script_args, **kwargs)
+            except ScriptAbortError:
+                raise
             except Exception:
                 errors.report(f"Error running process_before_every_sampling: {script.filename}", exc_info=True)
 
@@ -891,8 +903,19 @@ class ScriptRunner:
             try:
                 script_args = p.script_args[script.args_from : script.args_to]
                 script.process_before_every_sampling(p, *script_args, **kwargs)
+            except ScriptAbortError:
+                raise
             except Exception:
                 errors.report(f"Error running process_before_every_sampling: {script.filename}", exc_info=True)
+
+    def cleanup_processing(self, p):
+        for script in self.alwayson_scripts:
+            cleanup = getattr(script, "cleanup_processing", None)
+            if cleanup is not None:
+                try:
+                    cleanup(p)
+                except Exception:
+                    errors.report(f"Error cleaning up processing: {script.filename}", exc_info=True)
 
     def postprocess(self, p, processed):
         for script in self.ordered_scripts("postprocess"):
@@ -915,6 +938,8 @@ class ScriptRunner:
             try:
                 script_args = p.script_args[script.args_from : script.args_to]
                 script.postprocess_batch_list(p, pp, *script_args, **kwargs)
+            except ScriptAbortError:
+                raise
             except Exception:
                 errors.report(f"Error running postprocess_batch_list: {script.filename}", exc_info=True)
 

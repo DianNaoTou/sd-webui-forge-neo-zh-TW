@@ -45,6 +45,7 @@ _CONTROL_MODEL_CACHE = ModelCache()
 
 
 class ControlModelPatcher:
+    conditioning_kind = None
 
     @staticmethod
     def try_build_from_state_dict(state_dict, ckpt_path):
@@ -72,6 +73,7 @@ class ControlModelPatcher:
 
 
 class ControlNetPatcher(ControlModelPatcher):
+    conditioning_kind = "image"
 
     def __init__(self, model_patcher):
         super().__init__(model_patcher)
@@ -165,7 +167,9 @@ class ControlNetPatcher(ControlModelPatcher):
         controlnet_config["hint_width"] = controlnet_data["{}input_hint_block.0.weight".format(prefix)].shape[0]
 
         global _CONTROL_MODEL_CACHE
-        control_model = _CONTROL_MODEL_CACHE.get(ckpt_path)
+        cache_key = (ckpt_path, unet_dtype, computation_dtype, load_device)
+        cached = _CONTROL_MODEL_CACHE.get(cache_key)
+        control_model, model_patcher = cached if cached is not None else (None, None)
 
         if control_model is not None:
             logger.info("Reusing ControlNet Model...")
@@ -193,15 +197,15 @@ class ControlNetPatcher(ControlModelPatcher):
             if len(unexpected) > 0:
                 logger.debug("Unexpected ControlNet Keys: {}".format(unexpected))
 
-            _CONTROL_MODEL_CACHE.put(ckpt_path, control_model)
-
         global_average_pooling = False
         filename = os.path.splitext(ckpt_path)[0]
         if filename.endswith("_shuffle") or filename.endswith("_shuffle_fp16"):
             # TODO: smarter way of enabling global_average_pooling
             global_average_pooling = True
 
-        control = ControlNet(control_model, global_average_pooling=global_average_pooling, load_device=load_device, manual_cast_dtype=computation_dtype)
+        control = ControlNet(control_model, global_average_pooling=global_average_pooling, load_device=load_device, manual_cast_dtype=computation_dtype, model_patcher=model_patcher)
+        # Keep the device manager wrapper alive with the cached weights.
+        _CONTROL_MODEL_CACHE.put(cache_key, (control_model, control.control_model_wrapped))
         return ControlNetPatcher(control)
 
     def process_before_every_sampling(self, process, cond, mask, *args, control_type=None, **kwargs):

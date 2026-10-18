@@ -267,6 +267,24 @@ class ControlNetForForgeOfficial(scripts.Script):
             unit.module = "None"
 
         preprocessor = global_state.get_preprocessor(unit.module)
+        if preprocessor is None:
+            raise ValueError(f"找不到 ControlNet 預處理器：{unit.module}")
+        if preprocessor.do_not_need_model:
+            model_filename = "Not Needed"
+            params.model = ControlModelPatcher()
+        else:
+            if unit.model in (None, "", "None"):
+                raise ValueError("尚未選擇控制模型；請選擇與預處理器配套的模型，或停用該控制單元。")
+            model_filename = global_state.get_controlnet_filename(unit.model)
+            if not model_filename or not os.path.isfile(model_filename):
+                raise ValueError(f"找不到控制模型：{unit.model}；請重新整理模型清單。")
+            params.model = try_load_supported_control_model(model_filename)
+            if params.model is None:
+                raise ValueError(f"無法辨識控制模型：{unit.model}")
+        expected = getattr(preprocessor, "model_conditioning_kind", None)
+        actual = getattr(params.model, "conditioning_kind", None)
+        if expected is not None and actual is not None and expected != actual:
+            raise ValueError(f"預處理器 {unit.module} 與模型 {unit.model} 不相容；IPAdapter／InstantID 預處理器需配套的 IPAdapter／InstantID 權重。")
 
         input_list, resize_mode = self.get_input_data(p, unit, preprocessor, h, w)
         preprocessor_outputs = []
@@ -382,17 +400,7 @@ class ControlNetForForgeOfficial(scripts.Script):
             else:
                 params.control_mask_for_hr_fix = params.control_mask
 
-        if preprocessor.do_not_need_model:
-            model_filename = "Not Needed"
-            params.model = ControlModelPatcher()
-        else:
-            assert unit.model != "None", "You have not selected any control model!"
-            model_filename = global_state.get_controlnet_filename(unit.model)
-            params.model = try_load_supported_control_model(model_filename)
-            if params.model is None:
-                logger.error(f"Failed to load Control Model: {model_filename}")
-                return
-
+        self.validate_conditioning(params.model, params.control_cond, unit)
         params.preprocessor = preprocessor
 
         params.preprocessor.process_after_running_preprocessors(process=p, params=params, **kwargs)
@@ -463,10 +471,16 @@ class ControlNetForForgeOfficial(scripts.Script):
             params.model.positive_advanced_weighting = soft_weighting.copy()
             params.model.negative_advanced_weighting = soft_weighting.copy()
 
+        objects = p.sd_model.forge_objects
+        if getattr(self, "_patch_target", None) is not objects:
+            self._patch_target = objects
+            self._unet_before_controlnet = objects.unet
+
         cond, mask = params.preprocessor.process_before_every_sampling(p, cond, mask, *args, **kwargs)
 
         params.model.advanced_mask_weighting = mask
 
+        self.validate_conditioning(params.model, cond, unit)
         params.model.process_before_every_sampling(p, cond, mask, *args, **kwargs, control_type=convert_control_type(unit.type_filter))
 
         logger.info(f"ControlNet Method {params.preprocessor.name} patched.")
@@ -501,33 +515,95 @@ class ControlNetForForgeOfficial(scripts.Script):
         if params.model is not None:
             params.model.process_after_every_sampling(p, params, *args, **kwargs)
 
+    @staticmethod
+    def validate_conditioning(model, cond, unit):
+        kind = getattr(model, "conditioning_kind", None)
+        if kind == "image" and not isinstance(cond, torch.Tensor):
+            raise ValueError(f"預處理器 {unit.module} 的輸出不是圖片張量，不能搭配一般 ControlNet 模型 {unit.model}。請改用配套模型。")
+        if kind == "ipadapter" and (not isinstance(cond, dict) or "image" not in cond):
+            raise ValueError(f"模型 {unit.model} 需要 IPAdapter／InstantID 預處理器的特徵資料，不能使用一般圖片預處理器 {unit.module}。")
+
+    def cleanup_processing(self, p):
+        # ADetailer can call process_images recursively with ControlNet disabled.
+        if getattr(self, "_request_id", None) != id(p):
+            return
+        self._request_id = None
+        params = getattr(self, "current_params", {})
+        self.current_params = {}
+        target = getattr(self, "_patch_target", None)
+        original = getattr(self, "_unet_before_controlnet", None)
+        self._patch_target = None
+        self._unet_before_controlnet = None
+        try:
+            if target is not None:
+                from backend.sampling.sampling_function import sampling_cleanup
+                try:
+                    sampling_cleanup(target.unet)
+                finally:
+                    target.unet = original
+        finally:
+            for item in params.values():
+                item.model = None
+                item.preprocessor = None
+                item.control_cond = item.control_cond_for_hr_fix = None
+                item.control_mask = item.control_mask_for_hr_fix = None
+
+    def _abort(self, p, unit, error):
+        try:
+            self.cleanup_processing(p)
+        except Exception:
+            logger.exception("ControlNet cleanup failed")
+        raise scripts.ScriptAbortError(f"ControlNet 單元 {getattr(unit, '_idx', 0) + 1}：{error}") from error
+
     @torch.no_grad()
     def process(self, p, *args, **kwargs):
         if getattr(p, "control_net_disabled", False):
             return
-
+        self._request_id = id(p)
         self.current_params = {}
-        enabled_units = self.get_enabled_units(args)
-        Infotext.write_infotext(enabled_units, p)
+        self._patch_target = None
+        self._unet_before_controlnet = None
+        try:
+            enabled_units = self.get_enabled_units(args)
+            Infotext.write_infotext(enabled_units, p)
+        except Exception as error:
+            self._abort(p, None, error)
         for i, unit in enumerate(enabled_units):
             unit._idx = i
-            self.bound_check_params(unit)
             params = ControlNetCachedParameters()
-            self.process_unit_after_click_generate(p, unit, params, *args, **kwargs)
             self.current_params[i] = params
+            try:
+                self.bound_check_params(unit)
+                self.process_unit_after_click_generate(p, unit, params, *args, **kwargs)
+            except Exception as error:
+                self._abort(p, unit, error)
 
     @torch.no_grad()
     def process_before_every_sampling(self, p, *args, **kwargs):
+        if getattr(p, "control_net_disabled", False):
+            return
         for i, unit in enumerate(self.get_enabled_units(args)):
-            self.process_unit_before_every_sampling(p, unit, self.current_params[i], *args, **kwargs)
+            try:
+                params = getattr(self, "current_params", {}).get(i)
+                if params is None:
+                    raise ValueError("控制單元尚未成功初始化，已停止本次生成；請修正設定後重試。")
+                self.process_unit_before_every_sampling(p, unit, params, *args, **kwargs)
+            except Exception as error:
+                unit._idx = i
+                self._abort(p, unit, error)
 
     @torch.no_grad()
     def postprocess_batch_list(self, p, pp, *args, **kwargs):
+        if getattr(p, "control_net_disabled", False):
+            return
         for i, unit in enumerate(self.get_enabled_units(args)):
-            self.process_unit_after_every_sampling(p, unit, self.current_params[i], pp, *args, **kwargs)
+            params = getattr(self, "current_params", {}).get(i)
+            if params is not None:
+                self.process_unit_after_every_sampling(p, unit, params, pp, *args, **kwargs)
 
     def postprocess(self, p, processed, *args):
-        self.current_params = {}
+        # Cleanup is deferred until process_images finally, after all postprocessors.
+        pass
 
 
 def on_ui_settings():
