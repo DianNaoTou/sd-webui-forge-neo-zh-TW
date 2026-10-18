@@ -20,10 +20,12 @@ jobs:
           python -m pip install torch==2.14.1+cpu --index-url https://download.pytorch.org/whl/cpu
           python -m pip install packaging filelock tqdm Pillow==10.4.0 numpy
       - name: Compile core Python files
-        run: python -m compileall -q backend modules modules_forge scripts tests extensions-builtin/sd_forge_spectrum extensions-builtin/sd_forge_controlnet extensions-builtin/sd_forge_ipadapter
+        run: python -m compileall -q backend modules modules_forge scripts tests tools/launch_xpu_profile.py extensions-builtin/sd_forge_spectrum extensions-builtin/sd_forge_controlnet extensions-builtin/sd_forge_ipadapter
       - name: Run regression suite with real CPU PyTorch
         run: python -m unittest discover -s tests -v
       - name: Check optimized Python mask protection
         run: python -O -m unittest discover -s tests -p test_vae_flash_regressions.py -v
       - name: Check optimized Python ControlNet lifecycle
         run: python -O -m unittest discover -s tests -p test_controlnet_lifecycle.py -v
+      - name: Check isolated XPU profile contracts
+        run: python -O -m unittest discover -s tests -p test_xpu_profiles.py -v

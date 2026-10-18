@@ -48,3 +48,6 @@ notification.mp3
 *.bak
 *.log
 /extensions/**/.git/
+
+/venv-xpu-official/
+/venv-xpu-kitchen/

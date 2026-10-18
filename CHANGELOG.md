@@ -2,6 +2,14 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.30-tw.2-test.3（2026-10-18）
+
+- 新增官方 XPU 與 Kitchen XPU 實驗組獨立啟動檔，兩組固定 torch 2.14.1+xpu／torchvision 0.29.1+xpu，以 Kitchen 為主要比較變數；保留原 Intel 2.14.0 啟動檔及 NVIDIA 環境。
+- 分開 venv、設定、UI 設定、styles、輸出、HF／Torch／pip／暫存快取、連接埠及 Torch 安裝約束；只共用程式碼與模型路徑。擴充安裝設定階段序列化，避免 A/B 同時安裝衝突。
+- 實驗組固定來源版本，提供原生建置入口與本機 Wheel／SHA256 安裝；檢查 Torch ABI、BMG package／AOT target、B580 裝置、XPU 能力與強制原生 INT8 smoke test，缺少配套時停止，不靜默回退冒充加速。
+- Kitchen 修改版以獨立 requirements／安裝約束維持 0.2.37，官方組維持 0.2.38；不改根 requirements 或降級其他環境。
+- 新增 12 項隔離／錯誤防護測試；[操作、建置條件與未驗證限制](docs/reviews/2026-10-18-xpu-ab-test3.md)。目前無公開配套 Windows 原生 Wheel，B 組須建置後實測；未宣稱兩組已通過 Windows／GPU 推論。
+
 ## 2.30-tw.2-test.2（2026-10-18）
 
 - ControlNet 未選模型、模型不存在／無法辨識、已知 IPAdapter／一般 ControlNet 搭配錯誤時，明確提示並中止本次生成，避免悄悄退回無控制出圖。

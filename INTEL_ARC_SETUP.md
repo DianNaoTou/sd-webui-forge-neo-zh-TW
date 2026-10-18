@@ -1,3 +1,7 @@
+> **新增 test.3：隔離比較啟動方式**
+> `webui-user-intel-xpu-official.bat` 使用官方 PyTorch 2.14.1 XPU；`webui-user-intel-xpu-kitchen.bat` 使用相同 PyTorch 與 Kitchen XPU 修改版。各自獨立 venv／設定／輸出／快取，原啟動檔維持 PyTorch 2.14.0。
+> **實驗組目前沒有可直接下載的官方配套 Windows 原生 Wheel**，須自行建置或提供匹配的本機 Wheel；缺核心會明確停止，不以 eager 冒充。詳見 [完整說明](docs/reviews/2026-10-18-xpu-ab-test3.md)。
+
 # Intel Arc 安裝與啟動
 
 Intel Arc 版本沿用 Forge Neo 原本的自動安裝流程。第一次啟動時會建立獨立的
