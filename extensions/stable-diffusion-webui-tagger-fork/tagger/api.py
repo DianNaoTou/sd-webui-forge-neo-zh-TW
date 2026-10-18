@@ -18,6 +18,9 @@ from tagger import utils  # pylint: disable=import-error
 from tagger import api_models as models  # pylint: disable=import-error
 
 
+from tagger.new_onnx import TaggerModelError
+
+
 class Api:
     """Api class for FastAPI"""
     def __init__(
@@ -203,7 +206,10 @@ class Api:
             interrogator = utils.interrogators[m]
             res = {"tag": {}, "rating": {}}
             with self.queue_lock:
-                res["rating"], tag = interrogator.interrogate(image)
+                try:
+                    res["rating"], tag = interrogator.interrogate(image)
+                except TaggerModelError as exc:
+                    raise HTTPException(503, str(exc)) from exc
 
             for k, v in tag.items():
                 if v > req.threshold:

@@ -23,6 +23,8 @@ from tagger import utils  # pylint: disable=import-error
 from tagger.interrogator import Interrogator as It  # pylint: disable=E0401
 from tagger.uiset import IOData, QData  # pylint: disable=import-error
 
+from tagger.new_onnx import TaggerModelError
+
 TAG_INPUTS = ["add", "keep", "exclude", "search", "replace"]
 COMMON_OUTPUT = Tuple[
     Optional[str],               # tags as string
@@ -78,7 +80,11 @@ def on_interrogate(
     if interrogator is None:
         return (None,) * 6 + (f"'{name}': invalid interrogator",)
 
-    interrogator.batch_interrogate()
+    try:
+        interrogator.batch_interrogate()
+    except TaggerModelError as exc:
+        It.output = (None, None, None, str(exc))
+        return (None,) * 6 + (html_esc(str(exc)),)
     return search_filter(filt)
 
 
@@ -87,6 +93,12 @@ def on_gallery() -> List:
 
 
 def on_interrogate_image(*args) -> COMMON_OUTPUT:
+    # New models download only on an explicit single/batch/API request.
+    if len(args) > 1:
+        selected = next((i for i in utils.interrogators.values()
+                         if i.name == args[1]), None)
+        if getattr(selected, 'require_submit', False):
+            return (None,) * 6 + ('請按「辨識」開始；首次使用此模型時才會下載權重。',)
     # hack brcause image interrogaion occurs twice
     It.odd_increment = It.odd_increment + 1
     if It.odd_increment & 1 == 1:
@@ -110,7 +122,11 @@ def on_interrogate_image_submit(
     if interrogator is None:
         return (None,) * 6 + (f"'{name}': invalid interrogator",)
 
-    interrogator.interrogate_image(image)
+    try:
+        interrogator.interrogate_image(image)
+    except TaggerModelError as exc:
+        It.output = (None, None, None, str(exc))
+        return (None,) * 6 + (html_esc(str(exc)),)
     return search_filter(filt)
 
 
@@ -520,6 +536,10 @@ def on_ui_tabs():
 
         common_input = [interrogator, tag_search_selection] + \
                        [tag_input[tag] for tag in TAG_INPUTS]
+
+        gr.Markdown('PixAI Tagger v0.9／Camie Tagger v2：選取模型不會下載；'
+                    '首次按下辨識才會下載至既有 Hugging Face 快取。'
+                    '下載失敗可重試，Intel Arc 環境保留 CPU 推論。')
 
         # interrogation events
         image_submit.click(fn=wrap_gradio_gpu_call(on_interrogate_image_submit),
