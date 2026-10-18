@@ -2,6 +2,14 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.30-tw.2-test.4（2026-10-19）
+
+- 原 WD14 Tagger 介面新增 PixAI Tagger v0.9（官方連結之 DeepGHS ONNX）與 Camie Tagger v2（官方 ONNX），使用專用前處理與標籤解析，不替換舊模型載入器。
+- 選取新模型、上傳圖片與啟動 WebUI 均不下載；首次按辨識／批次辨識或發出 API 辨識請求才下載。固定來源 revision，沿用 HF 快取，先查本機；已快取時可離線載入。
+- 新模型下載／載入失敗顯示繁中錯誤並可重試，不影響其他模型；保留原標籤過濾、排序、批次與提示詞／圖片傳送流程。
+- 不新增執行相依套件、不調整 PyTorch／TorchVision／ONNX Runtime 安裝或 CUDA／XPU 啟動檔；Intel Arc 沿用 CPU Tagger 後端。
+- 新增 16 項測試，完整 107 項回歸通過；兩個新模型已完成實際權重 CPU 辨識、重複辨識及禁止網路後卸載重載。尚待 Windows／RTX 5060 Ti／B580 實機驗證。[完整說明](docs/reviews/2026-10-19-wd14-test4.md)。
+
 ## 2.30-tw.2-test.3（2026-10-18）
 
 - 新增官方 XPU 與 Kitchen XPU 實驗組獨立啟動檔，兩組固定 torch 2.14.1+xpu／torchvision 0.29.1+xpu，以 Kitchen 為主要比較變數；保留原 Intel 2.14.0 啟動檔及 NVIDIA 環境。
