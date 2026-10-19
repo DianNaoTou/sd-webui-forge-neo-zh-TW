@@ -12,7 +12,7 @@
 
 ## 版本與下載
 
-目前測試版本：**2.30-tw.2-test.6**（`neo-test`；B580 官方組 HR 可完成，但仍有 OOM 與卡頓，完整驗收未完成）。[WD14 新模型與按需下載說明](docs/reviews/2026-10-19-wd14-test4.md)。[Intel XPU 隔離比較環境與限制](docs/reviews/2026-10-18-xpu-ab-test3.md)。
+目前測試版本：**2.30-tw.2-test.6**（`neo-test`；B580 官方組 HR 可完成，但仍有 OOM 與卡頓，完整驗收未完成）。[WD14 新模型與按需下載說明](docs/reviews/2026-10-19-wd14-test4.md)。[官方 Intel XPU 安裝與維護政策](INTEL_ARC_SETUP.md)。
 
 目前正式發布版本：**2.30-tw.1**（上游 2.30）。
 
@@ -216,3 +216,5 @@ Forge Neo 主程式及各插件分別依其原始授權發布。本整合版保�
 開發與上游同步請遵守 [A1111 UI Freeze 規範](docs/UI_FREEZE.md)；測試版驗收見 [雙平台實機清單](docs/validation/ui-dual-platform.md)。
 
 `neo-test` 的 test.6 預設測試 XPU 原生 SDPA；B580 的三模式比較與回復分塊保護，見 [test.6 操作說明](docs/validation/xpu-sdpa-test6.md)。
+
+Kitchen 社群 XPU 實驗已依使用者決定停止採用，專用啟動／建置入口已移除；Intel 後續只維護新的官方路徑，仍待下一次大版本才納入正式版。

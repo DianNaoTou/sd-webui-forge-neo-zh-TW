@@ -2,9 +2,15 @@
 
 本專案的重要變更會記錄在此處。
 
+## Kitchen 社群實驗撤回（2026-10-19，版本維持 test.6）
+
+- 依使用者決定暫停採用 Kitchen 社群 XPU 方案，移除其專用啟動檔、建置腳本、fork／原生核心安裝與驗收分支；只保留新的官方 XPU profile。
+- 官方環境路徑、版本與 UI／插件／注意力模式不變；保留主程式必要的 `comfy-kitchen` 官方依賴。不刪使用者本機舊環境、輸出或快取。
+- 完整 122 項 Python 回歸通過。歷史實驗文件保留並標記撤回；目前只在 `neo-test`，下一次大版本更新才納入正式版。
+
 ## 維護／發布政策備註（2026-10-19，程式版本不變）
 
-- Intel 後續以新的官方 XPU profile 為主線，舊 Torch 2.14.0／`venv-intel-arc` 路徑列為淘汰；Kitchen 僅作可選實驗。
+- Intel 後續以新的官方 XPU profile 為主線，舊 Torch 2.14.0／`venv-intel-arc` 路徑列為淘汰；Kitchen 原列可選實驗，已由上方同日撤回決策取代。
 - 新官方環境目前僅留在 `neo-test`，下一次大版本更新才納入正式版，不能以目前的一般修訂版提前合併。本次僅記錄政策，不刪環境、不改啟動器、不修改 `neo` 或發布 Release。
 - [決策與當前實測狀態](docs/decisions/2026-10-19-intel-official-baseline.md)。
 

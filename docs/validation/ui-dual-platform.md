@@ -17,12 +17,11 @@ git pull --ff-only origin neo-test
 確認分支為 `neo-test`、版本顯示 `neo 2.30-tw.2-test.5`。
 如有本地修改或快轉失敗，先保留差異，不執行 reset／clean。
 更新前另外備份測試版的 `config.json`、`ui-config.json`，及已使用的
-`runtime/xpu-ab/official`、`runtime/xpu-ab/kitchen` 設定；不要覆蓋正式版。
+`runtime/xpu-ab/official` 設定；不要覆蓋正式版。
 
 - NVIDIA：使用原本的 CUDA 啟動方式與獨立環境，記錄實際 Python／Torch／驅動。
 - Intel：使用原本 Intel 啟動器；若測 official profile，用
-  `webui-user-intel-xpu-official.bat`（7862）；kitchen 用原有已完成 native kernel
-  安裝的 `webui-user-intel-xpu-kitchen.bat`（7863）。本次不要求安裝 kitchen。
+  `webui-user-intel-xpu-official.bat`（7862）；Kitchen 社群組已停止採用，不再列入驗收。
 - 記錄使用的設定檔位置；XPU profile 使用自己的 config／ui-config，
   首次初始化後不會自動覆蓋為根目錄的新設定。
 - 啟動沒有 traceback／插件載入錯誤。驗證 `comfy_kitchen` 不再因缺少

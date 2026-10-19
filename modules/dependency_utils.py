@@ -26,12 +26,19 @@ def installed_torch_pins():
     return pins
 
 
+def xpu_profile():
+    profile = os.environ.get('FORGE_XPU_AB_PROFILE')
+    if profile and profile != 'official':
+        raise RuntimeError(f'Unsupported XPU profile: {profile}; only official is maintained')
+    return profile
+
+
 def torch_constraint_file():
+    profile = xpu_profile()
     pins = installed_torch_pins()
     if not pins:
         return None
-    profile = os.environ.get('FORGE_XPU_AB_PROFILE')
-    if profile in ('official', 'kitchen'):
+    if profile == 'official':
         path = ROOT / 'runtime' / 'xpu-ab' / profile / 'constraints-torch.txt'
     else:
         path = ROOT / 'tmp' / 'constraints-torch.txt'
@@ -46,11 +53,7 @@ def pip_constraint_args():
     # Explicit quoted arguments also support Windows paths containing spaces.
     # Bundled extension installers all call the launcher's run_pip wrapper.
     requirement = ROOT / 'requirements.txt'
-    if os.environ.get('FORGE_XPU_AB_PROFILE') == 'kitchen':
-        owned = ROOT / 'runtime' / 'xpu-ab' / 'kitchen' / 'requirements.txt'
-        if Path(os.environ.get('REQS_FILE', '')).resolve() != owned.resolve() or not owned.is_file():
-            raise RuntimeError('Invalid isolated Kitchen requirements path')
-        requirement = owned
+    xpu_profile()  # Fail before installing from a retired profile environment.
     files = [ROOT / 'constraints-common.txt', requirement]
     torch_file = torch_constraint_file()
     if torch_file is not None:

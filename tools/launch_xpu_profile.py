@@ -1,4 +1,4 @@
-"""Windows A/B entry point. All dependency writes target the selected owned venv."""
+"""Windows official XPU entry point; all dependency writes stay in its owned venv."""
 import argparse
 from importlib import metadata
 import json
@@ -17,9 +17,6 @@ def main():
     parser.add_argument('profile', choices=profiles.PROFILES)
     parser.add_argument('--inside', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--setup-only', action='store_true')
-    parser.add_argument('--build-native', action='store_true')
-    parser.add_argument('--kernel-wheel')
-    parser.add_argument('--kernel-sha256')
     args, extra = parser.parse_known_args()
     venv, state = profiles.paths(ROOT, args.profile)
     # Validate comparison flags before creating or installing anything.
@@ -43,8 +40,6 @@ def main():
     profiles.initialize_extension_link(ROOT, state)
     requirement = profiles.requirements_for(ROOT, state, args.profile)
     os.environ['REQS_FILE'] = str(requirement)
-    if args.profile == 'kitchen':
-        profiles.kernel_preflight(args.kernel_wheel, args.build_native)
     expected = {'torch':profiles.TORCH, 'torchvision':profiles.VISION}
     installed = {}
     for name in expected:
@@ -55,18 +50,9 @@ def main():
     if installed != expected:
         profiles.pip('install', 'torch==' + profiles.TORCH, 'torchvision==' + profiles.VISION,
                      '--index-url', 'https://download.pytorch.org/whl/xpu')
-    if args.profile == 'kitchen':
-        profiles.install_kernel(state, args.kernel_wheel, args.kernel_sha256, args.build_native)
-        marker = state / 'kitchen-source.json'
-        try:
-            kitchen_version = metadata.version('comfy-kitchen')
-        except metadata.PackageNotFoundError:
-            kitchen_version = None
-        if not marker.exists() or json.loads(marker.read_text())['revision'] != profiles.KITCHEN_REV or kitchen_version != '0.2.37':
-            profiles.install_kitchen(state)
     sys.argv = ['launch.py', *forge_args, '--skip-prepare-environment']
     import launch
-    # Only setup is serialized; the two UIs have separate settings/ports/outputs.
+    # Serialize setup to protect concurrent official-profile launches.
     from filelock import FileLock
     with FileLock(str(ROOT / 'runtime' / 'xpu-ab' / 'setup.lock'), timeout=600):
         launch.prepare_environment()
@@ -74,9 +60,9 @@ def main():
     from backend.args import args as backend_args
     report["xpu_sdpa"] = backend_args.xpu_sdpa
     report.update(python=sys.version, interpreter=sys.executable, port=profiles.PROFILES[args.profile][1],
-                  requirements=str(requirement), kitchen_revision=profiles.KITCHEN_REV if args.profile == 'kitchen' else None)
+                  requirements=str(requirement))
     (state / 'runtime-report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2, default=str), encoding='utf-8')
-    print('\n[XPU A/B verified]\n' + json.dumps(report, ensure_ascii=False, indent=2, default=str), flush=True)
+    print('\n[XPU official verified]\n' + json.dumps(report, ensure_ascii=False, indent=2, default=str), flush=True)
     if not args.setup_only:
         launch.main()
     return 0

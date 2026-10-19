@@ -10,9 +10,8 @@
   不是將以上版本永久鎖死。
 - 舊 `webui-user-intel-arc.bat`／`venv-intel-arc`／PyTorch `2.14.0+xpu`
   路徑列為淘汰，不再作為後續 Intel 維護或測試主線。
-- Kitchen 社群修改組僅為可選實驗，不取代官方主線，也不是正式版必要條件。
-- 本次只標註維護政策，不刪除使用者既有環境、模型、設定或歷史啟動檔。
-  舊檔案保留不代表仍列為主要支援路徑。
+- 使用者於同日進一步決定：**Kitchen 社群修改組暫停採用，移出本專案的啟動與建置支援範圍**；不再作為可選實驗推進。日後若要重新採用，另依使用者新決定處理。
+- 本次停止社群支援，但不刪除使用者既有環境、模型或設定。舊 Intel 啟動檔保留為歷史相容入口，不代表仍列為主要支援路徑；Kitchen 專用啟動／建置檔已從測試分支移除。
 
 ## 分支與發布限制
 
@@ -35,3 +34,14 @@
 介面現有「Never OOM 記憶體最佳化 → 對VAE啟用（始終分塊）」可作下一步測試，
 UNet 始終卸載保持不勾；本次尚未收到此設定的實測結果，不預先標記通過。
 社群 Kitchen 組則因缺少原生 kernel 停在前置檢查，未完成生成測試。
+
+## 同日追加：停止採用社群組
+
+- 移除 `webui-user-intel-xpu-kitchen.bat` 與 `build-intel-xpu-kitchen.bat`。
+- 移除 fork 原始碼下載、原生 kernel／wheel 建置安裝、專用 requirements 與驗收分支。
+- `tools/launch_xpu_profile.py` 僅接受 `official`；舊的 `kitchen` profile／核心建置選項會在建立環境或安裝套件前拒絕，不靜默改跑官方組。
+- 保留官方組 `venv-xpu-official`、`runtime/xpu-ab/official`、7862、Torch 2.14.1+xpu／TorchVision 0.29.1+xpu，避免重新初始化設定。
+- **保留上游主程式仍需使用的 `comfy-kitchen==0.2.38`**；捨棄的是社群 XPU fork，不是刪除官方必要依賴。
+- 不自動刪除使用者本機 `venv-xpu-kitchen` 或舊快取／輸出，亦不解除安裝開發工具。
+- 歷史 review／changelog 保留原紀錄並註明撤回狀態；不修改已發布版本。
+- 本輪完整 122 項 Python 測試通過，另驗證官方環境隔離、拒絕社群 profile、拒絕已撤回建置選項、既有版本資訊 fallback 與 UI Freeze；尚未新增 Windows／GPU 實機驗證。

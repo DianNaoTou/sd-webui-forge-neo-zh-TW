@@ -41,8 +41,8 @@ git pull --ff-only origin neo-test
 .\webui-user-intel-xpu-official.bat --xpu-sdpa sliced
 ```
 
-也可明確傳 `--xpu-sdpa native`。已建置好 kitchen profile 者，可把檔名換成
-`webui-user-intel-xpu-kitchen.bat`，其餘相同；不要為此測試另外安裝 kitchen。
+也可明確傳 `--xpu-sdpa native`。Kitchen 社群 profile 已停止採用，
+其專用啟動／建置檔已移除；本表只測官方組的三種注意力模式。
 舊 `webui-user-intel-arc.bat` 使用者，預設同樣是 native；要對照時將
 `--xpu-sdpa math` 或 `--xpu-sdpa sliced` 加到該檔原有 `COMMANDLINE_ARGS`。
 
