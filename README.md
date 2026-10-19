@@ -209,3 +209,5 @@ Forge Neo 主程式及各插件分別依其原始授權發布。本整合版保�
 ---
 
 如果這個整合版對你有幫助，歡迎提交 Issue、協助測試或改善翻譯。
+
+開發與上游同步請遵守 [A1111 UI Freeze 規範](docs/UI_FREEZE.md)；測試版驗收見 [雙平台實機清單](docs/validation/ui-dual-platform.md)。

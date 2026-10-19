@@ -286,6 +286,15 @@ def create_ui():
                                         checkpoints_list, modules_list = _load_models()
                                         return [gr.update(choices=checkpoints_list), gr.update(choices=modules_list)]
 
+                                    # Keep the A1111-style local HR refresh control as well as
+                                    # the upstream shared checkpoint refresh event.
+                                    hr_checkpoint_refresh = ToolButton(value=refresh_symbol)
+
+                                    def refresh_model_and_modules():
+                                        main_entry.refresh_models()
+                                        return _refresh_models()
+
+                                    hr_checkpoint_refresh.click(fn=refresh_model_and_modules, outputs=[hr_checkpoint_name, hr_additional_modules])
                                     main_entry.on_refresh_checkpoint(_refresh_models, outputs=[hr_checkpoint_name, hr_additional_modules])
 
                                 with FormRow(elem_id="txt2img_hires_fix_row3b", variant="compact", visible=shared.opts.hires_fix_show_sampler) as hr_sampler_container:

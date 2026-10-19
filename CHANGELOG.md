@@ -2,6 +2,14 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.30-tw.2-test.5（2026-10-19）
+
+- 修正獨立 `--data-dir` 導致核心 CSS／JavaScript 與插件前端被 Gradio 拒絕存取；精確授權公開資源，CUDA／XPU 共用相同行為。
+- 恢復 2.30-tw.1 的設定頁樣式與操作、HR 本地模型刷新按鈕，保留上游共用刷新與所有後端整合。
+- 修正 WD14 DOM 選擇器及標籤輸入事件，不再把 regex 跳脫字元寫入提示詞。
+- 新增 UI Freeze 規範、發布版元件基準、真實 Gradio HTTP 與 Node 事件測試；116 項 Python 測試與 4 項 JavaScript 測試通過。
+- 沒有重設使用者設定、變更 Torch／XPU 依賴或發布 Release；雙平台生圖、HR 與完整插件實機驗收待測。[工程紀錄](docs/reviews/2026-10-19-ui-freeze-test5.md)／[實機清單](docs/validation/ui-dual-platform.md)。
+
 ## 2.30-tw.2-test.4（2026-10-19）
 
 - 原 WD14 Tagger 介面新增 PixAI Tagger v0.9（官方連結之 DeepGHS ONNX）與 Camie Tagger v2（官方 ONNX），使用專用前處理與標籤解析，不替換舊模型載入器。

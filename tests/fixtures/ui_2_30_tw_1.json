@@ -1,0 +1,176 @@
+{
+  "commit": "678453607fd97ae4a2a0f6d926631ce112d3161d",
+  "version": "neo 2.30-tw.1",
+  "controls": {
+    "modules/ui.py": {
+      "txt2img_width": {
+        "call": "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Slider', ctx=Load()), args=[], keywords=[keyword(arg='minimum', value=Constant(value=64)), keyword(arg='maximum', value=Constant(value=2048)), keyword(arg='step', value=Name(id='_STEP', ctx=Load())), keyword(arg='label', value=Constant(value='Width')), keyword(arg='value', value=Constant(value=1024)), keyword(arg='elem_id', value=Constant(value='txt2img_width'))])",
+        "parents": [
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Blocks', ctx=Load()), args=[], keywords=[keyword(arg='analytics_enabled', value=Constant(value=False)), keyword(arg='head', value=Name(id='canvas_head', ctx=Load()))])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Tab', ctx=Load()), args=[Constant(value='Generation')], keywords=[keyword(arg='id', value=Constant(value='txt2img_generation'))])",
+          "Call(func=Name(id='ResizeHandleRow', ctx=Load()), args=[], keywords=[keyword(arg='equal_height', value=Constant(value=False))])",
+          "Call(func=Name(id='ExitStack', ctx=Load()), args=[], keywords=[])",
+          "Call(func=Name(id='FormRow', ctx=Load()), args=[], keywords=[])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Column', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=Constant(value='txt2img_column_size')), keyword(arg='scale', value=Constant(value=4))])"
+        ]
+      },
+      "txt2img_height": {
+        "call": "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Slider', ctx=Load()), args=[], keywords=[keyword(arg='minimum', value=Constant(value=64)), keyword(arg='maximum', value=Constant(value=2048)), keyword(arg='step', value=Name(id='_STEP', ctx=Load())), keyword(arg='label', value=Constant(value='Height')), keyword(arg='value', value=Constant(value=1024)), keyword(arg='elem_id', value=Constant(value='txt2img_height'))])",
+        "parents": [
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Blocks', ctx=Load()), args=[], keywords=[keyword(arg='analytics_enabled', value=Constant(value=False)), keyword(arg='head', value=Name(id='canvas_head', ctx=Load()))])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Tab', ctx=Load()), args=[Constant(value='Generation')], keywords=[keyword(arg='id', value=Constant(value='txt2img_generation'))])",
+          "Call(func=Name(id='ResizeHandleRow', ctx=Load()), args=[], keywords=[keyword(arg='equal_height', value=Constant(value=False))])",
+          "Call(func=Name(id='ExitStack', ctx=Load()), args=[], keywords=[])",
+          "Call(func=Name(id='FormRow', ctx=Load()), args=[], keywords=[])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Column', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=Constant(value='txt2img_column_size')), keyword(arg='scale', value=Constant(value=4))])"
+        ]
+      },
+      "hr_checkpoint": {
+        "call": "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Dropdown', ctx=Load()), args=[], keywords=[keyword(arg='label', value=Constant(value='Hires Checkpoint')), keyword(arg='elem_id', value=Constant(value='hr_checkpoint')), keyword(arg='choices', value=Name(id='checkpoints_list', ctx=Load())), keyword(arg='value', value=Constant(value='Use same checkpoint')), keyword(arg='scale', value=Constant(value=2))])",
+        "parents": [
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Blocks', ctx=Load()), args=[], keywords=[keyword(arg='analytics_enabled', value=Constant(value=False)), keyword(arg='head', value=Name(id='canvas_head', ctx=Load()))])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Tab', ctx=Load()), args=[Constant(value='Generation')], keywords=[keyword(arg='id', value=Constant(value='txt2img_generation'))])",
+          "Call(func=Name(id='ResizeHandleRow', ctx=Load()), args=[], keywords=[keyword(arg='equal_height', value=Constant(value=False))])",
+          "Call(func=Name(id='ExitStack', ctx=Load()), args=[], keywords=[])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Row', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=Constant(value='txt2img_accordions')), keyword(arg='elem_classes', value=Constant(value='accordions'))])",
+          "Call(func=Name(id='InputAccordion', ctx=Load()), args=[Constant(value=False)], keywords=[keyword(arg='label', value=Constant(value='Hires. fix')), keyword(arg='elem_id', value=Constant(value='txt2img_hr'))])",
+          "Call(func=Name(id='FormRow', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=Constant(value='txt2img_hires_fix_row3')), keyword(arg='variant', value=Constant(value='compact')), keyword(arg='visible', value=Attribute(value=Attribute(value=Name(id='shared', ctx=Load()), attr='opts', ctx=Load()), attr='hires_fix_show_sampler', ctx=Load()))])"
+        ]
+      },
+      "hr_vae_te": {
+        "call": "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Dropdown', ctx=Load()), args=[], keywords=[keyword(arg='label', value=Constant(value='Hires VAE / Text Encoder')), keyword(arg='elem_id', value=Constant(value='hr_vae_te')), keyword(arg='choices', value=Name(id='modules_list', ctx=Load())), keyword(arg='value', value=List(elts=[Constant(value='Use same choices')], ctx=Load())), keyword(arg='multiselect', value=Constant(value=True)), keyword(arg='scale', value=Constant(value=3))])",
+        "parents": [
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Blocks', ctx=Load()), args=[], keywords=[keyword(arg='analytics_enabled', value=Constant(value=False)), keyword(arg='head', value=Name(id='canvas_head', ctx=Load()))])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Tab', ctx=Load()), args=[Constant(value='Generation')], keywords=[keyword(arg='id', value=Constant(value='txt2img_generation'))])",
+          "Call(func=Name(id='ResizeHandleRow', ctx=Load()), args=[], keywords=[keyword(arg='equal_height', value=Constant(value=False))])",
+          "Call(func=Name(id='ExitStack', ctx=Load()), args=[], keywords=[])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Row', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=Constant(value='txt2img_accordions')), keyword(arg='elem_classes', value=Constant(value='accordions'))])",
+          "Call(func=Name(id='InputAccordion', ctx=Load()), args=[Constant(value=False)], keywords=[keyword(arg='label', value=Constant(value='Hires. fix')), keyword(arg='elem_id', value=Constant(value='txt2img_hr'))])",
+          "Call(func=Name(id='FormRow', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=Constant(value='txt2img_hires_fix_row3')), keyword(arg='variant', value=Constant(value='compact')), keyword(arg='visible', value=Attribute(value=Attribute(value=Name(id='shared', ctx=Load()), attr='opts', ctx=Load()), attr='hires_fix_show_sampler', ctx=Load()))])"
+        ]
+      },
+      "hr_sampler": {
+        "call": "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Dropdown', ctx=Load()), args=[], keywords=[keyword(arg='label', value=Constant(value='Hires sampling method')), keyword(arg='elem_id', value=Constant(value='hr_sampler')), keyword(arg='choices', value=BinOp(left=List(elts=[Constant(value='Use same sampler')], ctx=Load()), op=Add(), right=Call(func=Attribute(value=Name(id='sd_samplers', ctx=Load()), attr='visible_sampler_names', ctx=Load()), args=[], keywords=[]))), keyword(arg='value', value=Constant(value='Use same sampler'))])",
+        "parents": [
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Blocks', ctx=Load()), args=[], keywords=[keyword(arg='analytics_enabled', value=Constant(value=False)), keyword(arg='head', value=Name(id='canvas_head', ctx=Load()))])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Tab', ctx=Load()), args=[Constant(value='Generation')], keywords=[keyword(arg='id', value=Constant(value='txt2img_generation'))])",
+          "Call(func=Name(id='ResizeHandleRow', ctx=Load()), args=[], keywords=[keyword(arg='equal_height', value=Constant(value=False))])",
+          "Call(func=Name(id='ExitStack', ctx=Load()), args=[], keywords=[])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Row', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=Constant(value='txt2img_accordions')), keyword(arg='elem_classes', value=Constant(value='accordions'))])",
+          "Call(func=Name(id='InputAccordion', ctx=Load()), args=[Constant(value=False)], keywords=[keyword(arg='label', value=Constant(value='Hires. fix')), keyword(arg='elem_id', value=Constant(value='txt2img_hr'))])",
+          "Call(func=Name(id='FormRow', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=Constant(value='txt2img_hires_fix_row3b')), keyword(arg='variant', value=Constant(value='compact')), keyword(arg='visible', value=Attribute(value=Attribute(value=Name(id='shared', ctx=Load()), attr='opts', ctx=Load()), attr='hires_fix_show_sampler', ctx=Load()))])"
+        ]
+      },
+      "img2img_width": {
+        "call": "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Slider', ctx=Load()), args=[], keywords=[keyword(arg='minimum', value=Constant(value=64)), keyword(arg='maximum', value=Constant(value=2048)), keyword(arg='step', value=Name(id='_STEP', ctx=Load())), keyword(arg='label', value=Constant(value='Width')), keyword(arg='value', value=Constant(value=1024)), keyword(arg='elem_id', value=Constant(value='img2img_width'))])",
+        "parents": [
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Blocks', ctx=Load()), args=[], keywords=[keyword(arg='analytics_enabled', value=Constant(value=False)), keyword(arg='head', value=Name(id='canvas_head', ctx=Load()))])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Tab', ctx=Load()), args=[Constant(value='Generation')], keywords=[keyword(arg='id', value=Constant(value='img2img_generation'))])",
+          "Call(func=Name(id='ResizeHandleRow', ctx=Load()), args=[], keywords=[keyword(arg='equal_height', value=Constant(value=False))])",
+          "Call(func=Name(id='ExitStack', ctx=Load()), args=[], keywords=[])",
+          "Call(func=Name(id='FormRow', ctx=Load()), args=[], keywords=[])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Column', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=Constant(value='img2img_column_size')), keyword(arg='scale', value=Constant(value=4))])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Tabs', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=Constant(value='img2img_tabs_resize'))])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Tab', ctx=Load()), args=[], keywords=[keyword(arg='label', value=Constant(value='Resize to')), keyword(arg='id', value=Constant(value='to')), keyword(arg='elem_id', value=Constant(value='img2img_tab_resize_to'))])",
+          "Call(func=Name(id='FormRow', ctx=Load()), args=[], keywords=[])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Column', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=Constant(value='img2img_column_size')), keyword(arg='scale', value=Constant(value=4))])"
+        ]
+      },
+      "img2img_height": {
+        "call": "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Slider', ctx=Load()), args=[], keywords=[keyword(arg='minimum', value=Constant(value=64)), keyword(arg='maximum', value=Constant(value=2048)), keyword(arg='step', value=Name(id='_STEP', ctx=Load())), keyword(arg='label', value=Constant(value='Height')), keyword(arg='value', value=Constant(value=1024)), keyword(arg='elem_id', value=Constant(value='img2img_height'))])",
+        "parents": [
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Blocks', ctx=Load()), args=[], keywords=[keyword(arg='analytics_enabled', value=Constant(value=False)), keyword(arg='head', value=Name(id='canvas_head', ctx=Load()))])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Tab', ctx=Load()), args=[Constant(value='Generation')], keywords=[keyword(arg='id', value=Constant(value='img2img_generation'))])",
+          "Call(func=Name(id='ResizeHandleRow', ctx=Load()), args=[], keywords=[keyword(arg='equal_height', value=Constant(value=False))])",
+          "Call(func=Name(id='ExitStack', ctx=Load()), args=[], keywords=[])",
+          "Call(func=Name(id='FormRow', ctx=Load()), args=[], keywords=[])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Column', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=Constant(value='img2img_column_size')), keyword(arg='scale', value=Constant(value=4))])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Tabs', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=Constant(value='img2img_tabs_resize'))])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Tab', ctx=Load()), args=[], keywords=[keyword(arg='label', value=Constant(value='Resize to')), keyword(arg='id', value=Constant(value='to')), keyword(arg='elem_id', value=Constant(value='img2img_tab_resize_to'))])",
+          "Call(func=Name(id='FormRow', ctx=Load()), args=[], keywords=[])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Column', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=Constant(value='img2img_column_size')), keyword(arg='scale', value=Constant(value=4))])"
+        ]
+      }
+    },
+    "modules/ui_settings.py": {
+      "settings_show_all_pages": {
+        "call": "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Button', ctx=Load()), args=[], keywords=[keyword(arg='value', value=Constant(value='Show all pages')), keyword(arg='elem_id', value=Constant(value='settings_show_all_pages'))])",
+        "parents": [
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Blocks', ctx=Load()), args=[], keywords=[keyword(arg='analytics_enabled', value=Constant(value=False))])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Tabs', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=Constant(value='settings'))])"
+        ]
+      },
+      "settings_show_one_page": {
+        "call": "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Button', ctx=Load()), args=[], keywords=[keyword(arg='value', value=Constant(value='Show only one page')), keyword(arg='elem_id', value=Constant(value='settings_show_one_page')), keyword(arg='visible', value=Constant(value=False))])",
+        "parents": [
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Blocks', ctx=Load()), args=[], keywords=[keyword(arg='analytics_enabled', value=Constant(value=False))])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Tabs', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=Constant(value='settings'))])"
+        ]
+      }
+    },
+    "modules_forge/main_entry.py": {
+      "forge_ui_preset": {
+        "call": "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Dropdown', ctx=Load()), args=[], keywords=[keyword(arg='label', value=Constant(value='UI Preset')), keyword(arg='value', value=Attribute(value=Attribute(value=Name(id='shared', ctx=Load()), attr='opts', ctx=Load()), attr='forge_preset', ctx=Load())), keyword(arg='choices', value=Call(func=Attribute(value=Name(id='PresetArch', ctx=Load()), attr='choices', ctx=Load()), args=[], keywords=[])), keyword(arg='elem_id', value=Constant(value='forge_ui_preset'))])",
+        "parents": []
+      },
+      "setting_sd_model_checkpoint": {
+        "call": "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Dropdown', ctx=Load()), args=[], keywords=[keyword(arg='label', value=Constant(value='Checkpoint')), keyword(arg='value', value=Constant(value=None)), keyword(arg='choices', value=Constant(value=None)), keyword(arg='elem_id', value=Constant(value='setting_sd_model_checkpoint')), keyword(arg='elem_classes', value=List(elts=[Constant(value='model_selection')], ctx=Load()))])",
+        "parents": []
+      },
+      "setting_sd_modules": {
+        "call": "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Dropdown', ctx=Load()), args=[], keywords=[keyword(arg='label', value=Constant(value='VAE / Text Encoder')), keyword(arg='value', value=Constant(value=None)), keyword(arg='choices', value=Constant(value=None)), keyword(arg='multiselect', value=Constant(value=True)), keyword(arg='elem_id', value=Constant(value='setting_sd_modules')), keyword(arg='elem_classes', value=List(elts=[Constant(value='model_selection')], ctx=Load()))])",
+        "parents": []
+      },
+      "forge_ui_dtype": {
+        "call": "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Dropdown', ctx=Load()), args=[], keywords=[keyword(arg='label', value=Constant(value='Diffusion in Low Bits')), keyword(arg='value', value=Constant(value=None)), keyword(arg='choices', value=Call(func=Name(id='list', ctx=Load()), args=[Call(func=Attribute(value=Name(id='forge_unet_storage_dtype_options', ctx=Load()), attr='keys', ctx=Load()), args=[], keywords=[])], keywords=[])), keyword(arg='elem_id', value=Constant(value='forge_ui_dtype'))])",
+        "parents": []
+      }
+    },
+    "modules/ui_toprow.py": {
+      "f'{self.id_part}_prompt'": {
+        "call": "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Textbox', ctx=Load()), args=[], keywords=[keyword(arg='label', value=Constant(value='Prompt')), keyword(arg='elem_id', value=JoinedStr(values=[FormattedValue(value=Attribute(value=Name(id='self', ctx=Load()), attr='id_part', ctx=Load()), conversion=-1), Constant(value='_prompt')])), keyword(arg='show_label', value=Constant(value=False)), keyword(arg='lines', value=Constant(value=3)), keyword(arg='placeholder', value=Constant(value='Prompt\\n(Ctrl+Enter to Generate ; Alt+Enter to Skip ; Esc to Interrupt)')), keyword(arg='elem_classes', value=List(elts=[Constant(value='prompt')], ctx=Load()))])",
+        "parents": [
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Column', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=JoinedStr(values=[FormattedValue(value=Attribute(value=Name(id='self', ctx=Load()), attr='id_part', ctx=Load()), conversion=-1), Constant(value='_prompt_container')])), keyword(arg='elem_classes', value=Call(func=Attribute(value=Name(id='self', ctx=Load()), attr='_container_class', ctx=Load()), args=[], keywords=[])), keyword(arg='scale', value=Constant(value=6))])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Row', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=JoinedStr(values=[FormattedValue(value=Attribute(value=Name(id='self', ctx=Load()), attr='id_part', ctx=Load()), conversion=-1), Constant(value='_prompt_row')])), keyword(arg='elem_classes', value=List(elts=[Constant(value='prompt-row')], ctx=Load()))])"
+        ]
+      },
+      "f'{self.id_part}_neg_prompt'": {
+        "call": "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Textbox', ctx=Load()), args=[], keywords=[keyword(arg='label', value=Constant(value='Negative Prompt')), keyword(arg='elem_id', value=JoinedStr(values=[FormattedValue(value=Attribute(value=Name(id='self', ctx=Load()), attr='id_part', ctx=Load()), conversion=-1), Constant(value='_neg_prompt')])), keyword(arg='show_label', value=Constant(value=False)), keyword(arg='lines', value=Constant(value=3)), keyword(arg='placeholder', value=Constant(value='Negative Prompt\\n(Ctrl+Enter to Generate ; Alt+Enter to Skip ; Esc to Interrupt)')), keyword(arg='elem_classes', value=List(elts=[Constant(value='prompt')], ctx=Load()))])",
+        "parents": [
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Column', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=JoinedStr(values=[FormattedValue(value=Attribute(value=Name(id='self', ctx=Load()), attr='id_part', ctx=Load()), conversion=-1), Constant(value='_prompt_container')])), keyword(arg='elem_classes', value=Call(func=Attribute(value=Name(id='self', ctx=Load()), attr='_container_class', ctx=Load()), args=[], keywords=[])), keyword(arg='scale', value=Constant(value=6))])",
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Row', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=JoinedStr(values=[FormattedValue(value=Attribute(value=Name(id='self', ctx=Load()), attr='id_part', ctx=Load()), conversion=-1), Constant(value='_neg_prompt_row')])), keyword(arg='elem_classes', value=List(elts=[Constant(value='prompt-row')], ctx=Load()))])"
+        ]
+      },
+      "f'{self.id_part}_generate'": {
+        "call": "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Button', ctx=Load()), args=[Constant(value='Generate')], keywords=[keyword(arg='elem_id', value=JoinedStr(values=[FormattedValue(value=Attribute(value=Name(id='self', ctx=Load()), attr='id_part', ctx=Load()), conversion=-1), Constant(value='_generate')])), keyword(arg='variant', value=Constant(value='primary')), keyword(arg='tooltip', value=Constant(value='Right click generate forever menu'))])",
+        "parents": [
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Row', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=JoinedStr(values=[FormattedValue(value=Attribute(value=Name(id='self', ctx=Load()), attr='id_part', ctx=Load()), conversion=-1), Constant(value='_generate_box')])), keyword(arg='elem_classes', value=BinOp(left=List(elts=[Constant(value='generate-box')], ctx=Load()), op=Add(), right=IfExp(test=Attribute(value=Name(id='self', ctx=Load()), attr='is_compact', ctx=Load()), body=List(elts=[Constant(value='generate-box-compact')], ctx=Load()), orelse=List(elts=[], ctx=Load())))), keyword(arg='render', value=UnaryOp(op=Not(), operand=Attribute(value=Name(id='self', ctx=Load()), attr='is_compact', ctx=Load())))])"
+        ]
+      },
+      "f'{self.id_part}_clear_prompt'": {
+        "call": "Call(func=Name(id='ToolButton', ctx=Load()), args=[], keywords=[keyword(arg='value', value=Name(id='clear_prompt_symbol', ctx=Load())), keyword(arg='elem_id', value=JoinedStr(values=[FormattedValue(value=Attribute(value=Name(id='self', ctx=Load()), attr='id_part', ctx=Load()), conversion=-1), Constant(value='_clear_prompt')])), keyword(arg='tooltip', value=Constant(value='Clear prompt'))])",
+        "parents": [
+          "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Row', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=JoinedStr(values=[FormattedValue(value=Attribute(value=Name(id='self', ctx=Load()), attr='id_part', ctx=Load()), conversion=-1), Constant(value='_tools')]))])"
+        ]
+      }
+    },
+    "modules/processing_scripts/sampler.py": {
+      "f'{self.tabname}_sampling'": {
+        "call": "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Dropdown', ctx=Load()), args=[], keywords=[keyword(arg='label', value=Constant(value='Sampling Method')), keyword(arg='elem_id', value=JoinedStr(values=[FormattedValue(value=Attribute(value=Name(id='self', ctx=Load()), attr='tabname', ctx=Load()), conversion=-1), Constant(value='_sampling')])), keyword(arg='choices', value=Name(id='sampler_names', ctx=Load())), keyword(arg='value', value=Subscript(value=Name(id='sampler_names', ctx=Load()), slice=Constant(value=0), ctx=Load()))])",
+        "parents": [
+          "Call(func=Name(id='FormRow', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=JoinedStr(values=[Constant(value='sampler_selection_'), FormattedValue(value=Attribute(value=Name(id='self', ctx=Load()), attr='tabname', ctx=Load()), conversion=-1)]))])"
+        ]
+      },
+      "f'{self.tabname}_steps'": {
+        "call": "Call(func=Attribute(value=Name(id='gr', ctx=Load()), attr='Slider', ctx=Load()), args=[], keywords=[keyword(arg='minimum', value=Constant(value=1)), keyword(arg='maximum', value=Constant(value=150)), keyword(arg='step', value=Constant(value=1)), keyword(arg='elem_id', value=JoinedStr(values=[FormattedValue(value=Attribute(value=Name(id='self', ctx=Load()), attr='tabname', ctx=Load()), conversion=-1), Constant(value='_steps')])), keyword(arg='label', value=Constant(value='Sampling Steps')), keyword(arg='value', value=Constant(value=20))])",
+        "parents": [
+          "Call(func=Name(id='FormRow', ctx=Load()), args=[], keywords=[keyword(arg='elem_id', value=JoinedStr(values=[Constant(value='sampler_selection_'), FormattedValue(value=Attribute(value=Name(id='self', ctx=Load()), attr='tabname', ctx=Load()), conversion=-1)]))])"
+        ]
+      }
+    }
+  },
+  "sha256": {
+    "style.css": "625a77c446dd0262d5fc527258e38954495dfa1afa63e453c2177a24b2fe9a87",
+    "javascript/settings.js": "13c8c9d3cfb01e985478e577dc4b3d63392d05d1cf88fa66331e97d82eb514d6"
+  }
+}
