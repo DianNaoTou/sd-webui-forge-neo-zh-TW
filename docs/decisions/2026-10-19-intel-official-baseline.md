@@ -5,7 +5,7 @@
 ## 維護基準
 
 - 後續 Intel 更新以新的官方 XPU profile 為主要維護、相容性與驗收基準。
-- 目前對應 `webui-user-intel-xpu-official.bat`、`venv-xpu-official`、
+- 目前對應 `webui-user-intel-arc.bat`（同日統一入口後）、`venv-xpu-official`、
   PyTorch `2.14.1+xpu`／TorchVision `0.29.1+xpu`。日後套件更新沿此官方路徑評估，
   不是將以上版本永久鎖死。
 - 舊 `webui-user-intel-arc.bat`／`venv-intel-arc`／PyTorch `2.14.0+xpu`
@@ -55,3 +55,10 @@
 `venv-xpu-official`、`runtime/xpu-ab/official` 與 7862，避免重新初始化已測好的設定。
 既有舊 venv、根目錄設定與資料保留，不自動搬移或刪除。原先「保留歷史入口」的決策
 由此次轉交行為取代；正式分支下一次大版本才整合的限制不變。
+
+## 同日最終簡化：僅保留 Intel Arc 一個入口
+
+依使用者要求，官方 XPU 啟動流程直接置入 `webui-user-intel-arc.bat`，
+移除 `webui-user-intel-xpu-official.bat`。本節取代上一節的雙入口轉交安排。
+官方 Python launcher、額外參數、失敗處理與環境／資料路徑完全沿用，
+不重新建立 venv、不搬移或改寫既有設定。正式分支與發布限制維持不變。

@@ -2,6 +2,11 @@
 
 本專案的重要變更會記錄在此處。
 
+## Intel Arc 單一啟動入口（2026-10-19，版本維持 test.6）
+
+- 官方 XPU 流程直接放入 `webui-user-intel-arc.bat`，移除多餘的 `webui-user-intel-xpu-official.bat`。
+- 沿用既有官方環境、設定與參數處理；不改依賴或推論行為。取代下方先前的雙入口安排。
+
 ## Intel Arc 啟動入口統一（2026-10-19，版本維持 test.6）
 
 - 原 Intel Arc 啟動檔直接轉交新版官方 XPU，保留額外參數與結束狀態；不再建立或使用 Torch 2.14.0／`venv-intel-arc`。

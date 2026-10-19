@@ -6,7 +6,7 @@
 webui-user-intel-arc.bat
 ```
 
-也可執行 `webui-user-intel-xpu-official.bat`；兩個入口啟動同一套環境，並傳遞額外參數與結束狀態。
+僅保留 `webui-user-intel-arc.bat` 一個 Intel 啟動入口，直接執行官方 XPU 流程，支援額外參數。原 `webui-user-intel-xpu-official.bat` 已移除。
 
 - Python：專案專用 3.13.12，由啟動器準備，不修改系統 Python。
 - 依賴：Torch 2.14.1+xpu／TorchVision 0.29.1+xpu。
@@ -22,7 +22,7 @@ webui-user-intel-arc.bat
 ## B580 建議操作與驗證
 
 採樣預設原生 SDPA。使用者已回報開啟「Never OOM 記憶體最佳化 → 對VAE啟用（始終分塊）」後，原先 HR 結束階段的嚴重記憶體壓力明顯改善；「為 UNet 啟用（始終卸載）」保持不勾。
-此選項由使用者在 UI 選擇，本次沒有強制改寫預設值。切換入口仍沿用官方組設定；請確認勾選狀態。
+此選項由使用者在 UI 選擇，本次沒有強制改寫預設值。此次簡化仍沿用官方組設定；請確認勾選狀態。
 
 更新後請驗證基本生圖、原本 HR 參數連續兩次、VAE 是否仍 OOM，以及生成後系統反應。A380 與其他 Arc 尚未在本輪驗證。
 原生／Math／分塊三模式對照見 [test.6 操作說明](docs/validation/xpu-sdpa-test6.md)。

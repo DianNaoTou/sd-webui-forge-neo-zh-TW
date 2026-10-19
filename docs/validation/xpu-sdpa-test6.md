@@ -32,13 +32,13 @@ git pull --ff-only origin neo-test
 
 ```powershell
 # test.6 預設：原生 PyTorch SDPA
-.\webui-user-intel-xpu-official.bat
+.\webui-user-intel-arc.bat
 
 # 舊狀態一：強制 Math，但取消 query 分塊
-.\webui-user-intel-xpu-official.bat --xpu-sdpa math
+.\webui-user-intel-arc.bat --xpu-sdpa math
 
 # 舊狀態二：回到 test.5 的 Math + query 分塊保護
-.\webui-user-intel-xpu-official.bat --xpu-sdpa sliced
+.\webui-user-intel-arc.bat --xpu-sdpa sliced
 ```
 
 也可明確傳 `--xpu-sdpa native`。Kitchen 社群 profile 已停止採用，

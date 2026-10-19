@@ -64,14 +64,15 @@ class BackendDetectionTests(unittest.TestCase):
             with self.subTest(version=version), patch.object(deps.metadata, 'version', fake_versions({'torch': version})):
                 self.assertEqual(deps.torch_backend_mismatch(expected, deps.torch_backend()), bad)
 
-    def test_intel_arc_entry_delegates_arguments_and_exit_status_to_official(self):
+    def test_intel_arc_is_the_single_official_entry(self):
         source = ARC_BAT.read_text(encoding='utf-8')
-        self.assertIn('call "%~dp0webui-user-intel-xpu-official.bat" %*', source)
-        self.assertIn('exit /b %errorlevel%', source)
+        self.assertIn('call bootstrap-python.bat', source)
+        self.assertIn('"%PYTHON%" tools\\launch_xpu_profile.py official  %*', source)
+        self.assertIn('if errorlevel 1 goto :failed', source)
+        self.assertIn('exit /b 0', source)
+        self.assertIn('exit /b 1', source)
         self.assertNotIn('venv-intel-arc', source)
-        self.assertNotIn('TORCH_COMMAND=', source)
-        official = (ROOT / 'webui-user-intel-xpu-official.bat').read_text()
-        self.assertIn('tools\\launch_xpu_profile.py official', official)
+        self.assertFalse((ROOT / 'webui-user-intel-xpu-official.bat').exists())
 
     def test_no_enforcement_without_explicit_command(self):
         self.assertIsNone(deps.expected_torch_backend('pip install torch==2.13.0+cu130', explicit=False))
