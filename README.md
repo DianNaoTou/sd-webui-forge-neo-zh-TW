@@ -76,7 +76,7 @@ ADetailer-Neo 等插件需要的偵測模型，會按照插件原有機制在需
 |---|---|---|---|
 | NVIDIA | `webui-user.bat` | Forge Neo 上游預設 CUDA 版本 | 跟隨上游維護 |
 | Intel Arc（測試主線） | `webui-user-intel-xpu-official.bat` | 官方 PyTorch 2.14.1+xpu | 後續維護基準；下次大版本才納入正式版 |
-| Intel Arc（舊路徑，已列淘汰） | `webui-user-intel-arc.bat` | PyTorch 2.14.0+xpu | 不再作為後續維護／驗收主線 |
+| Intel Arc（相容入口） | `webui-user-intel-arc.bat` | 同上 | 轉交官方 XPU 啟動器，沿用同一環境及設定 |
 
 兩種啟動方式共用同一套 Forge Neo、繁體中文、內建插件與模型目錄，但使用不同的虛擬環境，避免 CUDA 與 XPU 套件互相覆蓋。
 
@@ -119,7 +119,7 @@ webui-user.bat
 webui-user-intel-xpu-official.bat
 ```
 
-使用獨立的 `venv-xpu-official` 與官方 PyTorch 2.14.1+xpu。舊 `venv-intel-arc` 路徑列為淘汰；現有正式 `neo` 本次不變更。新官方路徑只留在測試分支，**等下一次大版本更新才納入正式版**，不隨目前的一般修訂版提前發布。完整說明見 [`INTEL_ARC_SETUP.md`](./INTEL_ARC_SETUP.md) 與 [維護／發布決策](docs/decisions/2026-10-19-intel-official-baseline.md)。
+使用獨立的 `venv-xpu-official` 與官方 PyTorch 2.14.1+xpu。原 `webui-user-intel-arc.bat` 已改為轉交官方入口，不再建立或使用舊 `venv-intel-arc`；既有舊環境保留但不再維護。現有正式 `neo` 本次不變更。新官方路徑只留在測試分支，**等下一次大版本更新才納入正式版**，不隨目前的一般修訂版提前發布。完整說明見 [`INTEL_ARC_SETUP.md`](./INTEL_ARC_SETUP.md) 與 [維護／發布決策](docs/decisions/2026-10-19-intel-official-baseline.md)。
 
 兩種版本都保留 Forge Neo 原本的安裝體驗：首次啟動會先以專案內的 `uv` 準備固定版本 Python 3.13.12，再建立對應的虛擬環境，並由 Forge Neo 安裝器自動安裝 PyTorch、核心相依套件與插件相依套件。它不會修改系統 Python，也不會自動安裝顯示卡驅動程式或 Stable Diffusion 主模型。
 

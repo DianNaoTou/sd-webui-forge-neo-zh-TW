@@ -1,13 +1,41 @@
-> **2026-10-19 維護決策：新的官方 XPU 為主線**
->
-> `neo-test` 後續以 `webui-user-intel-xpu-official.bat`／`venv-xpu-official`（目前 Torch 2.14.1+xpu）為主要路徑。舊 Torch 2.14.0／`venv-intel-arc` 列為淘汰；Kitchen 社群方案已停止採用，專用啟動／建置入口已移除。
-> **目前只留在測試版，等下一次大版本更新才納入正式 `neo`**。本次不刪除既有環境、不變更正式版，詳見 [決策紀錄](docs/decisions/2026-10-19-intel-official-baseline.md)。
->
-> 測試啟動：`webui-user-intel-xpu-official.bat`。test.6 的採樣預設是原生 SDPA，三模式與回復方法見 [操作說明](docs/validation/xpu-sdpa-test6.md)。
+# Intel Arc 安裝與啟動
 
-## 舊路徑與 test.3 歷史說明（以下不再是測試主線安裝指引）
+`neo-test` 的 Intel Arc 現在統一使用官方 PyTorch XPU：
 
-> test.3 的 Kitchen 比較環境已撤回；以下舊 Intel 2.14.0 內容僅供歷史參考，現在請使用上方官方啟動方式。
+```bat
+webui-user-intel-arc.bat
+```
+
+也可執行 `webui-user-intel-xpu-official.bat`；兩個入口啟動同一套環境，並傳遞額外參數與結束狀態。
+
+- Python：專案專用 3.13.12，由啟動器準備，不修改系統 Python。
+- 依賴：Torch 2.14.1+xpu／TorchVision 0.29.1+xpu。
+- 虛擬環境：`venv-xpu-official`，與 NVIDIA 獨立。
+- 設定／快取／輸出：`runtime/xpu-ab/official`，沿用既有官方組設定，不覆寫。
+- 模型：共用專案 `models`，無需重新下載。
+- UI、繁中及插件操作方式共用原本整合版。
+- 原 `venv-intel-arc` 不再建立或啟用；不自動刪除既有環境與資料。
+- 舊根目錄設定僅在官方設定尚不存在時複製；已有官方設定不會被舊設定蓋回。
+
+需要 Windows 10／11 64 位元、Git、Intel Arc 與相容驅動。首次啟動會建立官方環境、安裝依賴並驗證 XPU；已有官方環境可直接沿用。預設網址為 http://127.0.0.1:7862 。
+
+## B580 建議操作與驗證
+
+採樣預設原生 SDPA。使用者已回報開啟「Never OOM 記憶體最佳化 → 對VAE啟用（始終分塊）」後，原先 HR 結束階段的嚴重記憶體壓力明顯改善；「為 UNet 啟用（始終卸載）」保持不勾。
+此選項由使用者在 UI 選擇，本次沒有強制改寫預設值。切換入口仍沿用官方組設定；請確認勾選狀態。
+
+更新後請驗證基本生圖、原本 HR 參數連續兩次、VAE 是否仍 OOM，以及生成後系統反應。A380 與其他 Arc 尚未在本輪驗證。
+原生／Math／分塊三模式對照見 [test.6 操作說明](docs/validation/xpu-sdpa-test6.md)。
+
+**僅修改 `neo-test`；仍等下一次大版本才納入正式 `neo`，不發布 Release。**
+Kitchen 社群 fork 支援已移除；主程式必要的官方 comfy-kitchen 依賴保留。
+詳見 [維護決策](docs/decisions/2026-10-19-intel-official-baseline.md)。
+
+---
+
+## 歷史安裝說明（已由上方官方路徑取代，請勿照此建立舊環境）
+
+以下保留舊 2.14.0 的調整背景與紀錄，並非目前啟動器行為。
 
 # Intel Arc 安裝與啟動
 
