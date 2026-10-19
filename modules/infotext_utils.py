@@ -90,7 +90,11 @@ def _parse_info(output: gr.components.Component, key: str, params: dict[str, Any
         try:
             valtype = type(output.value)
 
-            if valtype == bool and v == "False":
+            # Empty Gradio fields (notably fresh prompt Textboxes) start at None.
+            # NoneType is not a converter; preserve the parsed value instead.
+            if output.value is None:
+                val = v
+            elif valtype == bool and v == "False":
                 val = False
             elif valtype == int:
                 val = float(v)
