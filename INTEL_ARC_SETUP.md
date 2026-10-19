@@ -1,3 +1,12 @@
+> **2026-10-19 維護決策：新的官方 XPU 為主線**
+>
+> `neo-test` 後續以 `webui-user-intel-xpu-official.bat`／`venv-xpu-official`（目前 Torch 2.14.1+xpu）為主要路徑。舊 Torch 2.14.0／`venv-intel-arc` 列為淘汰；Kitchen 僅為可選實驗。
+> **目前只留在測試版，等下一次大版本更新才納入正式 `neo`**。本次不刪除既有環境、不變更正式版，詳見 [決策紀錄](docs/decisions/2026-10-19-intel-official-baseline.md)。
+>
+> 測試啟動：`webui-user-intel-xpu-official.bat`。test.6 的採樣預設是原生 SDPA，三模式與回復方法見 [操作說明](docs/validation/xpu-sdpa-test6.md)。
+
+## 舊路徑與 test.3 歷史說明（以下不再是測試主線安裝指引）
+
 > **新增 test.3：隔離比較啟動方式**
 > `webui-user-intel-xpu-official.bat` 使用官方 PyTorch 2.14.1 XPU；`webui-user-intel-xpu-kitchen.bat` 使用相同 PyTorch 與 Kitchen XPU 修改版。各自獨立 venv／設定／輸出／快取，原啟動檔維持 PyTorch 2.14.0。
 > **實驗組目前沒有可直接下載的官方配套 Windows 原生 Wheel**，須自行建置或提供匹配的本機 Wheel；缺核心會明確停止，不以 eager 冒充。詳見 [完整說明](docs/reviews/2026-10-18-xpu-ab-test3.md)。

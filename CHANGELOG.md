@@ -2,6 +2,12 @@
 
 本專案的重要變更會記錄在此處。
 
+## 維護／發布政策備註（2026-10-19，程式版本不變）
+
+- Intel 後續以新的官方 XPU profile 為主線，舊 Torch 2.14.0／`venv-intel-arc` 路徑列為淘汰；Kitchen 僅作可選實驗。
+- 新官方環境目前僅留在 `neo-test`，下一次大版本更新才納入正式版，不能以目前的一般修訂版提前合併。本次僅記錄政策，不刪環境、不改啟動器、不修改 `neo` 或發布 Release。
+- [決策與當前實測狀態](docs/decisions/2026-10-19-intel-official-baseline.md)。
+
 ## 2.30-tw.2-test.6（2026-10-19）
 
 - Intel XPU 實驗預設改為原生 PyTorch SDPA 自選後端，取消本地強制 Math／query 分塊，以測試新版核心是否仍需要舊 workaround；不宣稱 NaN／OOM 已修復或速度已改善。

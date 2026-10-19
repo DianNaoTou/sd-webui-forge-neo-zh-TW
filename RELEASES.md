@@ -2,6 +2,10 @@
 
 本整合版以繁體中文使用者為主要對象。版本號跟隨 Forge Neo 上游；本專案額外整合或修補以 `-tw.修訂號` 區分，例如 `2.29.2-tw.1`、`2.29.2-tw.2`。日常修改先進入 `neo-test`，確認後再發布至 `neo`。
 
+## Intel 新官方環境的正式版納入限制
+
+2026-10-19 決定：後續 Intel 維護以新的官方 XPU profile 為主，舊 2.14.0 路徑列為淘汰；目前只在 `neo-test`，**下一次大版本更新才納入正式 `neo`**。不得因一般修訂或單項測試通過提前合併。具體大版本號尚未指定；正式分支與歷史 Release 本次維持原樣。詳見 [決策紀錄](docs/decisions/2026-10-19-intel-official-baseline.md)。
+
 ## 如何選擇
 
 | 選項 | 適用情況 | 下載 |
@@ -9,7 +13,7 @@
 | 最新正式版：2.30-tw.1 | 一般安裝與更新 | [正式分支 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo.zip) |
 | 上一正式版：2.29.2-tw.1 | 回退或比對上一版本 | [固定版本 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/tags/2.29.2-tw.1.zip) |
 | 首個穩定版：2.29.1-tw.1 | 保留更新前行為或回退比對 | [固定提交 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/fecbe6bf666a102680fcfe0626eae91a60fe0122.zip) |
-| 測試版：2.30-tw.2-test.4（neo-test） | 協助驗證尚未正式發布的修改 | [測試分支 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo-test.zip) |
+| 測試版：2.30-tw.2-test.6（neo-test） | 協助驗證尚未正式發布的修改 | [測試分支 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo-test.zip) |
 
 正式與測試分支 ZIP 重新下載時會取得當下分支內容；已下載的 ZIP 不會自動更新。首個穩定版固定提交 ZIP 永遠指向相同程式。正式發布使用固定 Tag／GitHub Release，舊版本原樣保留。進入下列發布頁，展開 Assets 並選擇 Source code (zip)，即可下載固定版本：
 
