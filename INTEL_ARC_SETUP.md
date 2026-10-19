@@ -19,6 +19,14 @@ webui-user-intel-arc.bat
 
 需要 Windows 10／11 64 位元、Git、Intel Arc 與相容驅動。首次啟動會建立官方環境、安裝依賴並驗證 XPU；已有官方環境可直接沿用。預設網址為 http://127.0.0.1:7862 。
 
+## Test 7 啟動設定與快取修正
+
+全新設定包含正確版本標記。若先前 test.6 建立的設定仍缺標記，第一次啟動 Test 7
+會顯示設定版本提醒；確認繼續後按 Enter，程式先在 `runtime/xpu-ab/official`
+留下 `config-before-version-*.json` 原檔備份，再只更新版本標記。
+既有提示詞、路徑及插件設定保留；這是記錄使用者確認，不是自動完成所有舊格式遷移。
+不要為此刪除 venv 或模型。詳見 [Test 7 驗證](docs/validation/startup-cache-test7.md)。
+
 ## B580 建議操作與驗證
 
 採樣預設原生 SDPA。使用者已回報開啟「Never OOM 記憶體最佳化 → 對VAE啟用（始終分塊）」後，原先 HR 結束階段的嚴重記憶體壓力明顯改善；「為 UNet 啟用（始終卸載）」保持不勾。

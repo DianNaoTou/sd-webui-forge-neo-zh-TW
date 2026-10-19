@@ -12,7 +12,7 @@
 
 ## 版本與下載
 
-目前測試版本：**2.30-tw.2-test.6**（`neo-test`；B580 官方組 HR 可完成，但仍有 OOM 與卡頓，完整驗收未完成）。[WD14 新模型與按需下載說明](docs/reviews/2026-10-19-wd14-test4.md)。[官方 Intel XPU 安裝與維護政策](INTEL_ARC_SETUP.md)。
+目前測試版本：**2.30-tw.2-test.7**（`neo-test`；修正 Intel 新設定版本警告與圖片快取發布競爭。使用者回報 test.6 的 B580 開啟 VAE 分塊後明顯改善，test.7 實機仍待驗證）。[Test 7 更新與驗證](docs/validation/startup-cache-test7.md)。[WD14 新模型與按需下載說明](docs/reviews/2026-10-19-wd14-test4.md)。[官方 Intel XPU 安裝與維護政策](INTEL_ARC_SETUP.md)。
 
 目前正式發布版本：**2.30-tw.1**（上游 2.30）。
 

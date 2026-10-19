@@ -556,11 +556,11 @@ def dump_sysinfo():
     return filename
 
 
-VERSION_UID: Final[str] = "PY313"
+VERSION_UID: Final[str] = forge_version.settings_version_uid
 
 
 def verify_version():
-    """prompt user to do a clean reinstall"""
+    """Check settings format without confusing it with dependency installation."""
     settings_file: os.PathLike = args.ui_settings_file
 
     if not os.path.isfile(settings_file):
@@ -590,12 +590,19 @@ def verify_version():
     print("\n\n")
     print("=" * w)
 
-    print(f"{Y}ALERT:{R} You are updating from an old version...")
-    print(f"{T}The recent WebUI updates include breaking changes!")
-    print(f"{T}Please perform a {E}clean reinstall{R}! Remember to {B}back up{R} the models!")
-    print(f"{T}{G}(alternatively, simply remove the config.json and ui-config.json files){R}")
+    print(f"{Y}ALERT:{R} Settings version is missing or differs from this WebUI.")
+    print(f"{T}This settings check does not mean Python packages failed to install.")
+    print(f"{T}Back up settings before continuing; older settings may need migration.")
+    print(f"{T}{G}A clean install should initialize settings with the current version marker.{R}")
 
     print("=" * w)
     print("\n\n")
 
+    official_xpu = os.environ.get("FORGE_XPU_AB_PROFILE") == "official"
+    if official_xpu:
+        print("Continuing backs up official Intel config.json and acknowledges this settings version.")
     input("Press Enter to Continue...")
+    if official_xpu:
+        from modules.xpu_profiles import acknowledge_settings_version
+
+        acknowledge_settings_version(script_path, settings_file)

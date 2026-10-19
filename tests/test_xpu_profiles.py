@@ -49,6 +49,33 @@ class XPUProfileTests(unittest.TestCase):
         self.assertEqual(json.loads(config.read_text())['seed'],42)
         self.assertEqual(json.loads((self.root/'config.json').read_text())['outdir_samples'],'old')
 
+    def test_fresh_settings_have_current_version_marker(self):
+        _, state = profiles.paths(self.root, 'official')
+        profiles.initialize_settings(self.root, state)
+        data = json.loads((state/'config.json').read_text())
+        self.assertEqual(data['VERSION_UID'], profiles.settings_version_uid)
+        self.assertEqual(data['localization'], 'zh_Hant')
+
+    def test_copied_old_settings_require_acknowledgement_and_backup(self):
+        original = {'seed': 27, 'VERSION_UID': 'older', 'localization': 'zh_Hant'}
+        (self.root/'config.json').write_text(json.dumps(original))
+        _, state = profiles.paths(self.root, 'official')
+        profiles.initialize_settings(self.root, state)
+        config = state/'config.json'
+        before = config.read_bytes()
+        self.assertEqual(json.loads(before)['VERSION_UID'], 'older')
+        profiles.acknowledge_settings_version(self.root, config)
+        after = json.loads(config.read_text())
+        self.assertEqual(after, {**json.loads(before), 'VERSION_UID': profiles.settings_version_uid})
+        backups = list(state.glob('config-before-version-*.json'))
+        self.assertEqual(len(backups), 1)
+        self.assertEqual(backups[0].read_bytes(), before)
+        profiles.acknowledge_settings_version(self.root, config)
+        self.assertEqual(list(state.glob('config-before-version-*.json')), backups)
+        self.assertEqual(json.loads((self.root/'config.json').read_text()), original)
+        with self.assertRaises(ValueError):
+            profiles.acknowledge_settings_version(self.root, self.root/'config.json')
+
     def test_flags_keep_models_settings_styles_port_and_sdpa_choices(self):
         _,state=profiles.paths(self.root,'official')
         for mode in ('native','math','sliced'):

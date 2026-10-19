@@ -40,3 +40,20 @@ jobs:
         run: python -O -m unittest discover -s tests -p test_wd14_models.py -v
       - name: Check optimized Python XPU attention modes
         run: python -O -m unittest discover -s tests -p test_xpu_attention.py -v
+
+  windows-file-io:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install UI file handling test dependencies
+        run: python -m pip install Pillow==10.4.0 "huggingface-hub>=0.34,<1.0" gradio==4.40.0 fastapi==0.127.1 httpx==0.28.1 pydantic==2.10.6
+      - name: Native Windows upload sharing protection
+        run: python -m unittest discover -s tests -p test_upload_cache.py -v
+      - name: Settings acknowledgement and backup
+        run: python -m unittest discover -s tests -p test_settings_version.py -v
+      - name: Official XPU isolation without GPU inference
+        run: python -m unittest discover -s tests -p test_xpu_profiles.py -v

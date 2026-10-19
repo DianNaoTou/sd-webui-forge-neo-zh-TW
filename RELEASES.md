@@ -13,7 +13,9 @@
 | 最新正式版：2.30-tw.1 | 一般安裝與更新 | [正式分支 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo.zip) |
 | 上一正式版：2.29.2-tw.1 | 回退或比對上一版本 | [固定版本 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/tags/2.29.2-tw.1.zip) |
 | 首個穩定版：2.29.1-tw.1 | 保留更新前行為或回退比對 | [固定提交 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/fecbe6bf666a102680fcfe0626eae91a60fe0122.zip) |
-| 測試版：2.30-tw.2-test.6（neo-test） | 協助驗證尚未正式發布的修改 | [測試分支 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo-test.zip) |
+| 測試版：2.30-tw.2-test.7（neo-test） | 協助驗證尚未正式發布的修改 | [測試分支 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo-test.zip) |
+
+Test 7 修正啟動設定版本警告及圖片快取發布競爭；[更新與實機驗證步驟](docs/validation/startup-cache-test7.md)。僅更新測試分支，沒有建立正式 Release。
 
 正式與測試分支 ZIP 重新下載時會取得當下分支內容；已下載的 ZIP 不會自動更新。首個穩定版固定提交 ZIP 永遠指向相同程式。正式發布使用固定 Tag／GitHub Release，舊版本原樣保留。進入下列發布頁，展開 Assets 並選擇 Source code (zip)，即可下載固定版本：
 

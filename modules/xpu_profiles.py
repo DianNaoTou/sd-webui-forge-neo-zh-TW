@@ -4,6 +4,10 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import shutil
+import tempfile
+
+from modules_forge.forge_version import settings_version_uid
 
 TORCH = '2.14.1+xpu'
 VISION = '0.29.1+xpu'
@@ -22,7 +26,7 @@ def initialize_settings(root, state):
     config = state / 'config.json'
     if not config.exists():
         source = Path(root) / 'config.json'
-        data = json.loads(source.read_text(encoding='utf-8')) if source.exists() else {'localization': 'zh_Hant'}
+        data = json.loads(source.read_text(encoding='utf-8')) if source.exists() else {'localization': 'zh_Hant', 'VERSION_UID': settings_version_uid}
         for name in ('outdir_samples', 'outdir_txt2img_samples', 'outdir_img2img_samples',
                      'outdir_extras_samples', 'outdir_grids', 'outdir_txt2img_grids',
                      'outdir_img2img_grids', 'outdir_save', 'outdir_init_images'):
@@ -36,6 +40,31 @@ def initialize_settings(root, state):
     if not styles.exists():
         original = Path(root) / 'styles.csv'
         styles.write_bytes(original.read_bytes() if original.exists() else b'name,prompt,negative_prompt\n')
+
+
+def acknowledge_settings_version(root, settings_file):
+    """Record explicit acknowledgement only for the owned official settings file."""
+    _, state = paths(root, 'official')
+    config = Path(settings_file)
+    if config.resolve() != (state / 'config.json').resolve():
+        raise ValueError('Refusing to mark settings outside the official XPU profile')
+    data = json.loads(config.read_text(encoding='utf-8'))
+    if data.get('VERSION_UID') == settings_version_uid:
+        return
+    # Keep the exact old settings before changing the marker, never replace a backup.
+    with tempfile.NamedTemporaryFile(delete=False, dir=state, prefix='config-before-version-', suffix='.json') as backup:
+        with config.open('rb') as source:
+            shutil.copyfileobj(source, backup)
+    staged = None
+    try:
+        data['VERSION_UID'] = settings_version_uid
+        with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', delete=False, dir=state, suffix='.json.tmp') as target:
+            staged = Path(target.name)
+            json.dump(data, target, ensure_ascii=False, indent=2)
+        os.replace(staged, config)
+    finally:
+        if staged is not None:
+            staged.unlink(missing_ok=True)
 
 
 def initialize_extension_link(root, state):
