@@ -18,7 +18,7 @@ class XPUProfileTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.root = Path(self.temp.name) / 'project with spaces'
+        self.root = (Path(self.temp.name) / 'project with spaces').resolve()
         self.root.mkdir()
         (self.root / 'requirements.txt').write_text('Pillow==10.4.0\ncomfy-kitchen==0.2.38\n', encoding='utf-8')
 

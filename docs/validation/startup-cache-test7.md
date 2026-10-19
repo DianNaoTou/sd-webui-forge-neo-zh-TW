@@ -63,3 +63,4 @@ RTX 5060 Ti 與 Arc B580 各自驗證：
 - Windows CI 用 CreateFileW 讀取共享鎖，實際拒絕背景覆寫；Linux 用替身模擬 Windows 失敗條件。皆不代表 GPU 生圖驗收。
 
 本輪本機結果：139 項 Python 回歸全部通過（零跳過），24 項最佳化模式測試、4 項 Node 前端測試及編譯／diff 檢查通過。Windows CI 與實機驗證須另依實際執行結果判定。
+Windows 首輪 CI：7 項檔案處理與 5 項設定確認測試通過；另發現既有 XPU 測試 fixture 對 Windows 8.3 短路徑未正規化，已修正 fixture，生產路徑不變。
