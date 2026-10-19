@@ -217,7 +217,7 @@ def verify_runtime(profile):
     if torch.__version__ != TORCH or not torch.xpu.is_available():
         raise RuntimeError(f'Profile requires {TORCH} and a working Intel XPU')
     report = {'profile':profile, 'torch':torch.__version__, 'device':torch.xpu.get_device_name(0),
-              'kitchen':ck.__version__, 'backends':ck.list_backends()}
+              'kitchen':getattr(ck, '__version__', 'unknown'), 'backends':ck.list_backends()}
     if profile == 'kitchen':
         if 'B580' not in report['device']:
             raise RuntimeError("This experimental BMG profile is admitted for the B580 only; review other devices separately.")
