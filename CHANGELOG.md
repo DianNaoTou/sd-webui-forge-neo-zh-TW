@@ -2,6 +2,13 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.30-tw.2-test.6（2026-10-19）
+
+- Intel XPU 實驗預設改為原生 PyTorch SDPA 自選後端，取消本地強制 Math／query 分塊，以測試新版核心是否仍需要舊 workaround；不宣稱 NaN／OOM 已修復或速度已改善。
+- 新增 `--xpu-sdpa native|math|sliced`：`math` 對照加入分塊前的 Math 狀態，`sliced` 回到 test.5 的原保護路徑；不自動換模式掩蓋失敗，日誌與 profile 報告記錄模式。
+- 不改 CUDA、模型按需載入／卸載、Torch／XPU 依賴、UI／翻譯／插件。125 項 Python 回歸、26 項最佳化模式與 4 項 JavaScript 測試通過；實機生圖／HR 尚待使用者測試。
+- [三模式實機對照與回復命令](docs/validation/xpu-sdpa-test6.md)／[工程紀錄](docs/reviews/2026-10-19-xpu-sdpa-test6.md)。
+
 ## 2.30-tw.2-test.5（2026-10-19）
 
 - 修正獨立 `--data-dir` 導致核心 CSS／JavaScript 與插件前端被 Gradio 拒絕存取；精確授權公開資源，CUDA／XPU 共用相同行為。

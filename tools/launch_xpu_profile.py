@@ -71,6 +71,8 @@ def main():
     with FileLock(str(ROOT / 'runtime' / 'xpu-ab' / 'setup.lock'), timeout=600):
         launch.prepare_environment()
     report = profiles.verify_runtime(args.profile)
+    from backend.args import args as backend_args
+    report["xpu_sdpa"] = backend_args.xpu_sdpa
     report.update(python=sys.version, interpreter=sys.executable, port=profiles.PROFILES[args.profile][1],
                   requirements=str(requirement), kitchen_revision=profiles.KITCHEN_REV if args.profile == 'kitchen' else None)
     (state / 'runtime-report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2, default=str), encoding='utf-8')

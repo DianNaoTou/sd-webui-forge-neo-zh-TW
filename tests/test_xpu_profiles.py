@@ -63,6 +63,15 @@ class XPUProfileTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     profiles.command_args(self.root,state,key,[bad])
 
+    def test_attention_comparison_flags_keep_the_same_profile_and_environment(self):
+        for key in ('official', 'kitchen'):
+            _, state = profiles.paths(self.root,key)
+            for mode in ('native', 'math', 'sliced'):
+                args = profiles.command_args(self.root,state,key,['--xpu-sdpa',mode])
+                self.assertEqual(args[-2:],['--xpu-sdpa',mode])
+                self.assertEqual(args[args.index('--data-dir')+1],str(state))
+                self.assertEqual(args[args.index('--port')+1],str(profiles.PROFILES[key][1]))
+
     def test_fork_constraints_do_not_get_overwritten_by_official_requirements(self):
         _, state = profiles.paths(self.root,'kitchen')
         requirement = profiles.requirements_for(self.root,state,'kitchen')

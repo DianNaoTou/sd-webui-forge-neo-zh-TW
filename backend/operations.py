@@ -11,6 +11,7 @@ import torch
 
 from backend import memory_management, stream, utils
 from backend.args import args, dynamic_args
+from backend.args import args as backend_args
 
 
 def gqa_repeat_factor(query_heads: int, key_heads: int, value_heads: int) -> int:
@@ -35,11 +36,12 @@ def scaled_dot_product_attention(q, k, v, *args, **kwargs):
         k, v = repeat_kv_for_gqa(k, v, q.shape[-3], -3)
         kwargs["enable_gqa"] = False
 
-    # Keep the XPU non-finite-output workaround, but bound math temporaries.
+    # test.6: compare current PyTorch dispatch with either historical workaround.
+    # Keep this policy XPU-only; the CUDA implementation below is unchanged.
     if q.device.type == "xpu":
-        from backend.xpu_attention import math_sdpa
+        from backend.xpu_attention import xpu_sdpa
 
-        return math_sdpa(q, k, v, *args, **kwargs)
+        return xpu_sdpa(q, k, v, *args, mode=backend_args.xpu_sdpa, **kwargs)
 
     return torch.nn.functional.scaled_dot_product_attention(q, k, v, *args, **kwargs)
 

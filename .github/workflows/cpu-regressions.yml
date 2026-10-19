@@ -38,3 +38,5 @@ jobs:
         run: python -O -m unittest discover -s tests -p test_xpu_profiles.py -v
       - name: Check optimized Python WD14 model adapters
         run: python -O -m unittest discover -s tests -p test_wd14_models.py -v
+      - name: Check optimized Python XPU attention modes
+        run: python -O -m unittest discover -s tests -p test_xpu_attention.py -v
