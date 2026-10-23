@@ -12,7 +12,7 @@
 
 ## 版本與下載
 
-目前測試版本：**2.30-tw.2-test.8**（`neo-test`；新增含淺層 Git 資訊的測試 ZIP，解壓後可直接執行 `git pull`）。[Test 8 更新與驗證](docs/validation/git-zip-test8.md)。保留 Test 7 的 GPU／插件實機驗證限制。
+目前測試分支版本：**2.30-tw.2-test.9**（`neo-test`；新增繁中 LayerDiffuse 可選功能，預設關閉）。[Test 9 說明與實機清單](docs/releases/2.30-tw.2-test.9.md)。CUDA／XPU 生成仍待實機驗證；固定版 ZIP 由既有 CI 通過後建立。
 
 目前正式發布版本：**2.30-tw.1**（上游 2.30）。
 
@@ -48,6 +48,7 @@ Stable Diffusion WebUI Forge Neo 是以 AUTOMATIC1111 Stable Diffusion WebUI 為
 | 元件 | 用途 | 整合狀態 |
 |---|---|---|
 | Forge Neo | Stable Diffusion WebUI 主程式 | 基於官方 `neo` 分支 |
+| LayerDiffuse | SD1.5／SDXL 圖層與透明圖片 | 測試分支整合繁中介面；預設關閉，[使用與限制](extensions/sd-forge-layerdiffuse/README.md) |
 | ADetailer-Neo | 自動偵測、遮罩與局部重繪 | 整合繁體中文介面 |
 | Civitai Model Downloader | 在介面中檢查並下載 Civitai 模型 | 整合繁體中文介面 |
 | forge-neo-image2prompt | 圖片反推提示詞 | 包含相容性修正 |

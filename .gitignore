@@ -18,6 +18,7 @@ __pycache__
 /config_states/
 /embeddings
 /extensions/*
+!/extensions/sd-forge-layerdiffuse/
 !/extensions/ADetailer-Neo/
 !/extensions/sd-webui-civitai-downloader/
 !/extensions/forge-neo-image2prompt/
@@ -54,3 +55,4 @@ notification.mp3
 
 # Personal launcher overrides loaded by webui.bat; never ship these.
 /webui.settings.bat
+

@@ -2,6 +2,15 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.30-tw.2-test.9（2026-10-23）
+
+- 新增 LayerDiffuse 繁體中文插件，功能預設關閉；以官方原碼與 Forge Neo Fix 3 為來源，排除第三方 Git 資訊與 Python 快取，不新增套件安裝器。
+- SDXL LoRA 轉接目前 WeightAdapter，檢查修補鍵與套用完整性；合成條件在插件採樣 modifier 中處理並對齊 batch，不改全域 is_inpaint 或核心推論程式。
+- 透明 VAE 依工作、模型家族及編解碼用途分開快取；沿用核心 finally 清理介面還原插件掛接。增加模型／圖片／批次驗證，失敗停止採樣。
+- 測試階段禁止與 ADetailer 同時啟用；SD1.5 不支援其他 Attention 掛接，權重固定為 1。保留英文 API／圖片資訊值，介面選項與提示繁中化。
+- 14 種按需權重固定 Hugging Face revision 與 SHA-256；既有檔案驗證失敗時保留原檔並停止，不覆寫使用者資料。
+- 本機 16 項無 GPU 回歸通過；全套 CI 與 CUDA／XPU、Hires、Illustrious、長時間連續生成另行驗收，不宣稱已通過 GPU 測試。[說明與清單](docs/releases/2.30-tw.2-test.9.md)。
+
 ## 2.30-tw.2-test.8（2026-10-23）
 
 - 新增 Release 附件 `neo-test.zip`：固定於通過 CI 的提交，包含單分支、depth 1、無 tags 的自包含 Git 資訊；解壓後直接 `git pull` 更新 `neo-test`，不要求初始化腳本。

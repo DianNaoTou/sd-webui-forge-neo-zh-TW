@@ -25,7 +25,7 @@ jobs:
       - name: Require real Gradio HTTP test runtime
         run: python -c "import gradio, fastapi; assert gradio.__version__ == '4.40.0'; assert fastapi.__version__ == '0.127.1'"
       - name: Compile core Python files
-        run: python -m compileall -q backend modules modules_forge scripts tests extensions/stable-diffusion-webui-tagger-fork tools/launch_xpu_profile.py extensions-builtin/sd_forge_spectrum extensions-builtin/sd_forge_controlnet extensions-builtin/sd_forge_ipadapter
+        run: python -m compileall -q backend modules modules_forge scripts tests extensions/sd-forge-layerdiffuse extensions/stable-diffusion-webui-tagger-fork tools/launch_xpu_profile.py extensions-builtin/sd_forge_spectrum extensions-builtin/sd_forge_controlnet extensions-builtin/sd_forge_ipadapter
       - name: Run regression suite with real CPU PyTorch
         run: python -m unittest discover -s tests -v
       - name: WD14 browser event regressions
@@ -164,7 +164,7 @@ jobs:
             else
               gh api "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/$VERSION" -f "sha=$GITHUB_SHA" > /dev/null
             fi
-            gh release create "$VERSION" --target "$GITHUB_SHA" --draft --prerelease --latest=false --title "$VERSION｜ZIP Git 更新測試" --notes-file "docs/releases/$VERSION.md"
+            gh release create "$VERSION" --target "$GITHUB_SHA" --draft --prerelease --latest=false --title "$VERSION｜測試版" --notes-file "docs/releases/$VERSION.md"
           fi
           gh release view "$VERSION" --json assets --jq '.assets[].name' > "$RUNNER_TEMP/asset-names.txt"
           for asset in neo-test.zip neo-test.zip.sha256; do
