@@ -51,3 +51,6 @@ notification.mp3
 
 /venv-xpu-official/
 /venv-xpu-kitchen/
+
+# Personal launcher overrides loaded by webui.bat; never ship these.
+/webui.settings.bat

@@ -2,6 +2,14 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.30-tw.2-test.8（2026-10-23）
+
+- 新增 Release 附件 `neo-test.zip`：固定於通過 CI 的提交，包含單分支、depth 1、無 tags 的自包含 Git 資訊；解壓後直接 `git pull` 更新 `neo-test`，不要求初始化腳本。
+- 封裝預設只允許快轉、停用自動 stash，並拒絕覆寫與遠端新增檔案碰撞的 ignored 檔案；本地修改衝突時停止。不執行強制 reset／clean、模型或環境備份。
+- 新增真實 Git 更新測試及追蹤資料檢查；排除個人 `webui.settings.bat`。既有受追蹤啟動檔仍受 Git 管理，不以 ignore／skip-worktree 隱藏差異。
+- Linux／Windows 回歸通過後建立固定測試 Tag／Prerelease，附 SHA-256；不改正式 `neo`、正式發布機制或 Latest 正式版。GitHub archive／Source code ZIP 仍不含 `.git`。
+- 不改 Test 7 的推論、CUDA／XPU 版本、模型下載或環境路徑。舊 Intel 正式版遷移限制與尚待 GPU 實機驗證項目維持；[完整說明](docs/validation/git-zip-test8.md)。
+
 ## 2.30-tw.2-test.7（2026-10-19）
 
 - Intel 全新設定寫入與啟動器一致的 `PY313` 版本標記；改正「設定不符」被誤述為需要重裝的警告。既有官方設定仍先顯示警告，使用者按 Enter 後備份原 JSON，只更新版本標記，後續不重複提示；不自動認定舊設定已遷移，也不改 NVIDIA 既有設定檔。

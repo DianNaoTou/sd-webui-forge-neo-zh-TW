@@ -12,7 +12,7 @@
 
 ## 版本與下載
 
-目前測試版本：**2.30-tw.2-test.7**（`neo-test`；修正 Intel 新設定版本警告與圖片快取發布競爭。使用者回報 test.6 的 B580 開啟 VAE 分塊後明顯改善，test.7 實機仍待驗證）。[Test 7 更新與驗證](docs/validation/startup-cache-test7.md)。[WD14 新模型與按需下載說明](docs/reviews/2026-10-19-wd14-test4.md)。[官方 Intel XPU 安裝與維護政策](INTEL_ARC_SETUP.md)。
+目前測試版本：**2.30-tw.2-test.8**（`neo-test`；新增含淺層 Git 資訊的測試 ZIP，解壓後可直接執行 `git pull`）。[Test 8 更新與驗證](docs/validation/git-zip-test8.md)。保留 Test 7 的 GPU／插件實機驗證限制。
 
 目前正式發布版本：**2.30-tw.1**（上游 2.30）。
 
@@ -21,7 +21,8 @@
 - [2.29.1-tw.1 首個穩定版發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.29.1-tw.1)
 - [最新正式版 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo.zip)
 - [首個穩定版 2.29.1-tw.1 固定 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/fecbe6bf666a102680fcfe0626eae91a60fe0122.zip)
-- [測試版 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo-test.zip)
+- [Test 8 可用 Git 更新的測試 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.30-tw.2-test.8/neo-test.zip)
+- [測試分支原始碼 ZIP（不含 Git）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo-test.zip)
 
 [版本選擇與更新方式](./RELEASES.md) ｜ [本次更新與已知限制](./docs/releases/2.30-tw.1.md) ｜ [完整更新紀錄](./CHANGELOG.md)
 

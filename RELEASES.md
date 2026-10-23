@@ -13,11 +13,11 @@
 | 最新正式版：2.30-tw.1 | 一般安裝與更新 | [正式分支 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo.zip) |
 | 上一正式版：2.29.2-tw.1 | 回退或比對上一版本 | [固定版本 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/tags/2.29.2-tw.1.zip) |
 | 首個穩定版：2.29.1-tw.1 | 保留更新前行為或回退比對 | [固定提交 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/fecbe6bf666a102680fcfe0626eae91a60fe0122.zip) |
-| 測試版：2.30-tw.2-test.7（neo-test） | 協助驗證尚未正式發布的修改 | [測試分支 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo-test.zip) |
+| 測試版：2.30-tw.2-test.8（neo-test） | 協助驗證尚未正式發布的修改 | [含 Git 的測試 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.30-tw.2-test.8/neo-test.zip) |
 
-Test 7 修正啟動設定版本警告及圖片快取發布競爭；[更新與實機驗證步驟](docs/validation/startup-cache-test7.md)。僅更新測試分支，沒有建立正式 Release。
+Test 8 新增可直接 `git pull` 的測試 ZIP，追蹤 `origin/neo-test`；[更新與驗證](docs/validation/git-zip-test8.md)。測試 ZIP 由回歸通過後發布的 Prerelease 附件提供，不取代正式版。舊的 archive／Source code ZIP 仍不含 `.git`。
 
-正式與測試分支 ZIP 重新下載時會取得當下分支內容；已下載的 ZIP 不會自動更新。首個穩定版固定提交 ZIP 永遠指向相同程式。正式發布使用固定 Tag／GitHub Release，舊版本原樣保留。進入下列發布頁，展開 Assets 並選擇 Source code (zip)，即可下載固定版本：
+GitHub archive 分支 ZIP 重新下載時會取得當下分支內容；已下載的 ZIP 不會自動更新。Test 8 Release 附件則固定於通過驗證的提交，解壓後使用 `git pull` 更新測試分支。首個穩定版固定提交 ZIP 永遠指向相同程式。正式發布使用固定 Tag／GitHub Release，舊版本原樣保留。進入下列發布頁，展開 Assets 並選擇 Source code (zip)，即可下載固定版本：
 
 - [2.30-tw.1 正式發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.30-tw.1)
 - [2.29.2-tw.1 上一正式版發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.29.2-tw.1)
@@ -54,7 +54,7 @@ git pull --ff-only
 
 ## 版本呈現
 
-正式版啟動與介面資訊使用 `neo 2.30-tw.1`；測試分支目前使用 `neo 2.30-tw.1-test`。`-test` 表示測試分支，並非新的正式發布。正式發布前移除 `-test`，並依當次更新調整上游版本及 `tw` 修訂號。舊版程式保持不變，仍顯示 `neo 2.29.1`，其整合版發布名稱為 `2.29.1-tw.1`。
+正式版啟動與介面資訊使用 `neo 2.30-tw.1`；測試分支目前使用 `neo 2.30-tw.2-test.8`。`-test` 表示測試分支，並非新的正式發布。正式發布前移除 `-test`，並依當次更新調整上游版本及 `tw` 修訂號。舊版程式保持不變，仍顯示 `neo 2.29.1`，其整合版發布名稱為 `2.29.1-tw.1`。
 
 ## 發布紀錄規則
 
