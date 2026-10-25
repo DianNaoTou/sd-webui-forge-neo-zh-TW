@@ -60,9 +60,31 @@ jobs:
       - name: Portable ZIP and ordinary Git pull protection
         run: python -m unittest discover -s tests -p test_git_zip_update.py -v
 
+  wd14-openvino:
+    name: WD14 OpenVINO isolation (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install worker test runtime without WebUI or Torch
+        run: python -m pip install numpy==2.3.5 openvino==2026.3.1 onnx==1.20.1 onnxruntime==1.30.0
+      - name: Require actual OpenVINO and ONNX runtimes
+        run: python -c "import openvino, onnx, onnxruntime; print(openvino.__version__, onnxruntime.__version__)"
+      - name: Worker transport, real CPU numerics, fallback and isolation
+        run: python -m unittest discover -s tests -p test_wd14_openvino.py -v
+      - name: Optimized worker regressions
+        run: python -O -m unittest discover -s tests -p test_wd14_openvino.py -v
+
   publish-test:
     if: github.event_name == 'push' && github.ref == 'refs/heads/neo-test'
-    needs: [regression, windows-file-io]
+    needs: [regression, windows-file-io, wd14-openvino]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     concurrency:

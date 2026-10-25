@@ -1,5 +1,7 @@
 @echo off
 setlocal
+set "FORGE_WD14_OPENVINO="
+set "FORGE_WD14_OV_DEVICE="
 cd /d "%~dp0"
 call bootstrap-python.bat
 if errorlevel 1 goto :failed

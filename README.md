@@ -12,7 +12,10 @@
 
 ## 版本與下載
 
-目前測試分支版本：**2.31-tw.1-test.3**（`neo-test`；擴充內附外掛的語系檔翻譯、修復 Civitai 介面與進度相容性，延續上游 2.31 整合）。[更新與驗證說明](docs/releases/2.31-tw.1-test.3.md)。固定測試 ZIP 由 CI 通過後建立。
+目前測試分支版本：**2.31-tw.1-test.4**（`neo-test`；新增選用的 Intel WD14 GPU 加速啟動檔，保留原始 CPU 辨識路徑，延續上游 2.31 整合）。[更新與驗證說明](docs/releases/2.31-tw.1-test.4.md)。固定測試 ZIP 由 CI 通過後建立。
+
+Intel 測試版啟動方式：原始 `webui-user-intel-arc.bat` 維持 WD14 CPU；新增 `webui-user-intel-arc-wd14-gpu.bat` 啟用獨立 OpenVINO GPU worker，載入／推論失敗時退回 CPU。首次使用新啟動檔會下載獨立執行環境，模型仍在按下辨識時才按需下載。完整使用與 B580 驗證見 [Test 4 說明](docs/releases/2.31-tw.1-test.4.md)。
+
 
 目前正式發布版本：**2.30-tw.1**（上游 2.30）。
 

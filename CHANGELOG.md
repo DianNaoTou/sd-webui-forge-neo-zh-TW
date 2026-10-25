@@ -2,6 +2,12 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.31-tw.1-test.4（2026-10-25）
+
+- 新增 `webui-user-intel-arc-wd14-gpu.bat`，以獨立 OpenVINO GPU worker 嘗試加速 WD14、PixAI 與 Camie 的 ONNX 模型；原始 Intel 啟動檔保留 CPU 路徑，NVIDIA 路徑不變。
+- GPU 套件僅裝到 `runtime/wd14-openvino/venv`，不替換生圖環境的 Torch／ONNX Runtime；模型前後處理與標籤過濾沿用既有實作。GPU 初始化或推論失敗會明確記錄並退回 CPU。
+- 支援獨顯辨識與指定 GPU 裝置、編譯快取、工作逾時與模型卸載清理，加入 Windows／Linux 隔離回歸及真實 OpenVINO CPU 數值比較。B580 GPU 效能與完整模型相容性仍待實機測試。[本版說明](docs/releases/2.31-tw.1-test.4.md)。
+
 ## 2.31-tw.1-test.3（2026-10-25）
 
 - 擴充檢查專案內附外掛，將 Image2Prompt、Civitai 下載器、WD14 新說明及 LoRA 中繼資料編輯器改為英文介面來源＋繁中語系檔；補上 RadialAttention、ControlNet、PiD、柔性局部重繪與 Ultimate Upscale 等漏翻片段。
