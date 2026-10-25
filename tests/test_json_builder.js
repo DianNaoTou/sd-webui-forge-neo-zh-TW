@@ -98,6 +98,14 @@ test('dynamic labels translate while schema radio values stay English',()=> {
     vm.runInContext(code('main'),ui.context);
     assert.equal(ui.tab.querySelectorAll('.jb-root').length,1);
 });
+test('real zh_Hant dictionary and English reload show reversible Builder labels',()=> {
+    const dictionary=JSON.parse(fs.readFileSync(path.join(__dirname,'../localizations/zh_Hant.json'),'utf8'));
+    const chinese=frontend(dictionary), english=frontend({});
+    assert.equal(chinese.tab.querySelector('.jb-add').children[0].textContent,'新增項目');
+    assert.equal(english.tab.querySelector('.jb-add').children[0].textContent,'Add Item');
+    assert.equal(chinese.tab.querySelector('.jb-dialog-input').attrs.placeholder,'已編譯的提示詞或構圖草稿');
+    assert.equal(english.tab.querySelector('.jb-dialog-input').attrs.placeholder,'Compiled Prompt or Layout Draft');
+});
 test('loaded layout sends prompt/dimensions to both Gradio tabs via input updates',()=> {
     const ui=frontend();
     ui.tab.querySelector('.jb-load-prompt').click();

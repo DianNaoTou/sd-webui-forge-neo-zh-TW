@@ -32,7 +32,14 @@ from modules.shared import cmd_opts, opts
 
 def script_name_to_index(name, scripts):
     try:
-        return [script.title().lower() for script in scripts].index(name.lower())
+        key = name.lower()
+        titles = [script.title().lower() for script in scripts]
+        if key in titles:
+            return titles.index(key)
+        for index, script in enumerate(scripts):
+            if key in [alias.lower() for alias in getattr(script, "api_aliases", ())]:
+                return index
+        raise ValueError("Unknown script name")
     except Exception as e:
         raise HTTPException(status_code=422, detail=f"Script '{name}' not found") from e
 

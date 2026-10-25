@@ -42,18 +42,18 @@ layer_model_root = os.path.join(models_path, 'layer_model')
 
 
 METHOD_LABELS = {
-    'FG_ONLY_ATTN_SD15': '（SD1.5）只生成透明圖片（Attention 注入）',
-    'FG_TO_BG_SD15': '（SD1.5）由前景生成背景（批次須為 2 的倍數）',
-    'BG_TO_FG_SD15': '（SD1.5）由背景生成前景（批次須為 2 的倍數）',
-    'JOINT_SD15': '（SD1.5）同時生成前景、背景與合成圖（批次須為 3 的倍數）',
-    'FG_ONLY_ATTN': '（SDXL）只生成透明圖片（Attention 注入）',
-    'FG_ONLY_CONV': '（SDXL）只生成透明圖片（卷積注入）',
-    'FG_TO_BLEND': '（SDXL）由前景生成合成圖',
-    'FG_BLEND_TO_BG': '（SDXL）由前景與合成圖生成背景',
-    'BG_TO_BLEND': '（SDXL）由背景生成合成圖',
-    'BG_BLEND_TO_FG': '（SDXL）由背景與合成圖生成前景',
+    'FG_ONLY_ATTN_SD15': '(SD1.5) Only Generate Transparent Image (Attention Injection)',
+    'FG_TO_BG_SD15': '(SD1.5) From Foreground to Background (need batch size 2)',
+    'BG_TO_FG_SD15': '(SD1.5) From Background to Foreground (need batch size 2)',
+    'JOINT_SD15': '(SD1.5) Generate Everything Together (need batch size 3)',
+    'FG_ONLY_ATTN': '(SDXL) Only Generate Transparent Image (Attention Injection)',
+    'FG_ONLY_CONV': '(SDXL) Only Generate Transparent Image (Conv Injection)',
+    'FG_TO_BLEND': '(SDXL) From Foreground to Blending',
+    'FG_BLEND_TO_BG': '(SDXL) From Foreground and Blending to Background',
+    'BG_TO_BLEND': '(SDXL) From Background to Blending',
+    'BG_BLEND_TO_FG': '(SDXL) From Background and Blending to Foreground',
 }
-RESIZE_LABELS = {'RESIZE': '直接縮放', 'CROP_AND_RESIZE': '裁切後縮放', 'RESIZE_AND_FILL': '縮放並填滿'}
+RESIZE_LABELS = {'RESIZE': 'Just Resize', 'CROP_AND_RESIZE': 'Crop and Resize', 'RESIZE_AND_FILL': 'Resize and Fill'}
 
 
 class LayerMethod(Enum):
@@ -74,42 +74,45 @@ def load_layer_model_state_dict(filename):
 
 
 class LayerDiffusionForForge(scripts.Script):
+    # Legacy beta API identifier, not a user-facing translated label.
+    api_aliases = ("LayerDiffuse 圖層透明生成",)
+
     def title(self):
-        return "LayerDiffuse 圖層透明生成"
+        return "LayerDiffuse"
 
     def show(self, is_img2img):
         return scripts.AlwaysVisible
 
     def ui(self, *args, **kwargs):
         with gr.Accordion(open=False, label=self.title()):
-            gr.Markdown('測試功能：支援一般 SD1.5／SDXL 模型，預設關閉；首次啟用會下載所需權重。請先關閉 ADetailer，輸出建議使用 PNG。SD1.5 權重固定為 1。')
-            enabled = gr.Checkbox(label='啟用', value=False)
-            method = gr.Dropdown(choices=[(METHOD_LABELS[e.name], e.value) for e in LayerMethod], value=LayerMethod.FG_ONLY_ATTN.value, label="生成方式", type='value')
+            gr.Markdown('Experimental: supports standard SD1.5 / SDXL models; disabled by default. Required weights download on first use. Disable ADetailer and use PNG output. SD1.5 weight must be 1.')
+            enabled = gr.Checkbox(label='Enable', value=False)
+            method = gr.Dropdown(choices=[(METHOD_LABELS[e.name], e.value) for e in LayerMethod], value=LayerMethod.FG_ONLY_ATTN.value, label="Generation Method", type='value')
             gr.HTML('</br>')  # some strange gradio problems
 
             with gr.Row():
                 with gr.Column(visible=False) as fg_col:
-                    gr.Markdown('前景圖片')
+                    gr.Markdown('Foreground Image')
                     fg_image = ForgeCanvas(numpy=True, no_scribbles=True, height=300).background
                 with gr.Column(visible=False) as bg_col:
-                    gr.Markdown('背景圖片')
+                    gr.Markdown('Background Image')
                     bg_image = ForgeCanvas(numpy=True, no_scribbles=True, height=300).background
                 with gr.Column(visible=False) as blend_col:
-                    gr.Markdown('合成圖片')
+                    gr.Markdown('Blended Image')
                     blend_image = ForgeCanvas(numpy=True, no_scribbles=True, height=300).background
 
             gr.HTML('</br>')  # some strange gradio problems
 
             with gr.Row():
-                weight = gr.Slider(label="權重（SDXL）", value=1.0, minimum=0.0, maximum=2.0, step=0.001)
-                ending_step = gr.Slider(label="圖層效果停止比例", value=1.0, minimum=0.0, maximum=1.0)
+                weight = gr.Slider(label="Weight (SDXL)", value=1.0, minimum=0.0, maximum=2.0, step=0.001)
+                ending_step = gr.Slider(label="Layer Effect Stop Fraction", value=1.0, minimum=0.0, maximum=1.0)
 
-            fg_additional_prompt = gr.Textbox(value="", placeholder="前景額外提示詞", visible=False, label='前景額外提示詞')
-            bg_additional_prompt = gr.Textbox(value="", placeholder="背景額外提示詞", visible=False, label='背景額外提示詞')
-            blend_additional_prompt = gr.Textbox(value="", placeholder="合成圖片額外提示詞", visible=False, label='合成圖片額外提示詞')
+            fg_additional_prompt = gr.Textbox(value="", placeholder="Additional Foreground Prompt", visible=False, label='Additional Foreground Prompt')
+            bg_additional_prompt = gr.Textbox(value="", placeholder="Additional Background Prompt", visible=False, label='Additional Background Prompt')
+            blend_additional_prompt = gr.Textbox(value="", placeholder="Additional Blended Image Prompt", visible=False, label='Additional Blended Image Prompt')
 
-            resize_mode = gr.Radio(choices=[(RESIZE_LABELS[e.name], e.value) for e in ResizeMode], value=ResizeMode.CROP_AND_RESIZE.value, label="圖片縮放方式", type='value', visible=False)
-            output_origin = gr.Checkbox(label='圖生圖輸出原始底圖（上游保留選項）', value=False, visible=False)
+            resize_mode = gr.Radio(choices=[(RESIZE_LABELS[e.name], e.value) for e in ResizeMode], value=ResizeMode.CROP_AND_RESIZE.value, label="Image Resize Mode", type='value', visible=False)
+            output_origin = gr.Checkbox(label='Output Original Image in img2img (upstream reserved option)', value=False, visible=False)
 
         def method_changed(m):
             m = LayerMethod(m)

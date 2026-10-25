@@ -2,6 +2,13 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.31-tw.1-test.2（2026-10-25）
+
+- 依 ImageStitch 實際 HTML text nodes 補翻譯檔，修復句子被粗體標籤拆開後整句詞條失效；原英文 HTML 不改。
+- LayerDiffuse 介面從寫死中文改為英文來源＋zh_Hant 字典；切換英文並重新載入介面時恢復英文，方法／縮放選項的英文資料值與參數順序維持。
+- API 使用固定英文 LayerDiffuse 名稱，保留原測試版中文名稱為相容別名；不以目前顯示語言改變 API 行為。
+- 新增真實 Gradio／原始 localization.js 文字節點、語系切換與舊 API 相容回歸，擴充 Windows CI。本機 Python 一般與最佳化各 185 項、Node 17 項通過；[本版說明](docs/releases/2.31-tw.1-test.2.md)。
+
 ## 2.31-tw.1-test.1（2026-10-25）
 
 - 完整合併上游 2.31 至 `0c388f8b`，新增 MOSS-Image、Qwen3.5 文字編碼器、SLG、融合 QKV LoRA 與繁中 JSON 構圖編輯器；保留 Test 9 全部功能。
