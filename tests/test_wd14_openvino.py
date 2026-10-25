@@ -60,14 +60,37 @@ class DeviceSelectionTests(unittest.TestCase):
             self.assertEqual(env['PATH'], 'drivers')
         self.assertEqual(base['PIP_TARGET'], 'main')
 
-    def test_original_launcher_clears_opt_in_and_gpu_launcher_is_separate(self):
-        original = (ROOT / 'webui-user-intel-arc.bat').read_text(encoding='utf-8')
-        gpu = (ROOT / 'webui-user-intel-arc-wd14-gpu.bat').read_text(encoding='utf-8')
-        self.assertIn('set "FORGE_WD14_OPENVINO="', original)
-        self.assertIn('tools\\launch_xpu_profile.py official', original)
-        self.assertNotIn('launch_wd14_gpu.py', original)
-        self.assertIn('tools\\launch_wd14_gpu.py %*', gpu)
-        self.assertIn('setlocal', gpu)
+    def test_single_intel_launcher_enables_worker_and_retires_duplicate_entry(self):
+        source = (ROOT / 'webui-user-intel-arc.bat').read_text(encoding='utf-8')
+        self.assertIn('tools\\launch_wd14_gpu.py %*', source)
+        self.assertIn('call bootstrap-python.bat', source)
+        self.assertIn('setlocal', source)
+        self.assertNotIn('FORGE_WD14_OPENVINO=', source)
+        self.assertFalse((ROOT / 'webui-user-intel-arc-wd14-gpu.bat').exists())
+
+    def test_launcher_delegates_to_official_profile_with_gpu_or_setup_fallback(self):
+        for setup_error in (None, RuntimeError('offline')):
+            with self.subTest(setup_error=setup_error), tempfile.TemporaryDirectory() as tmp:
+                state = Path(tmp)
+                fake_os = types.SimpleNamespace(name='nt', environ={'KEEP': 'value'})
+                lock = types.SimpleNamespace(LK_NBLCK=1, LK_UNLCK=2, locking=Mock())
+                with patch.object(launcher, 'os', fake_os), \
+                     patch.object(launcher, 'worker_state', return_value=state), \
+                     patch.object(launcher, 'prepare', side_effect=setup_error) as prepare, \
+                     patch.object(launcher.subprocess, 'call', return_value=7) as call, \
+                     patch.dict(sys.modules, {'msvcrt': lock}), \
+                     patch.object(sys, 'argv', ['launcher', '--wd14-device', 'GPU.1', '--model-ref', 'my-models']):
+                    self.assertEqual(launcher.main(), 7)
+                prepare.assert_called_once_with(ROOT)
+                args = call.call_args.args[0]
+                self.assertEqual(args, [sys.executable, str(ROOT / 'tools/launch_xpu_profile.py'),
+                                        'official', '--model-ref', 'my-models'])
+                env = call.call_args.kwargs['env']
+                self.assertEqual(env['KEEP'], 'value')
+                self.assertEqual(env['FORGE_WD14_OPENVINO'], '0' if setup_error else '1')
+                if not setup_error:
+                    self.assertEqual(env['FORGE_WD14_OV_DEVICE'], 'GPU.1')
+                self.assertEqual(call.call_args.kwargs['cwd'], ROOT)
 
     def test_only_opt_in_tagger_runtime_uses_worker_and_cpu_device_override_wins(self):
         tree = ast.parse((ROOT / 'extensions/stable-diffusion-webui-tagger-fork/tagger/interrogator.py').read_text(encoding='utf-8'))

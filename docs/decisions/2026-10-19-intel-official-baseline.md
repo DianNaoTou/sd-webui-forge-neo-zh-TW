@@ -62,3 +62,13 @@
 移除 `webui-user-intel-xpu-official.bat`。本節取代上一節的雙入口轉交安排。
 官方 Python launcher、額外參數、失敗處理與環境／資料路徑完全沿用，
 不重新建立 venv、不搬移或改寫既有設定。正式分支與發布限制維持不變。
+
+
+## 2026-10-25：2.31 正式版發布授權
+
+使用者完成簡單測試後，明確要求將 Intel WD14 GPU 修改前的 Test 3 升至正式分支。正式版號為 `2.31-tw.1`，本次授權使官方 XPU 基準隨 2.31 大版本正式納入；上文 10-19 當時的暫緩狀態保留為歷史紀錄。本次不包含 Test 4 的 OpenVINO worker、GPU 啟動檔或相關依賴修改。B580 既有 OOM／DEVICE_LOST 限制保留，未宣稱全面修復。
+
+
+## 2026-10-25：Test 5 統一 WD14 GPU 啟動入口
+
+使用者回報 Test 4 專用 GPU 啟動檔在 B580 功能正常，明確要求以該流程取代原 Intel Arc 啟動方式，捨棄雙 BAT 選擇。本次僅更新 `neo-test`、發布 `2.31-tw.1-test.5`：保留 `webui-user-intel-arc.bat` 名稱但改為 GPU 準備入口，刪除重複的 `webui-user-intel-arc-wd14-gpu.bat`，保留失敗時 CPU 自動退回及既有官方 XPU profile。NVIDIA 與正式 `neo` 不變。

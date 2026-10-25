@@ -1,12 +1,21 @@
 # Intel Arc 安裝與啟動
 
-`neo-test` 的 Intel Arc 現在統一使用官方 PyTorch XPU：
+本測試版 **2.31-tw.1-test.5** 的 Intel Arc 統一使用官方 PyTorch XPU 與 WD14 GPU 啟動流程：
 
 ```bat
 webui-user-intel-arc.bat
 ```
 
-僅保留 `webui-user-intel-arc.bat` 一個 Intel 啟動入口，直接執行官方 XPU 流程，支援額外參數。原 `webui-user-intel-xpu-official.bat` 已移除。
+僅保留 `webui-user-intel-arc.bat` 一個 Intel 啟動入口，執行 WD14 GPU 準備與官方 XPU 流程，支援額外參數。原 `webui-user-intel-xpu-official.bat` 已移除。
+
+
+## Test 5：WD14 GPU 加速整合至唯一入口
+
+`webui-user-intel-arc.bat` 現在先執行 `tools/launch_wd14_gpu.py`，準備獨立 OpenVINO worker，再進入官方 XPU profile。Test 4 的 `webui-user-intel-arc-wd14-gpu.bat` 已移除，原 CPU-only BAT 內容不再保留。
+
+首次會建立 `runtime/wd14-openvino/venv`（OpenVINO 2026.3.1／numpy 2.3.5）；已使用 Test 4 者沿用環境與編譯快取，不必重裝。GPU 設定、載入或推論失敗仍自動退回 CPU，且保留錯誤原因。套件不裝入生圖 venv，不替換 Torch／ONNX Runtime。明確選用 CPU 的參數仍優先。
+
+多 GPU 可執行 `webui-user-intel-arc.bat --wd14-device GPU.0`，索引請依實際裝置名稱確認。其他生圖參數照常傳入。使用者於 2026-10-25 回報 B580／Test 4 專用啟動檔功能正常；這是初步功能回報，未提供完整模型、速度或長時間測試資料。詳見 [Test 5 說明](docs/releases/2.31-tw.1-test.5.md)。
 
 - Python：專案專用 3.13.12，由啟動器準備，不修改系統 Python。
 - 依賴：Torch 2.14.1+xpu／TorchVision 0.29.1+xpu。
@@ -35,7 +44,7 @@ webui-user-intel-arc.bat
 更新後請驗證基本生圖、原本 HR 參數連續兩次、VAE 是否仍 OOM，以及生成後系統反應。A380 與其他 Arc 尚未在本輪驗證。
 原生／Math／分塊三模式對照見 [test.6 操作說明](docs/validation/xpu-sdpa-test6.md)。
 
-**僅修改 `neo-test`；仍等下一次大版本才納入正式 `neo`，不發布 Release。**
+**官方 XPU 生圖路徑已隨 2.31-tw.1 納入正式 `neo`；WD14 GPU 流程仍僅在 `neo-test`，正式版維持 CPU 辨識。**
 Kitchen 社群 fork 支援已移除；主程式必要的官方 comfy-kitchen 依賴保留。
 詳見 [維護決策](docs/decisions/2026-10-19-intel-official-baseline.md)。
 

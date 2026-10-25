@@ -1,4 +1,4 @@
-"""Opt-in Intel WD14 GPU launcher; installs only the private OpenVINO venv."""
+"""Intel Arc launcher with WD14 GPU acceleration; installs only the private OpenVINO venv."""
 import argparse
 from importlib import util
 import json

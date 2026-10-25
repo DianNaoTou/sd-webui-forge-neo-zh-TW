@@ -12,24 +12,26 @@
 
 ## 版本與下載
 
-目前測試分支版本：**2.31-tw.1-test.4**（`neo-test`；新增選用的 Intel WD14 GPU 加速啟動檔，保留原始 CPU 辨識路徑，延續上游 2.31 整合）。[更新與驗證說明](docs/releases/2.31-tw.1-test.4.md)。固定測試 ZIP 由 CI 通過後建立。
+目前測試分支版本：**2.31-tw.1-test.5**（`neo-test`）。Intel Arc 統一使用 `webui-user-intel-arc.bat`，預設啟用獨立 OpenVINO WD14 GPU 加速；移除 Test 4 額外的 `webui-user-intel-arc-wd14-gpu.bat`。使用者已回報 B580 初步功能正常，其他模型與效能仍待驗證。[Test 5 更新說明](docs/releases/2.31-tw.1-test.5.md)。
 
-Intel 測試版啟動方式：原始 `webui-user-intel-arc.bat` 維持 WD14 CPU；新增 `webui-user-intel-arc-wd14-gpu.bat` 啟用獨立 OpenVINO GPU worker，載入／推論失敗時退回 CPU。首次使用新啟動檔會下載獨立執行環境，模型仍在按下辨識時才按需下載。完整使用與 B580 驗證見 [Test 4 說明](docs/releases/2.31-tw.1-test.4.md)。
+- [Test 5 測試 ZIP（含 Git）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.31-tw.1-test.5/neo-test.zip)
 
+首次 Intel 啟動會準備 `runtime/wd14-openvino/venv`；沿用 Test 4 既有環境與編譯快取。GPU 初始化或推論失敗仍會明確記錄並退回 CPU。NVIDIA 啟動方式不變，正式版不納入本次修改。
 
-目前正式發布版本：**2.30-tw.1**（上游 2.30）。
+目前正式發布版本：**2.31-tw.1**（上游 2.31），相較上一正式版 **2.30-tw.1** 新增 MOSS／JSON 構圖、LayerDiffuse、WD14 新模型，改善繁中與多項穩定性問題。
 
-- [2.30-tw.1 正式發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.30-tw.1)（固定版本 ZIP 與繁中更新說明）
-- [2.29.2-tw.1 上一正式版發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.29.2-tw.1)
-- [2.29.1-tw.1 首個穩定版發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.29.1-tw.1)
-- [最新正式版 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo.zip)
-- [首個穩定版 2.29.1-tw.1 固定 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/fecbe6bf666a102680fcfe0626eae91a60fe0122.zip)
-- [Test 8 可用 Git 更新的測試 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.30-tw.2-test.8/neo-test.zip)
-- [測試分支原始碼 ZIP（不含 Git）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo-test.zip)
+- [下載正式版 neo.zip（含 Git，可更新）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.31-tw.1/neo.zip)
+- [2.31-tw.1 正式發布頁與更新說明](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.31-tw.1)
+- [2.30-tw.1 上一正式版](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.30-tw.1)
+- [最新測試版發布紀錄](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.31-tw.1-test.5)
 
-[版本選擇與更新方式](./RELEASES.md) ｜ [本次更新與已知限制](./docs/releases/2.30-tw.1.md) ｜ [完整更新紀錄](./CHANGELOG.md)
+新版 **Release 附件 `neo.zip`** 包含 Git 資訊；安裝 Git 後，在解壓的專案資料夾執行 `git pull` 即可更新正式分支 `neo`。GitHub 的 Source code ZIP／Code → Download ZIP 仍不包含 Git 資訊，舊 ZIP 不會自動取得此功能。已有安裝請使用原有 Git 更新方式，不要用 ZIP 覆蓋個人模型或設定。
 
-Intel B580 高解析度修復仍可能較慢，連續生成曾出現 OOM／DEVICE_LOST；本版保留為已知問題，未宣稱修復，詳見本次更新說明。
+正式版以已測試的 `2.31-tw.1-test.3` 為來源，**不含 Test 4 的 Intel WD14 OpenVINO GPU 實驗修改**；Intel WD14 沿用 CPU 辨識，該實驗繼續保留在 `neo-test`。
+
+[版本選擇與更新方式](./RELEASES.md) ｜ [本次更新與已知限制](./docs/releases/2.31-tw.1.md) ｜ [完整更新紀錄](./CHANGELOG.md)
+
+Intel B580 高解析度修復仍可能較慢，連續生成的 OOM／DEVICE_LOST 保留為已知限制。本次簡單實測通過不代表所有模型、尺寸與顯示卡皆已驗證。
 
 ## 專案介紹
 
@@ -80,7 +82,7 @@ ADetailer-Neo 等插件需要的偵測模型，會按照插件原有機制在需
 | 平台 | 啟動檔 | PyTorch | 狀態 |
 |---|---|---|---|
 | NVIDIA | `webui-user.bat` | Forge Neo 上游預設 CUDA 版本 | 跟隨上游維護 |
-| Intel Arc（測試主線） | `webui-user-intel-arc.bat` | 官方 PyTorch 2.14.1+xpu | 後續維護基準；下次大版本才納入正式版 |
+| Intel Arc | `webui-user-intel-arc.bat` | 官方 PyTorch 2.14.1+xpu | 官方 XPU 生圖；測試版另啟用 WD14 GPU |
 
 兩種啟動方式共用同一套 Forge Neo、繁體中文、內建插件與模型目錄，但使用不同的虛擬環境，避免 CUDA 與 XPU 套件互相覆蓋。
 
@@ -123,7 +125,7 @@ webui-user.bat
 webui-user-intel-arc.bat
 ```
 
-使用獨立的 `venv-xpu-official` 與官方 PyTorch 2.14.1+xpu。`webui-user-intel-arc.bat` 直接啟動官方 XPU，不再建立或使用舊 `venv-intel-arc`；既有舊環境保留但不再維護。現有正式 `neo` 本次不變更。新官方路徑只留在測試分支，**等下一次大版本更新才納入正式版**，不隨目前的一般修訂版提前發布。完整說明見 [`INTEL_ARC_SETUP.md`](./INTEL_ARC_SETUP.md) 與 [維護／發布決策](docs/decisions/2026-10-19-intel-official-baseline.md)。
+使用獨立的 `venv-xpu-official` 與官方 PyTorch 2.14.1+xpu。本測試版先準備獨立 WD14 OpenVINO GPU 環境，再啟動官方 XPU 生圖流程；既有設定、模型、快取及 7862 埠沿用。原 CPU-only 啟動流程由此取代，不再保留第二個 Intel BAT。GPU 失敗的 CPU 自動退回與顯式 CPU 選項仍保留。完整說明見 [`INTEL_ARC_SETUP.md`](./INTEL_ARC_SETUP.md)。
 
 兩種版本都保留 Forge Neo 原本的安裝體驗：首次啟動會先以專案內的 `uv` 準備固定版本 Python 3.13.12，再建立對應的虛擬環境，並由 Forge Neo 安裝器自動安裝 PyTorch、核心相依套件與插件相依套件。它不會修改系統 Python，也不會自動安裝顯示卡驅動程式或 Stable Diffusion 主模型。
 
@@ -219,6 +221,6 @@ Forge Neo 主程式及各插件分別依其原始授權發布。本整合版保�
 
 開發與上游同步請遵守 [A1111 UI Freeze 規範](docs/UI_FREEZE.md)；測試版驗收見 [雙平台實機清單](docs/validation/ui-dual-platform.md)。
 
-`neo-test` 的 test.6 預設測試 XPU 原生 SDPA；B580 的三模式比較與回復分塊保護，見 [test.6 操作說明](docs/validation/xpu-sdpa-test6.md)。
+官方 XPU 預設使用原生 SDPA；B580 的三模式比較與回復分塊保護，見 [test.6 操作說明](docs/validation/xpu-sdpa-test6.md)。
 
-Kitchen 社群 XPU 實驗已依使用者決定停止採用，專用啟動／建置入口已移除；Intel 後續只維護新的官方路徑，仍待下一次大版本才納入正式版。
+Kitchen 社群 XPU 實驗已依使用者決定停止採用，專用啟動／建置入口已移除；Intel 後續只維護官方 XPU 路徑，已納入 2.31 正式版。

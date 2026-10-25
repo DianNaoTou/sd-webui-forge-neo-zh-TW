@@ -2,6 +2,11 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.31-tw.1-test.5（2026-10-25）
+
+- 依 B580 使用者對 Test 4 的初步功能正常回報，將 WD14 GPU 流程改為唯一 Intel Arc 啟動入口：`webui-user-intel-arc.bat` 使用獨立 OpenVINO worker，刪除額外 GPU BAT，淘汰原 CPU-only 啟動內容。
+- 保留失敗退回 CPU、官方 XPU profile、環境與快取；NVIDIA 與正式版不變。沿用測試分支新增的 Forge Couple 繁中詞條，更新安裝／版本文件。[本版說明](docs/releases/2.31-tw.1-test.5.md)。
+
 ## 2.31-tw.1-test.4（2026-10-25）
 
 - 新增 `webui-user-intel-arc-wd14-gpu.bat`，以獨立 OpenVINO GPU worker 嘗試加速 WD14、PixAI 與 Camie 的 ONNX 模型；原始 Intel 啟動檔保留 CPU 路徑，NVIDIA 路徑不變。
