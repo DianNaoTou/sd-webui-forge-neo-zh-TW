@@ -17,12 +17,12 @@ from test_vae_flash_regressions import load_nodes
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = 'extensions/sd-forge-layerdiffuse/scripts/forge_layerdiffusion.py'
-ZH = json.loads((ROOT/'localizations/zh_Hant.json').read_text())
+ZH = json.loads((ROOT/'localizations/zh_Hant.json').read_text(encoding='utf-8'))
 
 
 class ReversibleLocalizationTests(unittest.TestCase):
     def setUp(self):
-        self.tree = ast.parse((ROOT/SCRIPT).read_text())
+        self.tree = ast.parse((ROOT/SCRIPT).read_text(encoding='utf-8'))
         self.labels = next(ast.literal_eval(n.value) for n in self.tree.body
                            if isinstance(n,ast.Assign) and getattr(n.targets[0],'id',None)=='METHOD_LABELS')
         self.resize = next(ast.literal_eval(n.value) for n in self.tree.body
@@ -71,7 +71,7 @@ class ScriptAliasTests(unittest.TestCase):
         return load_nodes('modules/api/api.py',['script_name_to_index'],{'HTTPException':HTTPException})['script_name_to_index']
 
     def test_canonical_and_legacy_layerdiffuse_api_names_resolve_same_script(self):
-        tree=ast.parse((ROOT/SCRIPT).read_text())
+        tree=ast.parse((ROOT/SCRIPT).read_text(encoding='utf-8'))
         cls=next(n for n in tree.body if isinstance(n,ast.ClassDef) and n.name=='LayerDiffusionForForge')
         aliases=next(ast.literal_eval(n.value) for n in cls.body if isinstance(n,ast.Assign) and n.targets[0].id=='api_aliases')
         script=types.SimpleNamespace(title=lambda:'LayerDiffuse',api_aliases=aliases)
