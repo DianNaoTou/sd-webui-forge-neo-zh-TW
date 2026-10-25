@@ -13,7 +13,7 @@ if errorlevel 1 (
 set "VENV_DIR=%~dp0venv-nvidia"
 
 set "TORCH_INDEX_URL=https://download.pytorch.org/whl/cu130"
-set "TORCH_COMMAND=pip install torch==2.13.0+cu130 torchvision==0.28.0+cu130 --index-url https://download.pytorch.org/whl/cu130"
+set "TORCH_COMMAND=pip install torch==2.14.0+cu130 torchvision==0.29.0+cu130 --index-url https://download.pytorch.org/whl/cu130"
 set "FORGE_ORT_CUDA13="
 
 set COMMANDLINE_ARGS=

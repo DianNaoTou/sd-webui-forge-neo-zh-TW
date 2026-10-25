@@ -1,4 +1,6 @@
 import os
+import filecmp
+import shutil
 import tempfile
 from collections import namedtuple
 from pathlib import Path
@@ -44,9 +46,10 @@ def save_pil_to_file(pil_image: Image.Image, cache_dir: os.PathLike = None, form
             metadata.add_text(key, value)
             use_metadata = True
 
-    file_obj = tempfile.NamedTemporaryFile(delete=False, suffix=".png", dir=dir)
-    pil_image.save(file_obj, pnginfo=(metadata if use_metadata else None))
-    return file_obj.name
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".png", dir=dir) as file_obj:
+        pil_image.save(file_obj, pnginfo=(metadata if use_metadata else None))
+        filename = file_obj.name
+    return filename
 
 
 async def async_move_files_to_cache(data, block, postprocess=False, check_in_upload_folder=False, keep_in_cache=False):
@@ -113,6 +116,40 @@ async def async_move_files_to_cache(data, block, postprocess=False, check_in_upl
     return await client_utils.async_traverse(data, _move_to_cache, client_utils.is_file_obj)
 
 
+def move_uploaded_files_to_cache(files, destinations):
+    """Publish completed upload copies without rewriting identical live cache files.
+
+    Gradio falls back to a background shutil.move when Windows rename encounters
+    an existing upload. That copy can truncate a file already served to a browser.
+    Keep duplicate content and publish other copies only after closing the writer.
+    A persistent permission error is still reported, never bypassed.
+    """
+    for source, destination in zip(files, destinations):
+        source, destination = Path(source), Path(destination)
+        if source.resolve() == destination.resolve():
+            continue
+        if destination.is_file() and filecmp.cmp(source, destination, shallow=False):
+            source.unlink()
+            continue
+        staged = None
+        try:
+            with tempfile.NamedTemporaryFile(delete=False, dir=destination.parent, suffix=".upload") as target:
+                staged = Path(target.name)
+                with source.open("rb") as uploaded:
+                    shutil.copyfileobj(uploaded, target)
+            # The handle is closed before the public name becomes visible.
+            try:
+                os.replace(staged, destination)
+            except PermissionError:
+                # A concurrent upload may have just published the same content.
+                if not (destination.is_file() and filecmp.cmp(source, destination, shallow=False)):
+                    raise
+            source.unlink()
+        finally:
+            if staged is not None:
+                staged.unlink(missing_ok=True)
+
+
 def install_ui_tempdir_override():
     """
     override save to file function so that it also writes PNG info.
@@ -121,6 +158,7 @@ def install_ui_tempdir_override():
 
     gradio.processing_utils.save_pil_to_cache = save_pil_to_file
     gradio.processing_utils.async_move_files_to_cache = async_move_files_to_cache
+    gradio.routes.move_uploaded_files_to_cache = move_uploaded_files_to_cache
 
 
 def on_tmpdir_changed():

@@ -14,9 +14,13 @@ from tagger.interrogator import Interrogator, DeepDanbooruInterrogator, \
                                 MLDanbooruInterrogator  # pylint: disable=E0401 # noqa: E501
 from tagger.interrogator import WaifuDiffusionInterrogator  # pylint: disable=E0401 # noqa: E501
 
+from tagger.new_onnx import PixAIInterrogator, CamieInterrogator
+
 preset = Preset(Path(scripts.basedir(), 'presets'))
 
 interrogators: Dict[str, Interrogator] = {
+    'pixai-tagger-v0.9': PixAIInterrogator(),
+    'camie-tagger-v2': CamieInterrogator(),
     'wd14-vit.v1': WaifuDiffusionInterrogator(
         'WD14 ViT v1',
         repo_id='SmilingWolf/wd-v1-4-vit-tagger'

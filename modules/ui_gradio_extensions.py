@@ -1,13 +1,42 @@
 import os
+from pathlib import Path
+from urllib.parse import quote
 
 import gradio as gr
 
-from modules import localization, scripts, shared, util
+from modules import extensions, localization, scripts, shared, util
 from modules.paths import data_path, script_path
 
 
 def webpath(fn):
-    return f"file={util.truncate_path(fn)}?{os.path.getmtime(fn)}"
+    path = util.truncate_path(fn).replace("\\", "/")
+    return f"file={quote(path, safe='/:')}?{os.path.getmtime(fn)}"
+
+
+def ui_asset_paths():
+    """Allow shipped frontend files even when --data-dir is outside the source.
+
+    Gradio only allows data_path by default. Do not allow the whole source or
+    extension root: they can contain API credentials and private settings.
+    Recompute on UI reload so only active extensions contribute assets.
+    """
+    assets = {Path(script_path) / "script.js"}
+    assets.update(Path(p) for p in scripts.list_files_with_name("style.css"))
+    user_css = Path(data_path) / "user.css"
+    if user_css.is_file():
+        assets.add(user_css)
+    public_suffixes = {".js", ".mjs", ".css", ".png", ".jpg", ".jpeg",
+                       ".webp", ".avif", ".svg", ".gif", ".ico", ".woff", ".woff2", ".ttf"}
+    for base in [Path(script_path), *(Path(ext.path) for ext in extensions.active())]:
+        for name in ("javascript", "html", "styles"):
+            folder = base / name
+            if folder.is_dir():
+                assets.update(p for p in folder.rglob("*")
+                              if p.is_file() and p.suffix.lower() in public_suffixes)
+    # Gradio preserves symlink spellings; Windows profile junctions and linked
+    # source checkouts must work through either spelling of the same file.
+    return sorted({str(name) for p in assets if p.is_file()
+                   for name in (p.absolute(), p.resolve())})
 
 
 def javascript_html():

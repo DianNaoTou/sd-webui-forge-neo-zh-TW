@@ -1,4 +1,5 @@
 ﻿""" This module contains the ui for the tagger tab. """
+from modules.localization import translate as ui_text
 from typing import Dict, Tuple, List, Optional
 import gradio as gr
 import re
@@ -22,6 +23,8 @@ except ImportError:
 from tagger import utils  # pylint: disable=import-error
 from tagger.interrogator import Interrogator as It  # pylint: disable=E0401
 from tagger.uiset import IOData, QData  # pylint: disable=import-error
+
+from tagger.new_onnx import TaggerModelError
 
 TAG_INPUTS = ["add", "keep", "exclude", "search", "replace"]
 COMMON_OUTPUT = Tuple[
@@ -78,7 +81,11 @@ def on_interrogate(
     if interrogator is None:
         return (None,) * 6 + (f"'{name}': invalid interrogator",)
 
-    interrogator.batch_interrogate()
+    try:
+        interrogator.batch_interrogate()
+    except TaggerModelError as exc:
+        It.output = (None, None, None, str(exc))
+        return (None,) * 6 + (html_esc(str(exc)),)
     return search_filter(filt)
 
 
@@ -87,6 +94,12 @@ def on_gallery() -> List:
 
 
 def on_interrogate_image(*args) -> COMMON_OUTPUT:
+    # New models download only on an explicit single/batch/API request.
+    if len(args) > 1:
+        selected = next((i for i in utils.interrogators.values()
+                         if i.name == args[1]), None)
+        if getattr(selected, 'require_submit', False):
+            return (None,) * 6 + (ui_text('Press Interrogate to start; weights are downloaded only on the first request for this model.'),)
     # hack brcause image interrogaion occurs twice
     It.odd_increment = It.odd_increment + 1
     if It.odd_increment & 1 == 1:
@@ -110,7 +123,11 @@ def on_interrogate_image_submit(
     if interrogator is None:
         return (None,) * 6 + (f"'{name}': invalid interrogator",)
 
-    interrogator.interrogate_image(image)
+    try:
+        interrogator.interrogate_image(image)
+    except TaggerModelError as exc:
+        It.output = (None, None, None, str(exc))
+        return (None,) * 6 + (html_esc(str(exc)),)
     return search_filter(filt)
 
 
@@ -520,6 +537,8 @@ def on_ui_tabs():
 
         common_input = [interrogator, tag_search_selection] + \
                        [tag_input[tag] for tag in TAG_INPUTS]
+
+        gr.Markdown('PixAI Tagger v0.9 / Camie Tagger v2: selecting a model does not download weights. The first interrogation downloads to the existing Hugging Face cache. Failed downloads can be retried; CPU inference remains available on Intel Arc.')
 
         # interrogation events
         image_submit.click(fn=wrap_gradio_gpu_call(on_interrogate_image_submit),

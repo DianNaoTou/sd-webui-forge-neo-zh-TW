@@ -10,7 +10,6 @@ from secrets import compare_digest
 from threading import Lock
 from typing import Any, Union, get_args, get_origin
 
-import gradio as gr
 import piexif
 import piexif.helper
 import requests
@@ -33,7 +32,14 @@ from modules.shared import cmd_opts, opts
 
 def script_name_to_index(name, scripts):
     try:
-        return [script.title().lower() for script in scripts].index(name.lower())
+        key = name.lower()
+        titles = [script.title().lower() for script in scripts]
+        if key in titles:
+            return titles.index(key)
+        for index, script in enumerate(scripts):
+            if key in [alias.lower() for alias in getattr(script, "api_aliases", ())]:
+                return index
+        raise ValueError("Unknown script name")
     except Exception as e:
         raise HTTPException(status_code=422, detail=f"Script '{name}' not found") from e
 
@@ -316,14 +322,10 @@ class Api:
         script_args = [None] * last_arg_index
         script_args[0] = 0
 
-        # get default values
-        with gr.Blocks():  # will throw errors calling ui function without this
-            for script in script_runner.scripts:
-                if script.ui(script.is_img2img):
-                    ui_default_values = []
-                    for elem in script.ui(script.is_img2img):
-                        ui_default_values.append(elem.value)
-                    script_args[script.args_from : script.args_to] = ui_default_values
+        # get default values recorded when the UI was built, instead of calling ui() again
+        for script in script_runner.scripts:
+            if script.api_info is not None:
+                script_args[script.args_from : script.args_to] = [arg.value for arg in script.api_info.args]
         return script_args
 
     def init_script_args(self, request, default_script_args, selectable_scripts, selectable_idx, script_runner, *, input_script_args=None):

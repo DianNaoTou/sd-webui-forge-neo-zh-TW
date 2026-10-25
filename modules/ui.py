@@ -199,6 +199,8 @@ def create_ui():
     reload_javascript()
 
     parameters_copypaste.reset()
+    main_entry.refresh_models()
+    main_entry.capture_callbacks()
 
     settings = ui_settings.UiSettings()
     settings.register_settings()
@@ -261,8 +263,8 @@ def create_ui():
 
                                 with FormRow(elem_id="txt2img_hires_fix_row2", variant="compact"):
                                     hr_scale = gr.Slider(minimum=1.0, maximum=4.0, step=0.05, label="Upscale by", value=2.0, elem_id="txt2img_hr_scale")
-                                    hr_resize_x = gr.Slider(minimum=0, maximum=4096, step=_STEP, label="Resize width to", value=0, elem_id="txt2img_hr_resize_x")
-                                    hr_resize_y = gr.Slider(minimum=0, maximum=4096, step=_STEP, label="Resize height to", value=0, elem_id="txt2img_hr_resize_y")
+                                    hr_resize_x = gr.Slider(minimum=0, maximum=2048, step=_STEP, label="Resize width to", value=0, elem_id="txt2img_hr_resize_x")
+                                    hr_resize_y = gr.Slider(minimum=0, maximum=2048, step=_STEP, label="Resize height to", value=0, elem_id="txt2img_hr_resize_y")
 
                                 with FormRow(elem_id="txt2img_hires_fix_row_cfg", variant="compact"):
                                     hr_distilled_cfg = gr.Slider(minimum=1.0, maximum=24.0, step=0.5, label="Hires Distilled CFG Scale", value=3.0, elem_id="txt2img_hr_distilled_cfg")
@@ -270,25 +272,31 @@ def create_ui():
 
                                 with FormRow(elem_id="txt2img_hires_fix_row3", variant="compact", visible=shared.opts.hires_fix_show_sampler):
 
-                                    def _refresh_models():
-                                        checkpoints_list = ["Use same checkpoint"]
-                                        modules_list = ["Use same choices"]
-                                        checkpoints, modules = main_entry.refresh_models()
-                                        return [checkpoints_list + checkpoints, modules_list + modules]
+                                    def _load_models():
+                                        checkpoints = shared.list_checkpoint_tiles(shared.opts.sd_checkpoint_dropdown_use_short)
+                                        modules = main_entry.module_list.keys() if shared.opts.sd_modules_dropdown_use_short else main_entry.module_map.values()
+                                        return [["Use same checkpoint"] + sorted(checkpoints), ["Use same choices"] + sorted(modules)]
 
-                                    checkpoints_list, modules_list = _refresh_models()
+                                    checkpoints_list, modules_list = _load_models()
 
                                     hr_checkpoint_name = gr.Dropdown(label="Hires Checkpoint", elem_id="hr_checkpoint", choices=checkpoints_list, value="Use same checkpoint", scale=2)
 
                                     hr_additional_modules = gr.Dropdown(label="Hires VAE / Text Encoder", elem_id="hr_vae_te", choices=modules_list, value=["Use same choices"], multiselect=True, scale=3)
 
+                                    def _refresh_models():
+                                        checkpoints_list, modules_list = _load_models()
+                                        return [gr.update(choices=checkpoints_list), gr.update(choices=modules_list)]
+
+                                    # Keep the A1111-style local HR refresh control as well as
+                                    # the upstream shared checkpoint refresh event.
                                     hr_checkpoint_refresh = ToolButton(value=refresh_symbol)
 
                                     def refresh_model_and_modules():
-                                        checkpoints_list, modules_list = _refresh_models()
-                                        return gr.update(choices=checkpoints_list), gr.update(choices=modules_list)
+                                        main_entry.refresh_models()
+                                        return _refresh_models()
 
                                     hr_checkpoint_refresh.click(fn=refresh_model_and_modules, outputs=[hr_checkpoint_name, hr_additional_modules])
+                                    main_entry.on_refresh_checkpoint(_refresh_models, outputs=[hr_checkpoint_name, hr_additional_modules])
 
                                 with FormRow(elem_id="txt2img_hires_fix_row3b", variant="compact", visible=shared.opts.hires_fix_show_sampler) as hr_sampler_container:
                                     hr_sampler_name = gr.Dropdown(label="Hires sampling method", elem_id="hr_sampler", choices=["Use same sampler"] + sd_samplers.visible_sampler_names(), value="Use same sampler")

@@ -61,6 +61,7 @@ fpte_group.add_argument("--fp8_e5m2-text-enc", action="store_true", help="Store 
 parser.add_argument("--cpu-text-enc", action="store_true", help="Run the text encoder on the CPU")
 
 parser.add_argument("--use-ck-attention", action="store_true", help="use Comfy-Kitchen attention")
+parser.add_argument("--xpu-sdpa", choices=("native", "math", "sliced"), default="native", help="Intel XPU SDPA comparison: native PyTorch selection (test.6 default), unsliced Math, or legacy bounded Math slicing; does not affect CUDA")
 parser.add_argument("--use-pytorch-cross-attention", action="store_true", help="Use the PyTorch cross attention (override sageattention/flash_attn/xformers)")
 parser.add_argument("--force-xformers-vae", action="store_true", help="Force VAE to use xformers attention (meant to be used with --use-pytorch-cross-attention)")
 parser.add_argument("--force-upcast-attention", action="store_true", help="Always upcast to fp32 during attention")
@@ -69,7 +70,8 @@ parser.add_argument("--sage", action="store_true", help="install sageattention")
 parser.add_argument("--flash", action="store_true", help="install flash_attn")
 parser.add_argument("--xformers", action="store_true", help="install xformers")
 parser.add_argument("--nunchaku", action="store_true", help="install nunchaku for SVDQ inference")
-parser.add_argument("--onnxruntime-gpu", action="store_true", help="install nightly onnxruntime-gpu with cu130 support")
+# Compatibility option retained for existing zh-TW launch configurations.
+parser.add_argument("--onnxruntime-gpu", action="store_true", help="install CUDA 13 nightly ONNX Runtime (legacy opt-in)")
 parser.add_argument("--pynvml", action="store_true", help="install pyNVML for accurate VRAM tracking")
 
 parser.add_argument("--disable-sage", action="store_true", help="disable sageattention")
@@ -172,6 +174,8 @@ class dynamic_args(metaclass=_DynamicArgsMeta):
     """Anima"""
     krea2: bool = False
     """Krea 2"""
+    moss: bool = False
+    """Moss-Image"""
     ref_latents: list["torch.Tensor"] = []
     """Reference Latent(s) for Flux Kontext / Qwen-Image-Edit / Flux.2 Klein"""
     concat_latent: "torch.Tensor" = None

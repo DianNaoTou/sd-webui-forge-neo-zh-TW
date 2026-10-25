@@ -1,5 +1,52 @@
 # Intel Arc 安裝與啟動
 
+正式版 **2.31-tw.1** 的 Intel Arc 統一使用官方 PyTorch XPU：
+
+```bat
+webui-user-intel-arc.bat
+```
+
+僅保留 `webui-user-intel-arc.bat` 一個 Intel 啟動入口，直接執行官方 XPU 流程，支援額外參數。原 `webui-user-intel-xpu-official.bat` 已移除。
+
+- Python：專案專用 3.13.12，由啟動器準備，不修改系統 Python。
+- 依賴：Torch 2.14.1+xpu／TorchVision 0.29.1+xpu。
+- 虛擬環境：`venv-xpu-official`，與 NVIDIA 獨立。
+- 設定／快取／輸出：`runtime/xpu-ab/official`，沿用既有官方組設定，不覆寫。
+- 模型：共用專案 `models`，無需重新下載。
+- UI、繁中及插件操作方式共用原本整合版。
+- 原 `venv-intel-arc` 不再建立或啟用；不自動刪除既有環境與資料。
+- 舊根目錄設定僅在官方設定尚不存在時複製；已有官方設定不會被舊設定蓋回。
+
+需要 Windows 10／11 64 位元、Git、Intel Arc 與相容驅動。首次啟動會建立官方環境、安裝依賴並驗證 XPU；已有官方環境可直接沿用。預設網址為 http://127.0.0.1:7862 。
+
+## Test 7 啟動設定與快取修正
+
+全新設定包含正確版本標記。若先前 test.6 建立的設定仍缺標記，第一次啟動 Test 7
+會顯示設定版本提醒；確認繼續後按 Enter，程式先在 `runtime/xpu-ab/official`
+留下 `config-before-version-*.json` 原檔備份，再只更新版本標記。
+既有提示詞、路徑及插件設定保留；這是記錄使用者確認，不是自動完成所有舊格式遷移。
+不要為此刪除 venv 或模型。詳見 [Test 7 驗證](docs/validation/startup-cache-test7.md)。
+
+## B580 建議操作與驗證
+
+採樣預設原生 SDPA。使用者已回報開啟「Never OOM 記憶體最佳化 → 對VAE啟用（始終分塊）」後，原先 HR 結束階段的嚴重記憶體壓力明顯改善；「為 UNet 啟用（始終卸載）」保持不勾。
+此選項由使用者在 UI 選擇，本次沒有強制改寫預設值。此次簡化仍沿用官方組設定；請確認勾選狀態。
+
+更新後請驗證基本生圖、原本 HR 參數連續兩次、VAE 是否仍 OOM，以及生成後系統反應。A380 與其他 Arc 尚未在本輪驗證。
+原生／Math／分塊三模式對照見 [test.6 操作說明](docs/validation/xpu-sdpa-test6.md)。
+
+**官方 XPU 路徑已隨 2.31-tw.1 納入正式 `neo`；本版不含 Test 4 的 Intel WD14 OpenVINO GPU 實驗修改。**
+Kitchen 社群 fork 支援已移除；主程式必要的官方 comfy-kitchen 依賴保留。
+詳見 [維護決策](docs/decisions/2026-10-19-intel-official-baseline.md)。
+
+---
+
+## 歷史安裝說明（已由上方官方路徑取代，請勿照此建立舊環境）
+
+以下保留舊 2.14.0 的調整背景與紀錄，並非目前啟動器行為。
+
+# Intel Arc 安裝與啟動
+
 Intel Arc 版本沿用 Forge Neo 原本的自動安裝流程。第一次啟動時會建立獨立的
 `venv-intel-arc`，自動安裝 PyTorch XPU、Forge Neo 核心相依套件及內建插件的相依套件。
 啟動器也會在專案內自動準備固定版本的 Python 3.13.12，不使用或修改系統 Python。

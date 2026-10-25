@@ -8,7 +8,7 @@
 function waitQuerySelector(selector, timeout = 5000, $rootElement = gradioApp()) {
     return new Promise((resolve, reject) => {
         const element = $rootElement.querySelector(selector)
-        if (document.querySelector(element)) {
+        if (element) {
             return resolve(element)
         }
 
@@ -62,11 +62,12 @@ function tag_clicked(tag, is_inverse) {
     value += ', ';
   }
   // besides setting the value an event needs to be triggered or the value isn't actually stored.
-  const input_event = new Event('input');
-  $selectedTextarea.querySelector('textarea').value = value + escapedTag;
-  $selectedTextarea.dispatchEvent(input_event);
+  const input_event = new Event('input', { bubbles: true });
+  const textarea = $selectedTextarea.querySelector('textarea');
+  textarea.value = value + tag;
+  textarea.dispatchEvent(input_event);
   const input_event2 = new Event('blur');
-  $selectedTextarea.dispatchEvent(input_event2);
+  textarea.dispatchEvent(input_event2);
 }
 
 function tagger_get_translation(text) {
@@ -227,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!spaceOrAlreadyWithComma.test(value)) {
                 value += ', ';
             }
-            const input_event = new Event('input');
+            const input_event = new Event('input', { bubbles: true });
             $selectedTextarea.querySelector('textarea').value = value + tag;
             $selectedTextarea.querySelector('textarea').dispatchEvent(input_event);
             const input_event2 = new Event('blur');

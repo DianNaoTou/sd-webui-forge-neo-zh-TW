@@ -248,11 +248,11 @@ def run_extensions_installers(settings_file):
 
 def prepare_environment():
     torch_index_url = os.environ.get("TORCH_INDEX_URL", "https://download.pytorch.org/whl/cu130")
-    torch_command = os.environ.get("TORCH_COMMAND", f"pip install torch==2.13.0+cu130 torchvision==0.28.0+cu130 --extra-index-url {torch_index_url}")
+    torch_command = os.environ.get("TORCH_COMMAND", f"pip install torch==2.14.0+cu130 torchvision==0.29.0+cu130 --extra-index-url {torch_index_url}")
     xformers_package = os.environ.get("XFORMERS_PACKAGE", f"xformers==0.0.35 --extra-index-url {torch_index_url}")
-    pynvml_package = os.environ.get("PYNVML_PACKAGE", "nvidia-ml-py==13.610.43")
+    pynvml_package = os.environ.get("PYNVML_PACKAGE", "nvidia-ml-py==13.615.71")
 
-    packaging_package = os.environ.get("PACKAGING_PACKAGE", "packaging==26.2")
+    packaging_package = os.environ.get("PACKAGING_PACKAGE", "packaging==26.3")
     gradio_package = os.environ.get("GRADIO_PACKAGE", "gradio==4.40.0 gradio_rangeslider==0.0.8")
     requirements_file = os.environ.get("REQS_FILE", "requirements.txt")
 
@@ -281,11 +281,6 @@ def prepare_environment():
         print(f"PyTorch backend mismatch: expected {expected_torch_backend}, found {installed_torch_backend or 'unknown'}. Reinstalling PyTorch...")
 
     if args.reinstall_torch or repair_torch_backend or not is_installed("torch") or not is_installed("torchvision"):
-        # TODO: Yeet Nunchaku...
-        if args.nunchaku:
-            torch_command = os.environ.get("TORCH_COMMAND", f"pip install torch==2.11.0+cu130 torchvision==0.26.0+cu130 --extra-index-url {torch_index_url}")
-            print("(using an older version of PyTorch due to Nunchaku dependency...)")
-
         run(f'"{python}" -m {torch_command}', "Installing PyTorch", "Couldn't install PyTorch", live=True)
         startup_timer.record("install torch")
 
@@ -318,25 +313,24 @@ assert cuda or xpu or mps
     ver_PY = f"cp{sys.version_info.major}{sys.version_info.minor}"
     ver_SAGE = "2.2.0"
     ver_FLASH = "2.8.3"
-    ver_TRITON = "3.7.1"
-    ver_NUNCHAKU = "1.2.1"
+    ver_TRITON = "3.9"  # upstream upper bound
     ver_TORCH, ver_CUDA = _torch_version()
     v_TORCH = ver_TORCH.rsplit(".", 1)[0]
     v_CUDA = f"{ver_CUDA[0:-1]}.{ver_CUDA[-1]}"
 
     if os.name == "nt":
-        ver_TRITON += ".post27"
-
         sage_package = os.environ.get("SAGE_PACKAGE", f"https://github.com/woct0rdho/SageAttention/releases/download/v{ver_SAGE}-windows.post6/sageattention-{ver_SAGE}+{ver_CUDA}torch2.10.0andhigher.post6-cp310-abi3-win_amd64.whl")
-        flash_package = os.environ.get("FLASH_PACKAGE", f"https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.9.52/flash_attn-{ver_FLASH}+{ver_CUDA}torch{v_TORCH}-{ver_PY}-{ver_PY}-win_amd64.whl")
-        triton_package = os.environ.get("TRITION_PACKAGE", f"triton-windows=={ver_TRITON}")
-        nunchaku_package = os.environ.get("NUNCHAKU_PACKAGE", f"https://github.com/nunchaku-ai/nunchaku/releases/download/v{ver_NUNCHAKU}/nunchaku-{ver_NUNCHAKU}+{v_CUDA}torch{v_TORCH}-{ver_PY}-{ver_PY}-win_amd64.whl")
+        flash_package = os.environ.get("FLASH_PACKAGE", f"https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.10.2/flash_attn-{ver_FLASH}+{ver_CUDA}torch{v_TORCH}-{ver_PY}-{ver_PY}-win_amd64.whl")
+        triton_package = os.environ.get("TRITION_PACKAGE", f"triton-windows<{ver_TRITON}")
+        nunchaku_platform = "win_amd64"
 
     else:
         sage_package = os.environ.get("SAGE_PACKAGE", f"sageattention=={ver_SAGE}")
-        flash_package = os.environ.get("FLASH_PACKAGE", f"https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.9.47/flash_attn-{ver_FLASH}+{ver_CUDA}torch{v_TORCH}-{ver_PY}-{ver_PY}-linux_x86_64.whl")
-        triton_package = os.environ.get("TRITION_PACKAGE", f"triton=={ver_TRITON}")
-        nunchaku_package = os.environ.get("NUNCHAKU_PACKAGE", f"https://github.com/nunchaku-ai/nunchaku/releases/download/v{ver_NUNCHAKU}/nunchaku-{ver_NUNCHAKU}+{v_CUDA}torch{v_TORCH}-{ver_PY}-{ver_PY}-linux_x86_64.whl")
+        flash_package = os.environ.get("FLASH_PACKAGE", f"https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.10.0/flash_attn-{ver_FLASH}+{ver_CUDA}torch{v_TORCH}-{ver_PY}-{ver_PY}-linux_x86_64.whl")
+        triton_package = os.environ.get("TRITION_PACKAGE", f"triton<{ver_TRITON}")
+        nunchaku_platform = "linux_x86_64"
+
+    nunchaku_package = os.environ.get("NUNCHAKU_PACKAGE") or dependency_utils.nunchaku_wheel(v_TORCH, v_CUDA, ver_PY, nunchaku_platform)
 
     cuda_build = torch_backend() == "cuda"
     if not cuda_build and any((args.xformers, args.sage, args.flash, args.nunchaku, args.onnxruntime_gpu)):
@@ -371,12 +365,15 @@ assert cuda or xpu or mps
             startup_timer.record("install flash_attn")
 
     if args.nunchaku and not is_installed("nunchaku"):
-        try:
-            run_pip(f"install {nunchaku_package}", "nunchaku")
-        except RuntimeError:
-            print("Failed to install nunchaku; Please manually install it")
+        if nunchaku_package is None:
+            print("No verified Nunchaku wheel for this PyTorch/CUDA/Python combination; skipping optional installation. PyTorch is unchanged. Set NUNCHAKU_PACKAGE only to a verified compatible wheel.")
         else:
-            startup_timer.record("install nunchaku")
+            try:
+                run_pip(f"install --no-deps {nunchaku_package}", "nunchaku")
+            except RuntimeError:
+                print("Failed to install nunchaku; Please manually install a compatible wheel")
+            else:
+                startup_timer.record("install nunchaku")
 
     if args.pynvml and not is_installed("pynvml"):
         run_pip(f"install {pynvml_package}", "pynvml")
@@ -557,11 +554,11 @@ def dump_sysinfo():
     return filename
 
 
-VERSION_UID: Final[str] = "PY313"
+VERSION_UID: Final[str] = forge_version.settings_version_uid
 
 
 def verify_version():
-    """prompt user to do a clean reinstall"""
+    """Check settings format without confusing it with dependency installation."""
     settings_file: os.PathLike = args.ui_settings_file
 
     if not os.path.isfile(settings_file):
@@ -591,12 +588,19 @@ def verify_version():
     print("\n\n")
     print("=" * w)
 
-    print(f"{Y}ALERT:{R} You are updating from an old version...")
-    print(f"{T}The recent WebUI updates include breaking changes!")
-    print(f"{T}Please perform a {E}clean reinstall{R}! Remember to {B}back up{R} the models!")
-    print(f"{T}{G}(alternatively, simply remove the config.json and ui-config.json files){R}")
+    print(f"{Y}ALERT:{R} Settings version is missing or differs from this WebUI.")
+    print(f"{T}This settings check does not mean Python packages failed to install.")
+    print(f"{T}Back up settings before continuing; older settings may need migration.")
+    print(f"{T}{G}A clean install should initialize settings with the current version marker.{R}")
 
     print("=" * w)
     print("\n\n")
 
+    official_xpu = os.environ.get("FORGE_XPU_AB_PROFILE") == "official"
+    if official_xpu:
+        print("Continuing backs up official Intel config.json and acknowledges this settings version.")
     input("Press Enter to Continue...")
+    if official_xpu:
+        from modules.xpu_profiles import acknowledge_settings_version
+
+        acknowledge_settings_version(script_path, settings_file)

@@ -801,6 +801,7 @@ def process_images(p: StableDiffusionProcessing) -> Processed:
 
     stored_opts = {k: opts.data[k] if k in opts.data else opts.get_default(k) for k in p.override_settings.keys() if k in opts.data}
 
+    _vae_override = None
     try:
         # if no checkpoint override or the override checkpoint can't be found, remove override entry and load opts checkpoint
         # and if after running refiner, the refiner model is not unloaded - webui swaps back to main model here, if model over is present it will be reloaded afterwards
@@ -821,18 +822,12 @@ def process_images(p: StableDiffusionProcessing) -> Processed:
             if _vae_override is not None:
                 global _overridden_modules
                 _overridden_modules = shared.opts.forge_additional_modules.copy()
-                override: str = _vae_override
-                all_vae: list[str] = sd_vae.vae_dict.keys()
-                for i in range(len(_overridden_modules)):
-                    if os.path.basename(_overridden_modules[i]) in all_vae:
-                        if _overridden_modules[i] != override:
-                            _overridden_modules.pop(i)
-                        else:
-                            override = None
+                for module in shared.opts.forge_additional_modules:
+                    if module in sd_vae.vae_dict.values():
+                        _overridden_modules.remove(module)
                         break
-
-                if sd_vae.reload_vae_weights(override):
-                    _overridden_modules.append(override)
+                if sd_vae.reload_vae_weights(_vae_override):
+                    _overridden_modules.append(_vae_override)
 
         # backwards compatibility, fix sampler and scheduler if invalid
         sd_samplers.fix_p_invalid_sampler_and_scheduler(p)
@@ -841,12 +836,20 @@ def process_images(p: StableDiffusionProcessing) -> Processed:
             res = process_images_inner(p)
 
     finally:
-        # restore original options
-        if p.override_settings_restore_afterwards:
-            set_config(stored_opts, save_config=False)
-        if _vae_override is not None:
-            sd_vae.restore_vae_weights()
-            _overridden_modules = None
+        try:
+            cleanup = getattr(p.scripts, "cleanup_processing", None)
+            if cleanup is not None:
+                cleanup(p)
+        finally:
+            try:
+                if p.override_settings_restore_afterwards:
+                    set_config(stored_opts, save_config=False)
+            finally:
+                if _vae_override is not None:
+                    try:
+                        sd_vae.restore_vae_weights()
+                    finally:
+                        _overridden_modules = None
 
     return res
 

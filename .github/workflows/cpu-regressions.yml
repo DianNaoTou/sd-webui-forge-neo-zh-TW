@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [neo, neo-test]
   push:
-    branches: ['chatgpt/vae-flash-review-20261011']
+    branches: [neo, neo-test, "release/**"]
 permissions:
   contents: read
 jobs:
@@ -15,13 +15,293 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Install isolated CPU test dependencies
         run: |
           python -m pip install torch==2.14.1+cpu --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install packaging filelock tqdm Pillow==10.4.0 numpy
+          python -m pip install packaging filelock tqdm Pillow==10.4.0 numpy==2.3.5 comfy-kitchen==0.2.40 einops==0.8.2 "huggingface-hub>=0.34,<1.0" gradio==4.40.0 fastapi==0.127.1 httpx==0.28.1 pydantic==2.10.6
+      - name: Require real Gradio HTTP test runtime
+        run: python -c "import gradio, fastapi; assert gradio.__version__ == '4.40.0'; assert fastapi.__version__ == '0.127.1'"
       - name: Compile core Python files
-        run: python -m compileall -q backend modules modules_forge scripts tests
+        run: python -m compileall -q backend modules modules_forge scripts tests extensions/sd-forge-layerdiffuse extensions/stable-diffusion-webui-tagger-fork tools/launch_xpu_profile.py extensions-builtin/sd_forge_spectrum extensions-builtin/sd_forge_controlnet extensions-builtin/sd_forge_ipadapter
       - name: Run regression suite with real CPU PyTorch
         run: python -m unittest discover -s tests -v
-      - name: Check optimized Python mask protection
-        run: python -O -m unittest discover -s tests -p test_vae_flash_regressions.py -v
+      - name: WD14 browser event regressions
+        run: node --test tests/test_tagger_frontend.js tests/test_json_builder.js tests/test_localization_nodes.js tests/test_civitai_localization.js
+      - name: Run full regression suite with optimized Python
+        run: python -O -m unittest discover -s tests -v
+
+  windows-file-io:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install Windows CPU numerical test runtime
+        run: python -m pip install torch==2.14.1+cpu --index-url https://download.pytorch.org/whl/cpu
+      - name: Install UI file handling test dependencies
+        run: python -m pip install audioop-lts==0.2.2 numpy==2.3.5 comfy-kitchen==0.2.40 einops==0.8.2 Pillow==10.4.0 "huggingface-hub>=0.34,<1.0" gradio==4.40.0 fastapi==0.127.1 httpx==0.28.1 pydantic==2.10.6
+      - name: Require real Windows Gradio HTTP test runtime
+        run: python -c "import audioop, gradio, fastapi; assert gradio.__version__ == '4.40.0'; assert fastapi.__version__ == '0.127.1'"
+      - name: Windows 2.31 integration regressions
+        run: python -m unittest discover -s tests -p test_forge_231.py -v
+      - name: Windows English-source UI and localization contracts
+        run: python -m unittest discover -s tests -p test_reversible_localization.py -v
+      - name: Native Windows upload sharing protection
+        run: python -m unittest discover -s tests -p test_upload_cache.py -v
+      - name: Settings acknowledgement and backup
+        run: python -m unittest discover -s tests -p test_settings_version.py -v
+      - name: Official XPU isolation without GPU inference
+        run: python -m unittest discover -s tests -p test_xpu_profiles.py -v
+      - name: Portable ZIP and ordinary Git pull protection
+        run: python -m unittest discover -s tests -p test_git_zip_update.py -v
+
+  publish-test:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/neo-test'
+    needs: [regression, windows-file-io]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: publish-neo-test
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate numbered test version
+        id: version
+        run: |
+          python - <<'PY'
+          import ast, os, pathlib, re
+          tree = ast.parse(pathlib.Path('modules_forge/forge_version.py').read_text())
+          values = {n.targets[0].id: ast.literal_eval(n.value) for n in tree.body if isinstance(n, ast.Assign)}
+          version = values['release']
+          assert re.fullmatch(r'\d+\.\d+(?:\.\d+)?-tw\.\d+-test\.\d+', version), 'A numbered test version is required'
+          assert pathlib.Path(f'docs/releases/{version}.md').is_file(), 'Test release notes missing'
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f'version={version}\n')
+          PY
+      - name: Preserve an already published test version
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if gh api "repos/$GITHUB_REPOSITORY/releases/tags/$VERSION" > "$RUNNER_TEMP/existing-release.json"; then
+            draft=$(jq -r .draft "$RUNNER_TEMP/existing-release.json")
+            if [ "$draft" = false ]; then
+              echo "Preserving already published $VERSION"
+              echo 'published=true' >> "$GITHUB_OUTPUT"
+            else
+              tag_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$VERSION" --jq .object.sha)
+              test "$tag_sha" = "$GITHUB_SHA" || { echo 'Draft tag does not match this validated commit'; exit 1; }
+            fi
+          else
+            # Distinguish an absent release from authentication/network failures.
+            gh api "repos/$GITHUB_REPOSITORY/releases?per_page=1" > /dev/null
+          fi
+      - name: Build ZIP from the validated commit
+        if: steps.existing.outputs.published != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if jq -e 'any(.assets[]?; .name == "neo-test.zip")' "$RUNNER_TEMP/existing-release.json" > /dev/null 2>&1; then
+            # Reuse a verified draft ZIP after an interrupted upload. Rebuilding
+            # Git indexes/packfiles need not produce byte-identical archives.
+            mkdir -p "$RUNNER_TEMP/package"
+            gh release download "$VERSION" --dir "$RUNNER_TEMP/package" --pattern 'neo-test.zip*'
+            python - <<'PY'
+          import hashlib, os, pathlib
+          root = pathlib.Path(os.environ['RUNNER_TEMP']) / 'package'
+          checksum = hashlib.sha256((root / 'neo-test.zip').read_bytes()).hexdigest() + '  neo-test.zip\n'
+          target = root / 'neo-test.zip.sha256'
+          if target.exists():
+              assert target.read_text() == checksum, 'Draft checksum mismatch'
+          else:
+              target.write_text(checksum, encoding='ascii')
+          PY
+          else
+            python tools/package_git_zip.py --source "https://github.com/$GITHUB_REPOSITORY.git" --branch neo-test --commit "$GITHUB_SHA" --output "$RUNNER_TEMP/package/neo-test.zip" > "$RUNNER_TEMP/package-summary.json"
+            cat "$RUNNER_TEMP/package-summary.json"
+          fi
+          python - <<'PY'
+          import os, pathlib, zipfile, subprocess
+          package = pathlib.Path(os.environ['RUNNER_TEMP']) / 'package/neo-test.zip'
+          target = package.parent / 'verify'
+          with zipfile.ZipFile(package) as archive:
+              archive.extractall(target)
+          root = target / 'sd-webui-forge-neo-zh-TW-neo-test'
+          def git(*args):
+              return subprocess.check_output(['git', '-C', str(root), *args], text=True).strip()
+          assert git('rev-parse', 'HEAD') == os.environ['GITHUB_SHA']
+          assert git('rev-parse', '--abbrev-ref', '@{u}') == 'origin/neo-test'
+          assert git('remote', 'get-url', 'origin') == 'https://github.com/' + os.environ['GITHUB_REPOSITORY'] + '.git'
+          assert git('config', 'pull.ff') == 'only'
+          assert git('config', 'branch.neo-test.mergeOptions') == '--no-overwrite-ignore'
+          assert not git('status', '--porcelain')
+          git('fsck', '--full')
+          PY
+      - name: Publish immutable test ZIP as a prerelease
+        if: steps.existing.outputs.published != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if ! gh api "repos/$GITHUB_REPOSITORY/releases/tags/$VERSION" > /dev/null 2>&1; then
+            if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$VERSION" > "$RUNNER_TEMP/tag.json" 2>/dev/null; then
+              test "$(jq -r .object.type "$RUNNER_TEMP/tag.json")" = commit
+              test "$(jq -r .object.sha "$RUNNER_TEMP/tag.json")" = "$GITHUB_SHA"
+            else
+              gh api "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/$VERSION" -f "sha=$GITHUB_SHA" > /dev/null
+            fi
+            gh release create "$VERSION" --target "$GITHUB_SHA" --draft --prerelease --latest=false --title "$VERSION｜測試版" --notes-file "docs/releases/$VERSION.md"
+          fi
+          gh release view "$VERSION" --json assets --jq '.assets[].name' > "$RUNNER_TEMP/asset-names.txt"
+          for asset in neo-test.zip neo-test.zip.sha256; do
+            if ! grep -Fxq "$asset" "$RUNNER_TEMP/asset-names.txt"; then
+              gh release upload "$VERSION" "$RUNNER_TEMP/package/$asset"
+            fi
+          done
+          # An interrupted upload must not publish incomplete or mismatched assets.
+          mkdir "$RUNNER_TEMP/download-check"
+          gh release download "$VERSION" --dir "$RUNNER_TEMP/download-check" --pattern 'neo-test.zip*'
+          cmp "$RUNNER_TEMP/package/neo-test.zip" "$RUNNER_TEMP/download-check/neo-test.zip"
+          cmp "$RUNNER_TEMP/package/neo-test.zip.sha256" "$RUNNER_TEMP/download-check/neo-test.zip.sha256"
+          gh release edit "$VERSION" --draft=false --prerelease --latest=false
+
+  publish-stable:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/neo'
+    needs: [regression, windows-file-io]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: publish-neo
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate formal version
+        id: version
+        run: |
+          python - <<'PY'
+          import ast, os, pathlib, re
+          tree = ast.parse(pathlib.Path('modules_forge/forge_version.py').read_text())
+          values = {n.targets[0].id: ast.literal_eval(n.value) for n in tree.body if isinstance(n, ast.Assign)}
+          version = values['release']
+          assert re.fullmatch(r'\d+\.\d+(?:\.\d+)?-tw\.\d+', version), 'A formal version is required'
+          assert pathlib.Path(f'docs/releases/{version}.md').is_file(), 'Formal release notes missing'
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f'version={version}\n')
+          PY
+      - name: Verify release scope excludes Intel WD14 GPU experiment
+        run: |
+          python - <<'PYCODE'
+          from pathlib import Path
+          for name in ('webui-user-intel-arc-wd14-gpu.bat', 'tools/launch_wd14_gpu.py', 'tools/wd14_openvino_worker.py', 'extensions/stable-diffusion-webui-tagger-fork/tagger/openvino_backend.py'):
+              assert not Path(name).exists(), name
+          assert 'FORGE_WD14_OPENVINO' not in Path('extensions/stable-diffusion-webui-tagger-fork/tagger/interrogator.py').read_text(encoding='utf-8')
+          PYCODE
+      - name: Preserve an already published formal version
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if gh api "repos/$GITHUB_REPOSITORY/releases/tags/$VERSION" > "$RUNNER_TEMP/existing-release.json"; then
+            draft=$(jq -r .draft "$RUNNER_TEMP/existing-release.json")
+            if [ "$draft" = false ]; then
+              echo "Preserving already published $VERSION"
+              echo 'published=true' >> "$GITHUB_OUTPUT"
+            else
+              tag_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$VERSION" --jq .object.sha)
+              test "$tag_sha" = "$GITHUB_SHA" || { echo 'Draft tag does not match this validated commit'; exit 1; }
+            fi
+          else
+            # Distinguish an absent release from authentication/network failures.
+            gh api "repos/$GITHUB_REPOSITORY/releases?per_page=1" > /dev/null
+          fi
+      - name: Build ZIP from the validated commit
+        if: steps.existing.outputs.published != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if jq -e 'any(.assets[]?; .name == "neo.zip")' "$RUNNER_TEMP/existing-release.json" > /dev/null 2>&1; then
+            # Reuse a verified draft ZIP after an interrupted upload. Rebuilding
+            # Git indexes/packfiles need not produce byte-identical archives.
+            mkdir -p "$RUNNER_TEMP/package"
+            gh release download "$VERSION" --dir "$RUNNER_TEMP/package" --pattern 'neo.zip*'
+            python - <<'PY'
+          import hashlib, os, pathlib
+          root = pathlib.Path(os.environ['RUNNER_TEMP']) / 'package'
+          checksum = hashlib.sha256((root / 'neo.zip').read_bytes()).hexdigest() + '  neo.zip\n'
+          target = root / 'neo.zip.sha256'
+          if target.exists():
+              assert target.read_text() == checksum, 'Draft checksum mismatch'
+          else:
+              target.write_text(checksum, encoding='ascii')
+          PY
+          else
+            python tools/package_git_zip.py --source "https://github.com/$GITHUB_REPOSITORY.git" --branch neo --commit "$GITHUB_SHA" --output "$RUNNER_TEMP/package/neo.zip" > "$RUNNER_TEMP/package-summary.json"
+            cat "$RUNNER_TEMP/package-summary.json"
+          fi
+          python - <<'PY'
+          import os, pathlib, zipfile, subprocess
+          package = pathlib.Path(os.environ['RUNNER_TEMP']) / 'package/neo.zip'
+          target = package.parent / 'verify'
+          with zipfile.ZipFile(package) as archive:
+              archive.extractall(target)
+          root = target / 'sd-webui-forge-neo-zh-TW-neo'
+          def git(*args):
+              return subprocess.check_output(['git', '-C', str(root), *args], text=True).strip()
+          assert git('rev-parse', 'HEAD') == os.environ['GITHUB_SHA']
+          assert git('rev-parse', '--abbrev-ref', '@{u}') == 'origin/neo'
+          assert git('remote', 'get-url', 'origin') == 'https://github.com/' + os.environ['GITHUB_REPOSITORY'] + '.git'
+          assert git('config', 'pull.ff') == 'only'
+          assert git('config', 'branch.neo.mergeOptions') == '--no-overwrite-ignore'
+          assert not git('status', '--porcelain')
+          git('fsck', '--full')
+          PY
+      - name: Publish immutable formal ZIP as the latest release
+        if: steps.existing.outputs.published != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if ! gh api "repos/$GITHUB_REPOSITORY/releases/tags/$VERSION" > /dev/null 2>&1; then
+            if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$VERSION" > "$RUNNER_TEMP/tag.json" 2>/dev/null; then
+              test "$(jq -r .object.type "$RUNNER_TEMP/tag.json")" = commit
+              test "$(jq -r .object.sha "$RUNNER_TEMP/tag.json")" = "$GITHUB_SHA"
+            else
+              gh api "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/$VERSION" -f "sha=$GITHUB_SHA" > /dev/null
+            fi
+            gh release create "$VERSION" --target "$GITHUB_SHA" --draft --latest=false --title "$VERSION｜正式版" --notes-file "docs/releases/$VERSION.md"
+          fi
+          gh release view "$VERSION" --json assets --jq '.assets[].name' > "$RUNNER_TEMP/asset-names.txt"
+          for asset in neo.zip neo.zip.sha256; do
+            if ! grep -Fxq "$asset" "$RUNNER_TEMP/asset-names.txt"; then
+              gh release upload "$VERSION" "$RUNNER_TEMP/package/$asset"
+            fi
+          done
+          # An interrupted upload must not publish incomplete or mismatched assets.
+          mkdir "$RUNNER_TEMP/download-check"
+          gh release download "$VERSION" --dir "$RUNNER_TEMP/download-check" --pattern 'neo.zip*'
+          cmp "$RUNNER_TEMP/package/neo.zip" "$RUNNER_TEMP/download-check/neo.zip"
+          cmp "$RUNNER_TEMP/package/neo.zip.sha256" "$RUNNER_TEMP/download-check/neo.zip.sha256"
+          gh release edit "$VERSION" --draft=false --prerelease=false --latest=true

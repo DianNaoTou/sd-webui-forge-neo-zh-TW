@@ -1,4 +1,4 @@
-"""Bound temporary attention matrices on the Intel XPU math backend."""
+"""Selectable Intel XPU attention paths for test.6 comparisons."""
 import logging
 import math
 
@@ -7,6 +7,29 @@ from torch.nn.attention import SDPBackend, sdpa_kernel
 
 logger = logging.getLogger("attention")
 _reported_slicing = False
+_reported_modes = set()
+
+
+def xpu_sdpa(q, k, v, *args, mode="native", **kwargs):
+    """Choose exactly one path; do not hide native failures with a retry.
+
+    native: PyTorch selects the backend, with no local Math context or slicing.
+    math:   the pre-20a10e3d unsliced Math workaround for non-finite output.
+    sliced: the test.5 bounded Math implementation retained below.
+    Model loading/offloading and VAE tiling policies are independent.
+    """
+    if mode not in ("native", "math", "sliced"):
+        raise ValueError(f"Unknown XPU SDPA mode: {mode}")
+    if mode not in _reported_modes:
+        logger.info("XPU SDPA mode=%s | PyTorch=%s | device=%s | no automatic mode fallback",
+                    mode, torch.__version__, q.device)
+        _reported_modes.add(mode)
+    if mode == "native":
+        return torch.nn.functional.scaled_dot_product_attention(q, k, v, *args, **kwargs)
+    if mode == "math":
+        with sdpa_kernel(SDPBackend.MATH):
+            return torch.nn.functional.scaled_dot_product_attention(q, k, v, *args, **kwargs)
+    return math_sdpa(q, k, v, *args, **kwargs)
 
 
 def math_sdpa(q, k, v, attn_mask=None, dropout_p=0.0, is_causal=False,

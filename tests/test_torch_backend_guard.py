@@ -9,6 +9,7 @@ import unittest
 from unittest.mock import patch
 
 from modules import dependency_utils as deps
+from modules import xpu_profiles as profiles
 
 ROOT = Path(__file__).resolve().parents[1]
 NVIDIA_BAT = ROOT / 'webui-user.bat'
@@ -57,11 +58,21 @@ class BackendDetectionTests(unittest.TestCase):
             self.assertFalse(deps.torch_backend_mismatch('cuda', deps.torch_backend()))
 
     def test_intel_arc_flow_requires_xpu(self):
-        expected = deps.expected_torch_backend(bat_torch_command(ARC_BAT))
+        expected = deps.expected_torch_backend(profiles.environment(ROOT, 'official', {})['TORCH_COMMAND'])
         self.assertEqual(expected, 'xpu')
-        for version, bad in (('2.14.0+xpu', False), ('2.14.0+cpu', True), ('2.13.0+cu130', True)):
+        for version, bad in (('2.14.1+xpu', False), ('2.14.1+cpu', True), ('2.13.0+cu130', True)):
             with self.subTest(version=version), patch.object(deps.metadata, 'version', fake_versions({'torch': version})):
                 self.assertEqual(deps.torch_backend_mismatch(expected, deps.torch_backend()), bad)
+
+    def test_intel_arc_is_the_single_official_entry(self):
+        source = ARC_BAT.read_text(encoding='utf-8')
+        self.assertIn('call bootstrap-python.bat', source)
+        self.assertIn('"%PYTHON%" tools\\launch_xpu_profile.py official  %*', source)
+        self.assertIn('if errorlevel 1 goto :failed', source)
+        self.assertIn('exit /b 0', source)
+        self.assertIn('exit /b 1', source)
+        self.assertNotIn('venv-intel-arc', source)
+        self.assertFalse((ROOT / 'webui-user-intel-xpu-official.bat').exists())
 
     def test_no_enforcement_without_explicit_command(self):
         self.assertIsNone(deps.expected_torch_backend('pip install torch==2.13.0+cu130', explicit=False))
@@ -70,10 +81,10 @@ class BackendDetectionTests(unittest.TestCase):
 
     def test_repair_commands_target_gpu_indexes(self):
         nvidia = bat_torch_command(NVIDIA_BAT)
-        self.assertIn('torch==2.13.0+cu130', nvidia)
+        self.assertIn('torch==2.14.0+cu130', nvidia)
         self.assertIn('--index-url https://download.pytorch.org/whl/cu130', nvidia)
         self.assertIn('torchvision==', nvidia)
-        arc = bat_torch_command(ARC_BAT)
+        arc = profiles.environment(ROOT, 'official', {})['TORCH_COMMAND']
         self.assertIn('+xpu', arc)
         self.assertIn('--index-url https://download.pytorch.org/whl/xpu', arc)
 

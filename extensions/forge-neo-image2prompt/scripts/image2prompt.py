@@ -6,6 +6,8 @@ encoder (Qwen2-VL / Qwen2.5-VL or Florence-2). The generated prompt can be
 sent directly to txt2img / img2img.
 """
 
+from modules.localization import translate as ui_text
+
 import gc
 import gradio as gr
 import torch
@@ -17,19 +19,19 @@ from modules import script_callbacks, shared, devices
 # ---------------------------------------------------------------------------
 
 MODELS = {
-    "Qwen2-VL-2B-Instruct (推薦, ~5GB)": {
+    'Qwen2-VL-2B-Instruct (recommended, ~5GB)': {
         "repo": "Qwen/Qwen2-VL-2B-Instruct",
         "type": "qwen2vl",
     },
-    "Qwen2.5-VL-3B-Instruct (效果較佳, ~7GB)": {
+    'Qwen2.5-VL-3B-Instruct (better quality, ~7GB)': {
         "repo": "Qwen/Qwen2.5-VL-3B-Instruct",
         "type": "qwen25vl",
     },
-    "Qwen2-VL-7B-Instruct (最佳效果, ~16GB)": {
+    'Qwen2-VL-7B-Instruct (best quality, ~16GB)': {
         "repo": "Qwen/Qwen2-VL-7B-Instruct",
         "type": "qwen2vl",
     },
-    "Florence-2-base (輕量, ~1GB)": {
+    'Florence-2-base (lightweight, ~1GB)': {
         "repo": "microsoft/Florence-2-base",
         "type": "florence2",
     },
@@ -40,27 +42,30 @@ MODELS = {
 }
 
 STYLES = {
-    "SD 提示詞／自然語言": (
+    'SD Prompt / Natural Language': (
         "Describe this image as a Stable Diffusion prompt. Output a single "
         "comma-separated prompt describing: subject, appearance, clothing, "
         "pose, background, lighting, camera angle, art style and quality "
         "modifiers. Output ONLY the prompt, no explanations, no quotes."
     ),
-    "Danbooru 標籤格式": (
+    'Danbooru Tags': (
         "Describe this image using booru-style tags. Output a single line of "
         "lowercase comma-separated tags (e.g. '1girl, long hair, ...'), "
         "covering subject, features, clothing, pose, background and style. "
         "Output ONLY the tags."
     ),
-    "詳細描述": (
+    'Detailed Description': (
         "Describe this image in extreme detail in one paragraph: subject, "
         "colors, textures, composition, lighting, mood and style. "
         "Output ONLY the description."
     ),
-    "簡短描述": (
+    'Short Description': (
         "Describe this image in one short sentence. Output ONLY the sentence."
     ),
 }
+
+# Legacy selector identifiers remain accepted by callback/API callers.
+LEGACY_LABELS = {'Qwen2-VL-2B-Instruct (推薦, ~5GB)': 'Qwen2-VL-2B-Instruct (recommended, ~5GB)', 'Qwen2.5-VL-3B-Instruct (效果較佳, ~7GB)': 'Qwen2.5-VL-3B-Instruct (better quality, ~7GB)', 'Qwen2-VL-7B-Instruct (最佳效果, ~16GB)': 'Qwen2-VL-7B-Instruct (best quality, ~16GB)', 'Florence-2-base (輕量, ~1GB)': 'Florence-2-base (lightweight, ~1GB)', 'SD 提示詞／自然語言': 'SD Prompt / Natural Language', 'Danbooru 標籤格式': 'Danbooru Tags', '詳細描述': 'Detailed Description', '簡短描述': 'Short Description'}
 
 # ---------------------------------------------------------------------------
 # State
@@ -103,8 +108,8 @@ def _load_model(model_label: str, force_cpu: bool):
                 from transformers import Qwen2_5_VLForConditionalGeneration as VLModel
             except ImportError:
                 raise RuntimeError(
-                    "Qwen2.5-VL richiede transformers >= 4.49. "
-                    "Aggiorna con: pip install -U transformers"
+                    "Qwen2.5-VL requires transformers >= 4.49. "
+                    "Update with: pip install -U transformers"
                 )
         model = VLModel.from_pretrained(
             info["repo"], torch_dtype=dtype, device_map=device
@@ -182,8 +187,10 @@ def _run_florence(model, processor, image, max_tokens):
 
 def generate_prompt(image, model_label, style_label, custom_instruction,
                     max_tokens, force_cpu, unload_after):
+    model_label = LEGACY_LABELS.get(model_label, model_label)
+    style_label = LEGACY_LABELS.get(style_label, style_label)
     if image is None:
-        return "", "⚠️ 請先上傳圖片。"
+        return "", ui_text('Please upload an image first.')
 
     try:
         image = image.convert("RGB")
@@ -199,20 +206,20 @@ def generate_prompt(image, model_label, style_label, custom_instruction,
         # cleanup: single line, no wrapping quotes
         result = result.strip().strip('"').strip()
 
-        status = f"✅ 產生的提示詞 con {model_label.split(' (')[0]}"
+        status = ui_text('Prompt generated with {0}', model_label.split(' (')[0])
         if unload_after:
             _free_model()
-            status += " — 模型已從顯存卸載。"
+            status += ui_text(' — Model unloaded from VRAM.')
         return result, status
 
     except Exception as e:
         _free_model()
-        return "", f"❌ 錯誤： {e}"
+        return "", ui_text('Error: {0}', e)
 
 
 def unload_clicked():
     _free_model()
-    return "🧹 模型已卸載，顯存已釋放。"
+    return ui_text('Model unloaded and VRAM released.')
 
 
 # ---------------------------------------------------------------------------
@@ -226,56 +233,56 @@ def _send_to(tab: str):
 
 def on_ui_tabs():
     with gr.Blocks(analytics_enabled=False) as ui:
-        gr.Markdown("## 🖼️ → 📝 Image2Prompt — 從圖片產生提示詞")
+        gr.Markdown('## Image2Prompt — Generate prompts from images')
 
         with gr.Row():
             with gr.Column(scale=1):
                 image = gr.Image(
-                    label="輸入圖片",
+                    label='Input Image',
                     type="pil",
                     sources=["upload", "clipboard"],
                     height=420,
                 )
                 model_dd = gr.Dropdown(
-                    label="辨識模型（視覺語言）",
+                    label='Vision-language Model',
                     choices=list(MODELS.keys()),
                     value=list(MODELS.keys())[0],
                 )
                 style_dd = gr.Dropdown(
-                    label="提示詞格式",
+                    label='Prompt Format',
                     choices=list(STYLES.keys()),
                     value=list(STYLES.keys())[0],
                 )
-                with gr.Accordion("進階選項", open=False):
+                with gr.Accordion('Advanced Options', open=False):
                     custom_tb = gr.Textbox(
-                        label="自訂指令（覆蓋提示詞格式，僅限 Qwen）",
-                        placeholder="Es: Describe only the clothing in booru tags...",
+                        label='Custom Instruction (overrides prompt format, Qwen only)',
+                        placeholder='E.g. Describe only the clothing in booru tags...',
                         lines=2,
                     )
                     max_tokens = gr.Slider(
-                        label="最大長度（Token）",
+                        label='Maximum Length (Tokens)',
                         minimum=32, maximum=1024, value=256, step=16,
                     )
-                    force_cpu = gr.Checkbox(label="強制使用 CPU（較慢，不占用顯存）", value=False)
+                    force_cpu = gr.Checkbox(label='Force CPU (slower, uses no VRAM)', value=False)
                     unload_after = gr.Checkbox(
-                        label="每次產生後卸載模型（釋放顯存）",
+                        label='Unload Model After Generation (free VRAM)',
                         value=False,
                     )
 
-                generate_btn = gr.Button("🚀 產生提示詞", variant="primary")
-                unload_btn = gr.Button("🧹 卸載模型／釋放顯存")
+                generate_btn = gr.Button('Generate Prompt', variant="primary")
+                unload_btn = gr.Button('Unload Model / Free VRAM')
 
             with gr.Column(scale=1):
                 prompt_out = gr.Textbox(
-                    label="產生的提示詞",
+                    label='Generated Prompt',
                     lines=10,
                     show_copy_button=True,
                     interactive=True,
                 )
                 status = gr.Markdown("")
                 with gr.Row():
-                    send_t2i = gr.Button("📤 傳送至文生圖")
-                    send_i2i = gr.Button("📤 傳送至圖生圖")
+                    send_t2i = gr.Button('Send to txt2img')
+                    send_i2i = gr.Button('Send to img2img')
 
         generate_btn.click(
             fn=generate_prompt,
@@ -305,11 +312,7 @@ def on_ui_tabs():
                     "    ta.value = x;"
                     "    ta.dispatchEvent(new Event('input', {bubbles: true}));"
                     "  }"
-                    "  const btns = app.querySelectorAll('#tabs > .tab-nav > button, #tabs > div > button');"
-                    "  for (const b of btns) {"
-                    "    const t = b.textContent.trim().toLowerCase();"
-                    "    if ((tab === 'txt2img' && t === 'txt2img') || (tab === 'img2img' && t === 'img2img')) { b.click(); break; }"
-                    "  }"
+                    f"  switch_to_{target_tab}();"
                     "  return x;"
                     "}"
                 ),

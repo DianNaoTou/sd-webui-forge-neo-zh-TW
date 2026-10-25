@@ -1,3 +1,4 @@
+from modules.localization import translate as ui_text
 import modules.scripts as scripts
 import gradio as gr
 import os
@@ -88,7 +89,7 @@ def get_civitai_first_image_url_from_model_info(model_info, model_version_id=Non
 def check_model(model_url):
     model_id, model_version_id = parse_civitai_model_and_version_id(model_url)
     if not model_id:
-        return None, None, None, "無法從網址或輸入內容辨識模型 ID。"
+        return None, None, None, ui_text('Could not identify the model ID from the URL or input.')
     api_key = get_civitai_api_key()
     try:
         model_info = get_civitai_model_info(model_id, api_key=api_key)
@@ -98,13 +99,13 @@ def check_model(model_url):
         model_name = model_info.get("name", f"Model {model_id}")
         model_type = model_info.get("type", "Unknown")
         tags = model_info.get("tags", [])
-        tags_str = ", ".join(tags) if tags else "無"
-        info_text = f"模型：{model_name}\n類型：{model_type if model_type != 'Unknown' else '未知'}\n標籤：{tags_str}"
+        tags_str = ", ".join(tags) if tags else ui_text('None')
+        info_text = ui_text('Model: {0}\nType: {1}\nTags: {2}', model_name, model_type if model_type != 'Unknown' else ui_text('Unknown'), tags_str)
         if model_version_id:
-            info_text += f"\n版本 ID：{model_version_id}"
+            info_text += ui_text('\nVersion ID: {0}', model_version_id)
         return image_url, model_id, model_version_id, info_text
     except Exception as e:
-        return None, None, None, f"檢查模型時發生錯誤：{str(e)}"
+        return None, None, None, ui_text('Error checking model: {0}', str(e))
 
 
 def get_first_valid_preview_image(model_info, preview_url=None):
@@ -153,7 +154,7 @@ def download_civitai_model_with_progress(
     The cancel button should set DOWNLOAD_CANCEL_FLAGS[model_id] = True.
     """
     # Clear output at the start of a new download
-    yield gr.Label.update(value="準備開始…"), gr.Textbox.update(value="")
+    yield gr.update(value=ui_text('Preparing…')), gr.update(value="")
     api_key = get_civitai_api_key()
     # Reset cancellation flag at the start
     DOWNLOAD_CANCEL_FLAGS[model_id] = False
@@ -163,8 +164,8 @@ def download_civitai_model_with_progress(
     except Exception as e:
         # Clean up flag on error
         DOWNLOAD_CANCEL_FLAGS.pop(model_id, None)
-        yield gr.Label.update(value="錯誤"), gr.Textbox.update(
-            value=f"錯誤：{str(e)}"
+        yield gr.update(value=ui_text('Error')), gr.update(
+            value=ui_text('Error: {0}', str(e))
         )
         return
 
@@ -178,9 +179,9 @@ def download_civitai_model_with_progress(
         if not version:
             DOWNLOAD_CANCEL_FLAGS.pop(model_id, None)
             yield (
-                gr.Label.update(value="錯誤"),
-                gr.Textbox.update(
-                    value=f"找不到模型 {model_id} 的版本 ID {model_version_id}。"
+                gr.update(value=ui_text('Error')),
+                gr.update(
+                    value=ui_text('Version ID {1} not found for model {0}.', model_id, model_version_id)
                 ),
             )
             return
@@ -189,8 +190,8 @@ def download_civitai_model_with_progress(
             version = model_versions[0]
         else:
             DOWNLOAD_CANCEL_FLAGS.pop(model_id, None)
-            yield gr.Label.update(value="錯誤"), gr.Textbox.update(
-                value="此模型沒有可用版本。"
+            yield gr.update(value=ui_text('Error')), gr.update(
+                value=ui_text('This model has no available versions.')
             )
             return
 
@@ -203,8 +204,8 @@ def download_civitai_model_with_progress(
 
     if not model_files:
         DOWNLOAD_CANCEL_FLAGS.pop(model_id, None)
-        yield gr.Label.update(value="錯誤"), gr.Textbox.update(
-            value="此版本沒有可下載的模型檔案。"
+        yield gr.update(value=ui_text('Error')), gr.update(
+            value=ui_text('This version has no downloadable model files.')
         )
         return
 
@@ -221,7 +222,7 @@ def download_civitai_model_with_progress(
 
     filename = sanitize_filename(filename)
 
-    if save_folder and save_folder != "自動選擇（依模型類型）":
+    if save_folder and save_folder not in ('Auto Select (by model type)', '自動選擇（依模型類型）'):
         folder = save_folder
     else:
         MODEL_FOLDERS = get_model_folders()
@@ -230,7 +231,7 @@ def download_civitai_model_with_progress(
     dest_path = os.path.join(folder, filename)
 
     if os.path.exists(dest_path):
-        msg = f"模型已存在：{dest_path}"
+        msg = ui_text('Model already exists: {0}', dest_path)
         print(msg)
         # Still save metadata and preview if missing
         # Use selected preview URL if provided, otherwise fall back to first image
@@ -239,7 +240,7 @@ def download_civitai_model_with_progress(
             preview_url = version["images"][0]["url"]
         save_preview_and_metadata(folder, filename, data, preview_url, version)
         DOWNLOAD_CANCEL_FLAGS.pop(model_id, None)
-        yield gr.Label.update(value=msg), gr.Textbox.update(value=msg)
+        yield gr.update(value=msg), gr.update(value=msg)
         return
 
     headers = {}
@@ -293,9 +294,9 @@ def download_civitai_model_with_progress(
                             print(f"Failed to remove partial file: {cleanup_err}")
                         DOWNLOAD_CANCEL_FLAGS.pop(model_id, None)
                         yield (
-                            gr.Label.update(value="已取消"),
-                            gr.Textbox.update(
-                                value=f"已取消下載並刪除未完成檔案：{filename}"
+                            gr.update(value=ui_text('Cancelled')),
+                            gr.update(
+                                value=ui_text('Download cancelled and incomplete file removed: {0}', filename)
                             ),
                         )
                         return
@@ -328,22 +329,21 @@ def download_civitai_model_with_progress(
                         last_update = now
 
                     # Gradio progress
-                    progress_str = "下載中…"
+                    progress_str = ui_text('Downloading…')
                     if (
                         downloaded - last_progress > update_interval
                         or downloaded == total
                     ):
                         progress((downloaded / total) if total else 0)
                         yield (
-                            gr.Label.update(
+                            gr.update(
                                 value=(
-                                    f"下載中：{downloaded//1024}KB/{total//1024 if total else '?'}KB "
-                                    f"({downloaded/total*100:.1f}%)"
+                                    ui_text('Downloading: {0}KB/{1}KB ({2:.1f}%)', downloaded // 1024, total // 1024 if total else '?', downloaded / total * 100)
                                     if total
                                     else ""
                                 )
                             ),
-                            gr.Textbox.update(value=progress_str),
+                            gr.update(value=progress_str),
                         )
                         last_progress = downloaded
 
@@ -357,23 +357,25 @@ def download_civitai_model_with_progress(
             preview_url = version["images"][0]["url"]
         save_preview_and_metadata(folder, filename, data, preview_url, version)
         DOWNLOAD_CANCEL_FLAGS.pop(model_id, None)
-        yield gr.Label.update(value="完成"), gr.Textbox.update(
-            value=f"Civitai {model_type} 模型已下載至：{dest_path}"
+        yield gr.update(value=ui_text('Done')), gr.update(
+            value=ui_text('Civitai {0} model downloaded to: {1}', model_type, dest_path)
         )
         time.sleep(0.2)
     except Exception as e:
         DOWNLOAD_CANCEL_FLAGS.pop(model_id, None)
-        yield gr.Label.update(value="錯誤"), gr.Textbox.update(
-            value=f"從 Civitai 下載時發生錯誤：{str(e)}"
+        yield gr.update(value=ui_text('Error')), gr.update(
+            value=ui_text('Error downloading from Civitai: {0}', str(e))
         )
 
 
 def download_model(model_state, preview_urls_state, preview_selection, save_folder, progress=gr.Progress()):
+    # Accept selector values submitted by older Chinese test builds.
+    preview_selection = {"預覽圖 1": "Preview 1", "預覽圖 2": "Preview 2"}.get(preview_selection, preview_selection)
     # model_state: (model_id, model_version_id)
     # preview_urls_state: (preview1_url, preview2_url)
     if not model_state or not model_state[0]:
-        yield gr.Label.update(value="錯誤"), gr.Textbox.update(
-            value="尚未檢查模型，請先按「檢查模型」。"
+        yield gr.update(value=ui_text('Error')), gr.update(
+            value=ui_text('Check the model first.')
         )
         return
     model_id, model_version_id = model_state
@@ -381,12 +383,12 @@ def download_model(model_state, preview_urls_state, preview_selection, save_fold
     selected_preview_url = None
     if preview_urls_state:
         preview1_url, preview2_url = preview_urls_state
-        if preview_selection == "預覽圖 1" and preview1_url:
+        if preview_selection == 'Preview 1' and preview1_url:
             selected_preview_url = preview1_url
-        elif preview_selection == "預覽圖 2" and preview2_url:
+        elif preview_selection == 'Preview 2' and preview2_url:
             selected_preview_url = preview2_url
         # Fallback to preview1 if preview2 is selected but not available
-        elif preview_selection == "預覽圖 2" and preview1_url:
+        elif preview_selection == 'Preview 2' and preview1_url:
             selected_preview_url = preview1_url
         elif preview1_url:
             selected_preview_url = preview1_url
@@ -447,22 +449,22 @@ def on_ui_tabs():
         )
         with gr.Row():
             with gr.Column(variant="panel"):
-                gr.Markdown("#### 選擇模型")
+                gr.Markdown('#### Select Model')
                 model_url = gr.Textbox(
-                    label="Civitai 模型網址或 ID",
-                    placeholder="例如：12345 或 https://civitai.com/models/12345/...",
+                    label='Civitai Model URL or ID',
+                    placeholder='E.g. 12345 or https://civitai.com/models/12345/...',
                     scale=4,
                     elem_id="model_url_input",
                 )
                 with gr.Row():
-                    check_btn = gr.Button("檢查模型", variant="secondary")
-                gr.Markdown("#### 資訊工具")
+                    check_btn = gr.Button('Check Model', variant="secondary")
+                gr.Markdown('#### Information Tools')
                 with gr.Row():
-                    check_missing_btn = gr.Button("檢查模型缺少的資訊（預覽圖、中繼資料）", variant="secondary")
-                    check_updates_btn = gr.Button("檢查模型更新", variant="secondary")
+                    check_missing_btn = gr.Button('Check Missing Model Information (previews, metadata)', variant="secondary")
+                    check_updates_btn = gr.Button('Check Model Updates', variant="secondary")
 
                 if getattr(_shared.opts, "civitai_enable_folder_selector", False):
-                    gr.Markdown("#### 儲存資料夾")
+                    gr.Markdown('#### Save Folder')
                     folder_choices = sorted(set(get_model_folders().values()))
                     subfolders = set()
                     for folder in folder_choices:
@@ -474,55 +476,53 @@ def on_ui_tabs():
                                     subfolders.add(sub_rel)
                     all_folders = sorted(set(folder_choices) | subfolders)
                     save_folder = gr.Dropdown(
-                        choices=["自動選擇（依模型類型）"] + all_folders,
-                        value="自動選擇（依模型類型）",
-                        label="儲存至資料夾",
+                        choices=['Auto Select (by model type)'] + all_folders,
+                        value='Auto Select (by model type)',
+                        label='Save to Folder',
                         interactive=True,
                     )
                 else:
-                    save_folder = gr.State(value="自動選擇（依模型類型）")
+                    save_folder = gr.State(value='Auto Select (by model type)')
 
-                gr.Markdown("#### 下載控制")
+                gr.Markdown('#### Download Controls')
                 with gr.Row():
-                    cancel_btn = gr.Button("取消", variant="stop", scale=1)
+                    cancel_btn = gr.Button('Cancel', variant="stop", scale=1)
                     download_btn = gr.Button(
-                        "下載", interactive=False, variant="primary", scale=2
+                        'Download', interactive=False, variant="primary", scale=2
                     )
 
-                progress_label = gr.Label(label="進度", elem_id="ota_progress")
-                output = gr.Markdown(label="輸出訊息", elem_id="ota_textbox")
+                progress_label = gr.Label(label='Progress', elem_id="ota_progress")
+                output = gr.Markdown(label='Output Messages', elem_id="ota_textbox")
 
             with gr.Column(variant="panel"):
-                gr.Markdown("#### 模型預覽與資訊")
+                gr.Markdown('#### Model Previews and Information')
                 with gr.Row():
                     preview1 = gr.Image(
-                        label="預覽圖 1", interactive=False, height=512, fill_width=True
+                        label='Preview 1', interactive=False, height=512
                     )
                     preview2 = gr.Image(
-                        label="預覽圖 2", interactive=False, height=512, fill_width=True
+                        label='Preview 2', interactive=False, height=512
                     )
                 preview_selection = gr.Radio(
-                    label="選擇縮圖預覽",
-                    choices=["預覽圖 1", "預覽圖 2"],
-                    value="預覽圖 1",
+                    label='Thumbnail Preview',
+                    choices=['Preview 1', 'Preview 2'],
+                    value='Preview 1',
                     interactive=True,
-                    info="選擇下載後要用作模型縮圖的預覽圖片"
+                    info='Select the preview image to use as the model thumbnail after download'
                 )
-                info = gr.Textbox(label="模型資訊", interactive=False, lines=6)
+                info = gr.Textbox(label='Model Information', interactive=False, lines=6)
 
         model_state = gr.State(value=None)
         preview_urls_state = gr.State(value=None)  # Store (preview1_url, preview2_url)
         gr.Markdown(
-            f"<div style='text-align:center; color:gray;'>"
-            f"<center><b>Civitai 模型下載器 — v{VERSION} — otacoo</b></center>"
-            f"</div>"
+            f"<div style='text-align:center; color:gray;'><center><b>Civitai Model Downloader</b> — v{VERSION} — otacoo</center></div>"
         )
 
         # --- Logic functions ---
         def get_first_two_preview_images(model_url):
             model_id, model_version_id = parse_civitai_model_and_version_id(model_url)
             if not model_id:
-                return None, None, None, None, "無法從網址或輸入內容辨識模型 ID。"
+                return None, None, None, None, ui_text('Could not identify the model ID from the URL or input.')
             api_key = get_civitai_api_key()
             try:
                 model_info = get_civitai_model_info(model_id, api_key=api_key)
@@ -552,15 +552,15 @@ def on_ui_tabs():
                 model_name = model_info.get("name", f"Model {model_id}")
                 model_type = model_info.get("type", "Unknown")
                 tags = model_info.get("tags", [])
-                tags_str = ", ".join(tags) if tags else "無"
+                tags_str = ", ".join(tags) if tags else ui_text('None')
                 base_model = version.get("baseModel", None) if version else None
-                base_line = f"\n基礎模型：{base_model}" if base_model else ""
-                info_text = f"模型：{model_name}\n類型：{model_type if model_type != 'Unknown' else '未知'}{base_line}\n標籤：{tags_str}"
+                base_line = ui_text('\nBase Model: {0}', base_model) if base_model else ""
+                info_text = ui_text('Model: {0}\nType: {1}{2}\nTags: {3}', model_name, model_type if model_type != 'Unknown' else ui_text('Unknown'), base_line, tags_str)
                 if model_version_id:
-                    info_text += f"\n版本 ID：{model_version_id}"
+                    info_text += ui_text('\nVersion ID: {0}', model_version_id)
                 return img1, img2, model_id, model_version_id, info_text
             except Exception as e:
-                return None, None, None, None, f"檢查模型時發生錯誤：{str(e)}"
+                return None, None, None, None, ui_text('Error checking model: {0}', str(e))
 
         def check_and_update(url):
             img1, img2, model_id, model_version_id, info_text = get_first_two_preview_images(url)
@@ -583,9 +583,9 @@ def on_ui_tabs():
             except Exception:
                 pass
             if cancelled:
-                return gr.Label.update(value=""), "正在取消…"
+                return gr.update(value=""), ui_text('Cancelling…')
             else:
-                return gr.Label.update(value=""), "目前沒有可取消的作業。"
+                return gr.update(value=""), ui_text('There is no active operation to cancel.')
 
         # --- Button bindings ---
         check_btn.click(
@@ -596,14 +596,14 @@ def on_ui_tabs():
         def check_missing_info_or_cancel():
             if is_running():
                 cancel_process()
-                yield "正在停止目前的作業…"
+                yield ui_text('Stopping the current operation…')
                 return
             yield from check_missing_info()
 
         def check_model_updates_or_cancel():
             if is_running():
                 cancel_process()
-                yield "正在停止目前的作業…"
+                yield ui_text('Stopping the current operation…')
                 return
             yield from check_model_updates()
 
@@ -628,7 +628,7 @@ def on_ui_tabs():
             outputs=[progress_label, output],
         )
 
-    return [(ui_component, "模型下載器", "extension_model_dl_tab")]
+    return [(ui_component, 'Model Downloader', "extension_model_dl_tab")]
 
 
 script_callbacks.on_ui_tabs(on_ui_tabs)

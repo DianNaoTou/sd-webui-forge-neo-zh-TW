@@ -9,6 +9,7 @@ from modules_forge.utils import numpy_to_pytorch
 
 
 class PreprocessorClipVisionForIPAdapter(PreprocessorClipVision):
+    model_conditioning_kind = "ipadapter"
     def __init__(self, name, url, filename):
         super().__init__(name, url, filename)
         self.tags = ["IP-Adapter"]
@@ -51,6 +52,7 @@ class PreprocessorClipVisionWithInsightFaceForIPAdapter(PreprocessorClipVisionFo
 
 
 class PreprocessorInsightFaceForInstantID(Preprocessor):
+    model_conditioning_kind = "ipadapter"
     def __init__(self, name):
         super().__init__()
         self.name = name
@@ -83,6 +85,7 @@ add_supported_preprocessor(PreprocessorInsightFaceForInstantID(name="InsightFace
 
 
 class IPAdapterPatcher(ControlModelPatcher):
+    conditioning_kind = "ipadapter"
     @staticmethod
     def try_build_from_state_dict(state_dict, ckpt_path):
         model = state_dict

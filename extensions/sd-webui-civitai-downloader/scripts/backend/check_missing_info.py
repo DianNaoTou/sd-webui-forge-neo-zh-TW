@@ -1,3 +1,4 @@
+from modules.localization import translate as ui_text
 import os
 import hashlib
 import requests
@@ -33,7 +34,7 @@ def cancel_check_missing_info():
 
 def check_missing_info():
     if is_running():
-        yield f"另一個作業正在執行：{get_type()}"
+        yield ui_text('Another operation is running: {0}', get_type())
         return
     set_running('missing_info')
     try:
@@ -65,22 +66,22 @@ def check_missing_info():
                             break
                     missing = []
                     if not os.path.exists(metadata_path):
-                        missing.append('中繼資料')
+                        missing.append(ui_text('Metadata'))
                     if not preview_found:
-                        missing.append('預覽圖')
+                        missing.append(ui_text('Preview'))
                     if missing:
                         files_to_check.append((root, file, missing))
         total = len(files_to_check)
         if total == 0:
-            yield "所有模型都有中繼資料與預覽圖。"
+            yield ui_text('All models have metadata and previews.')
             return
         # Second pass: process each file only once
         for idx, (root, file, missing) in enumerate(files_to_check, 1):
             if is_cancelled():
-                yield f"已取消；完成 {idx-1}/{total} 個檔案。"
+                yield ui_text('Cancelled; processed {0}/{1} files.', idx - 1, total)
                 return
             processed = idx
-            status = f"[{processed}/{total}] 處理中：{file} (缺少：{', '.join(missing)})"
+            status = ui_text('[{0}/{1}] Processing: {2} (missing: {3})', processed, total, file, ', '.join(missing))
             print(status)
             yield '\n'.join(summary + [status])
             try:
@@ -98,7 +99,7 @@ def check_missing_info():
                 api_key = get_civitai_api_key()
                 model_version_info = get_model_info_by_hash(file_hash, api_key=api_key)
                 if not model_version_info:
-                    msg = f"已略過：{file} ({', '.join(missing)}) - 找不到與 SHA256 對應的 Civitai 模型"
+                    msg = ui_text('Skipped: {0} ({1}) - no Civitai model matches the SHA256', file, ', '.join(missing))
                     print(msg)
                     summary.append(msg)
                     yield '\n'.join(summary + [f"[{processed}/{total}] ..."])
@@ -114,12 +115,12 @@ def check_missing_info():
                 if model_version_info.get('images'):
                     preview_url = model_version_info['images'][0]['url']
                 save_preview_and_metadata(root, file, model_info, preview_url, model_version_info)
-                msg = f"已補齊：{file} ({', '.join(missing)})"
+                msg = ui_text('Updated: {0} ({1})', file, ', '.join(missing))
                 print(msg)
                 summary.append(msg)
                 yield '\n\n'.join(summary + [f"[{processed}/{total}] ..."])
             except Exception as e:
-                msg = f"處理失敗：{file} ({', '.join(missing)}) - {str(e)}"
+                msg = ui_text('Processing failed: {0} ({1}) - {2}', file, ', '.join(missing), str(e))
                 print(msg)
                 summary.append(msg)
                 yield '\n\n'.join(summary + [f"[{processed}/{total}] ..."])

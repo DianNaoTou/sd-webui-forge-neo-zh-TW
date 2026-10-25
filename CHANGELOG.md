@@ -2,6 +2,141 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.31-tw.1 正式版（2026-10-25）
+
+相較上一正式版 **2.30-tw.1**：
+
+- 更新至上游 Forge Neo 2.31，新增 MOSS-Image、Qwen3.5 編碼器、JSON 構圖編輯器與 SLG。
+- 整合 LayerDiffuse 透明圖層生成與 WD14 PixAI／Camie 模型，模型依需要下載。
+- 同步 NVIDIA／Intel 核心套件與官方 XPU 獨立環境，改善模型載入、外掛相容性與操作流程。
+- 正式版 `neo.zip` 加入 Git 更新支援，解壓後可用 `git pull` 更新 `neo`。
+- 補齊多項繁中翻譯與英文切換，修復各種 bug、改善穩定性。
+- 來源為已測試的 Test 3，不含 Intel WD14 OpenVINO GPU 實驗；B580 既有記憶體／驅動限制仍保留。[正式更新說明](docs/releases/2.31-tw.1.md)。
+
+## 2.31-tw.1-test.3（2026-10-25）
+
+- 擴充檢查專案內附外掛，將 Image2Prompt、Civitai 下載器、WD14 新說明及 LoRA 中繼資料編輯器改為英文介面來源＋繁中語系檔；補上 RadialAttention、ControlNet、PiD、柔性局部重繪與 Ultimate Upscale 等漏翻片段。
+- Civitai／Image2Prompt 動態提示改由目前語系字典格式化，保留使用者資料與舊中文選項相容；修正 Image2Prompt 中文頁籤傳送。
+- 真實 Gradio 測試揭露 Civitai 不相容的 Image.fill_width 與元件類別 update 呼叫，移除無效參數並改用 gr.update，恢復介面與進度更新。
+- 本輪新增 168 個字典詞條，既有翻譯不變。Prompt All-in-One 保留自己的 i18n.json 與獨立語言選單；未宣稱底層日誌／所有錯誤已完成翻譯。[本版說明](docs/releases/2.31-tw.1-test.3.md)。
+
+## 2.31-tw.1-test.2（2026-10-25）
+
+- 依 ImageStitch 實際 HTML text nodes 補翻譯檔，修復句子被粗體標籤拆開後整句詞條失效；原英文 HTML 不改。
+- LayerDiffuse 介面從寫死中文改為英文來源＋zh_Hant 字典；切換英文並重新載入介面時恢復英文，方法／縮放選項的英文資料值與參數順序維持。
+- API 使用固定英文 LayerDiffuse 名稱，保留原測試版中文名稱為相容別名；不以目前顯示語言改變 API 行為。
+- 新增真實 Gradio／原始 localization.js 文字節點、語系切換與舊 API 相容回歸，擴充 Windows CI。本機 Python 一般與最佳化各 185 項、Node 17 項通過；[本版說明](docs/releases/2.31-tw.1-test.2.md)。
+
+## 2.31-tw.1-test.1（2026-10-25）
+
+- 完整合併上游 2.31 至 `0c388f8b`，新增 MOSS-Image、Qwen3.5 文字編碼器、SLG、融合 QKV LoRA 與繁中 JSON 構圖編輯器；保留 Test 9 全部功能。
+- 同步 Alpha 門檻、X/Y/Z VAE／成本排序、CPU 量化判斷、混合精度與 GGUF 修補。修正字串前綴篩選、None VAE 檔名、清理失敗阻斷還原、數字 LoRA 強度，Spectrum 在 `-O` 的未賦值崩潰，以及 JSON 載入／跳脫／可選欄位保留問題。
+- 新 CUDA 預設 Torch 2.14.0／vision 0.29.0，Intel 維持官方 2.14.1+xpu／0.29.1+xpu；Kitchen 升至 0.2.40。保留 Gradio／Pillow／HEIF 相容組合，新增 MarkupSafe 2.1.5 約束。Python bootstrap 與 Nunchaku 已驗證安裝矩陣暫維持。
+- 保留 A1111 UI Freeze、XPU 隔離與注意力修補、既有 ONNX 選用參數、插件、設定／模型／輸出和 ZIP Git 更新機制。僅更新測試分支，正式分支不變。
+- 新增真實 CPU 小型 MOSS／Qwen 數值、SLG、RGBA、VAE 還原及 JSON 前端事件測試，擴充 Linux／Windows CI。完整 GPU 模型與品質仍待實機驗證。[本版說明](docs/releases/2.31-tw.1-test.1.md)。
+
+## 2.30-tw.2-test.9（2026-10-23）
+
+- 新增 LayerDiffuse 繁體中文插件，功能預設關閉；以官方原碼與 Forge Neo Fix 3 為來源，排除第三方 Git 資訊與 Python 快取，不新增套件安裝器。
+- SDXL LoRA 轉接目前 WeightAdapter，檢查修補鍵與套用完整性；合成條件在插件採樣 modifier 中處理並對齊 batch，不改全域 is_inpaint 或核心推論程式。
+- 透明 VAE 依工作、模型家族及編解碼用途分開快取；沿用核心 finally 清理介面還原插件掛接。增加模型／圖片／批次驗證，失敗停止採樣。
+- 測試階段禁止與 ADetailer 同時啟用；SD1.5 不支援其他 Attention 掛接，權重固定為 1。保留英文 API／圖片資訊值，介面選項與提示繁中化。
+- 14 種按需權重固定 Hugging Face revision 與 SHA-256；既有檔案驗證失敗時保留原檔並停止，不覆寫使用者資料。
+- 本機 16 項無 GPU 回歸通過；全套 CI 與 CUDA／XPU、Hires、Illustrious、長時間連續生成另行驗收，不宣稱已通過 GPU 測試。[說明與清單](docs/releases/2.30-tw.2-test.9.md)。
+
+## 2.30-tw.2-test.8（2026-10-23）
+
+- 新增 Release 附件 `neo-test.zip`：固定於通過 CI 的提交，包含單分支、depth 1、無 tags 的自包含 Git 資訊；解壓後直接 `git pull` 更新 `neo-test`，不要求初始化腳本。
+- 封裝預設只允許快轉、停用自動 stash，並拒絕覆寫與遠端新增檔案碰撞的 ignored 檔案；本地修改衝突時停止。不執行強制 reset／clean、模型或環境備份。
+- 新增真實 Git 更新測試及追蹤資料檢查；排除個人 `webui.settings.bat`。既有受追蹤啟動檔仍受 Git 管理，不以 ignore／skip-worktree 隱藏差異。
+- Linux／Windows 回歸通過後建立固定測試 Tag／Prerelease，附 SHA-256；不改正式 `neo`、正式發布機制或 Latest 正式版。GitHub archive／Source code ZIP 仍不含 `.git`。
+- 不改 Test 7 的推論、CUDA／XPU 版本、模型下載或環境路徑。舊 Intel 正式版遷移限制與尚待 GPU 實機驗證項目維持；[完整說明](docs/validation/git-zip-test8.md)。
+
+## 2.30-tw.2-test.7（2026-10-19）
+
+- Intel 全新設定寫入與啟動器一致的 `PY313` 版本標記；改正「設定不符」被誤述為需要重裝的警告。既有官方設定仍先顯示警告，使用者按 Enter 後備份原 JSON，只更新版本標記，後續不重複提示；不自動認定舊設定已遷移，也不改 NVIDIA 既有設定檔。
+- 修正可重現的 Gradio Windows 同名上傳 fallback 覆寫競爭：相同內容的既有快取不覆寫，其他複製寫入同目錄暫存檔，關閉寫入 handle 後原子發布。PIL 預覽檔也明確關檔後才返回。真正的權限拒絕仍回報，不放寬檔案存取規則。
+- CUDA／XPU 仍使用各自快取；不改 UI、推論、VAE 選項或依賴版本。保留 test.6 已提交的提示詞空白欄位修正；使用者曾回報重啟後原操作已恢復，不將兩種症狀直接視為同一根因。
+- 新增實際 Gradio HTTP 重複上傳／讀圖與快取隔離測試、原檔備份／版本確認測試；Windows CI 使用原生檔案共享鎖驗證，Linux 模擬 Windows rename 行為。使用者原機的 PermissionError 根因未完全定案，仍須實機複驗。
+- [Test 7 更新與驗證](docs/validation/startup-cache-test7.md)。只更新 `neo-test`，不合併正式分支或建立正式 Release。
+
+## 圖像資訊提示詞傳送修復（2026-10-19，版本維持 test.6）
+
+- 修正空白 Gradio 欄位初始值為 None 時，傳送參數錯用 NoneType 轉換而靜默略過提示詞；文生圖／圖生圖共用的解析路徑均套用修正。
+- 新增實際 Gradio 元件回歸：讀取帶參數的 PNG、正負提示詞與生成參數回填、圖生圖圖片／尺寸傳送及分頁事件綁定；保留既有欄位型別轉換與缺少欄位略過行為。
+- 僅修改 `neo-test`；Windows 完整介面操作仍待使用者確認，不涉及推論或套件版本。
+
+## Intel Arc 單一啟動入口（2026-10-19，版本維持 test.6）
+
+- 官方 XPU 流程直接放入 `webui-user-intel-arc.bat`，移除多餘的 `webui-user-intel-xpu-official.bat`。
+- 沿用既有官方環境、設定與參數處理；不改依賴或推論行為。取代下方先前的雙入口安排。
+
+## Intel Arc 啟動入口統一（2026-10-19，版本維持 test.6）
+
+- 原 Intel Arc 啟動檔直接轉交新版官方 XPU，保留額外參數與結束狀態；不再建立或使用 Torch 2.14.0／`venv-intel-arc`。
+- 沿用既有官方 venv、設定與 7862，不刪使用者舊資料。記錄 B580 開啟 VAE 分塊後明顯改善的使用者回報。
+- 僅在 `neo-test`；正式版仍待下一次大版本整合。
+
+## Kitchen 社群實驗撤回（2026-10-19，版本維持 test.6）
+
+- 依使用者決定暫停採用 Kitchen 社群 XPU 方案，移除其專用啟動檔、建置腳本、fork／原生核心安裝與驗收分支；只保留新的官方 XPU profile。
+- 官方環境路徑、版本與 UI／插件／注意力模式不變；保留主程式必要的 `comfy-kitchen` 官方依賴。不刪使用者本機舊環境、輸出或快取。
+- 完整 122 項 Python 回歸通過。歷史實驗文件保留並標記撤回；目前只在 `neo-test`，下一次大版本更新才納入正式版。
+
+## 維護／發布政策備註（2026-10-19，程式版本不變）
+
+- Intel 後續以新的官方 XPU profile 為主線，舊 Torch 2.14.0／`venv-intel-arc` 路徑列為淘汰；Kitchen 原列可選實驗，已由上方同日撤回決策取代。
+- 新官方環境目前僅留在 `neo-test`，下一次大版本更新才納入正式版，不能以目前的一般修訂版提前合併。本次僅記錄政策，不刪環境、不改啟動器、不修改 `neo` 或發布 Release。
+- [決策與當前實測狀態](docs/decisions/2026-10-19-intel-official-baseline.md)。
+
+## 2.30-tw.2-test.6（2026-10-19）
+
+- Intel XPU 實驗預設改為原生 PyTorch SDPA 自選後端，取消本地強制 Math／query 分塊，以測試新版核心是否仍需要舊 workaround；不宣稱 NaN／OOM 已修復或速度已改善。
+- 新增 `--xpu-sdpa native|math|sliced`：`math` 對照加入分塊前的 Math 狀態，`sliced` 回到 test.5 的原保護路徑；不自動換模式掩蓋失敗，日誌與 profile 報告記錄模式。
+- 不改 CUDA、模型按需載入／卸載、Torch／XPU 依賴、UI／翻譯／插件。125 項 Python 回歸、26 項最佳化模式與 4 項 JavaScript 測試通過；實機生圖／HR 尚待使用者測試。
+- [三模式實機對照與回復命令](docs/validation/xpu-sdpa-test6.md)／[工程紀錄](docs/reviews/2026-10-19-xpu-sdpa-test6.md)。
+
+## 2.30-tw.2-test.5（2026-10-19）
+
+- 修正獨立 `--data-dir` 導致核心 CSS／JavaScript 與插件前端被 Gradio 拒絕存取；精確授權公開資源，CUDA／XPU 共用相同行為。
+- 恢復 2.30-tw.1 的設定頁樣式與操作、HR 本地模型刷新按鈕，保留上游共用刷新與所有後端整合。
+- 修正 WD14 DOM 選擇器及標籤輸入事件，不再把 regex 跳脫字元寫入提示詞。
+- 新增 UI Freeze 規範、發布版元件基準、真實 Gradio HTTP 與 Node 事件測試；116 項 Python 測試與 4 項 JavaScript 測試通過。
+- 沒有重設使用者設定、變更 Torch／XPU 依賴或發布 Release；雙平台生圖、HR 與完整插件實機驗收待測。[工程紀錄](docs/reviews/2026-10-19-ui-freeze-test5.md)／[實機清單](docs/validation/ui-dual-platform.md)。
+
+## 2.30-tw.2-test.4（2026-10-19）
+
+- 原 WD14 Tagger 介面新增 PixAI Tagger v0.9（官方連結之 DeepGHS ONNX）與 Camie Tagger v2（官方 ONNX），使用專用前處理與標籤解析，不替換舊模型載入器。
+- 選取新模型、上傳圖片與啟動 WebUI 均不下載；首次按辨識／批次辨識或發出 API 辨識請求才下載。固定來源 revision，沿用 HF 快取，先查本機；已快取時可離線載入。
+- 新模型下載／載入失敗顯示繁中錯誤並可重試，不影響其他模型；保留原標籤過濾、排序、批次與提示詞／圖片傳送流程。
+- 不新增執行相依套件、不調整 PyTorch／TorchVision／ONNX Runtime 安裝或 CUDA／XPU 啟動檔；Intel Arc 沿用 CPU Tagger 後端。
+- 新增 16 項測試，完整 107 項回歸通過；兩個新模型已完成實際權重 CPU 辨識、重複辨識及禁止網路後卸載重載。尚待 Windows／RTX 5060 Ti／B580 實機驗證。[完整說明](docs/reviews/2026-10-19-wd14-test4.md)。
+
+## 2.30-tw.2-test.3（2026-10-18）
+
+- 新增官方 XPU 與 Kitchen XPU 實驗組獨立啟動檔，兩組固定 torch 2.14.1+xpu／torchvision 0.29.1+xpu，以 Kitchen 為主要比較變數；保留原 Intel 2.14.0 啟動檔及 NVIDIA 環境。
+- 分開 venv、設定、UI 設定、styles、輸出、HF／Torch／pip／暫存快取、連接埠及 Torch 安裝約束；只共用程式碼與模型路徑。擴充安裝設定階段序列化，避免 A/B 同時安裝衝突。
+- 實驗組固定來源版本，提供原生建置入口與本機 Wheel／SHA256 安裝；檢查 Torch ABI、BMG package／AOT target、B580 裝置、XPU 能力與強制原生 INT8 smoke test，缺少配套時停止，不靜默回退冒充加速。
+- Kitchen 修改版以獨立 requirements／安裝約束維持 0.2.37，官方組維持 0.2.38；不改根 requirements 或降級其他環境。
+- 新增 12 項隔離／錯誤防護測試；[操作、建置條件與未驗證限制](docs/reviews/2026-10-18-xpu-ab-test3.md)。目前無公開配套 Windows 原生 Wheel，B 組須建置後實測；未宣稱兩組已通過 Windows／GPU 推論。
+
+## 2.30-tw.2-test.2（2026-10-18）
+
+- ControlNet 未選模型、模型不存在／無法辨識、已知 IPAdapter／一般 ControlNet 搭配錯誤時，明確提示並中止本次生成，避免悄悄退回無控制出圖。
+- 初始化與採樣掛載失敗後清除單元參數，不再接續觸發 `KeyError: 0`；在 `process_images` 的 finally 執行可重複呼叫的請求清理，恢復掛載前 UNet。
+- 修正一般 ControlNet 快取只保留權重、複本另建顯存包裝器的生命週期；快取與複本共用受管理包裝器，清理時保留記憶體管理器的追蹤，以便按需求卸載，不隱藏洩漏警告。
+- 新增 CPU 回歸測試：錯配提前攔截、失敗中止與重試、多單元／HR 回呼、ADetailer 停用 ControlNet 的巢狀請求隔離、快取／複本生命週期與 dtype 分離。
+- [完整修補說明與重測項目](docs/reviews/2026-10-18-controlnet-test2.md)。本輪尚無 GPU／Windows 修補後實測，不能宣稱記憶體洩漏已完全消除；正式 neo 維持不動。
+
+## 2.30-tw.2-test.1（2026-10-18）
+
+- 同步上游 `ce6848b8..f7f23149`，依實際 Diff 保留已整合 VAE 與我方 Flash 遮罩保護。
+- Spectrum 重寫：分批／條件獨立預測、擬合快取；補上 HR 步數為 0 的回退、純量條件防護及預測串流讀取前等待。
+- 修正權重錯誤分類、API 腳本預設參數重用，統一主模型／Refiner／HR／XYZ 模型清單刷新。
+- 更新 Callback 呼叫者查找、設定頁排版、輸入框高度與 comfy-kitchen 0.2.38；保留本地依賴約束及繁中翻譯。
+- Nunchaku 維持選用，移除自動降級 PyTorch；未確認相容 Wheel 的組合略過安裝，明確指定的 Wheel 以 `--no-deps` 安裝。
+- [完整審查、衝突與驗證限制](docs/reviews/2026-10-18-upstream-sync.md)。此版未經 GPU 推論實測；正式版維持 2.30-tw.1。
+
 ## 2.30-tw.1（2026-10-13）
 
 將已測試的 2.30-tw.1-test 升為正式版；完整新增功能、Bug 修正、驗證與已知限制見 [本次發布說明](docs/releases/2.30-tw.1.md)。

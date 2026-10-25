@@ -12,18 +12,20 @@
 
 ## 版本與下載
 
-目前正式發布版本：**2.30-tw.1**（上游 2.30）。
+目前正式發布版本：**2.31-tw.1**（上游 2.31），相較上一正式版 **2.30-tw.1** 新增 MOSS／JSON 構圖、LayerDiffuse、WD14 新模型，改善繁中與多項穩定性問題。
 
-- [2.30-tw.1 正式發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.30-tw.1)（固定版本 ZIP 與繁中更新說明）
-- [2.29.2-tw.1 上一正式版發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.29.2-tw.1)
-- [2.29.1-tw.1 首個穩定版發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.29.1-tw.1)
-- [最新正式版 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo.zip)
-- [首個穩定版 2.29.1-tw.1 固定 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/fecbe6bf666a102680fcfe0626eae91a60fe0122.zip)
-- [測試版 ZIP](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/archive/refs/heads/neo-test.zip)
+- [下載正式版 neo.zip（含 Git，可更新）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.31-tw.1/neo.zip)
+- [2.31-tw.1 正式發布頁與更新說明](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.31-tw.1)
+- [2.30-tw.1 上一正式版](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.30-tw.1)
+- [最新測試版發布紀錄](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases?q=pre-release%3Atrue)
 
-[版本選擇與更新方式](./RELEASES.md) ｜ [本次更新與已知限制](./docs/releases/2.30-tw.1.md) ｜ [完整更新紀錄](./CHANGELOG.md)
+新版 **Release 附件 `neo.zip`** 包含 Git 資訊；安裝 Git 後，在解壓的專案資料夾執行 `git pull` 即可更新正式分支 `neo`。GitHub 的 Source code ZIP／Code → Download ZIP 仍不包含 Git 資訊，舊 ZIP 不會自動取得此功能。已有安裝請使用原有 Git 更新方式，不要用 ZIP 覆蓋個人模型或設定。
 
-Intel B580 高解析度修復仍可能較慢，連續生成曾出現 OOM／DEVICE_LOST；本版保留為已知問題，未宣稱修復，詳見本次更新說明。
+本版以已測試的 `2.31-tw.1-test.3` 為來源，**不含 Test 4 的 Intel WD14 OpenVINO GPU 實驗修改**；Intel WD14 沿用 CPU 辨識，該實驗繼續保留在 `neo-test`。
+
+[版本選擇與更新方式](./RELEASES.md) ｜ [本次更新與已知限制](./docs/releases/2.31-tw.1.md) ｜ [完整更新紀錄](./CHANGELOG.md)
+
+Intel B580 高解析度修復仍可能較慢，連續生成的 OOM／DEVICE_LOST 保留為已知限制。本次簡單實測通過不代表所有模型、尺寸與顯示卡皆已驗證。
 
 ## 專案介紹
 
@@ -45,6 +47,7 @@ Stable Diffusion WebUI Forge Neo 是以 AUTOMATIC1111 Stable Diffusion WebUI 為
 | 元件 | 用途 | 整合狀態 |
 |---|---|---|
 | Forge Neo | Stable Diffusion WebUI 主程式 | 基於官方 `neo` 分支 |
+| LayerDiffuse | SD1.5／SDXL 圖層與透明圖片 | 測試分支整合繁中介面；預設關閉，[使用與限制](extensions/sd-forge-layerdiffuse/README.md) |
 | ADetailer-Neo | 自動偵測、遮罩與局部重繪 | 整合繁體中文介面 |
 | Civitai Model Downloader | 在介面中檢查並下載 Civitai 模型 | 整合繁體中文介面 |
 | forge-neo-image2prompt | 圖片反推提示詞 | 包含相容性修正 |
@@ -73,7 +76,7 @@ ADetailer-Neo 等插件需要的偵測模型，會按照插件原有機制在需
 | 平台 | 啟動檔 | PyTorch | 狀態 |
 |---|---|---|---|
 | NVIDIA | `webui-user.bat` | Forge Neo 上游預設 CUDA 版本 | 跟隨上游維護 |
-| Intel Arc | `webui-user-intel-arc.bat` | PyTorch XPU | 整合 XPU Math SDPA 相容性修正 |
+| Intel Arc | `webui-user-intel-arc.bat` | 官方 PyTorch 2.14.1+xpu | 2.31 正式版官方 XPU 基準 |
 
 兩種啟動方式共用同一套 Forge Neo、繁體中文、內建插件與模型目錄，但使用不同的虛擬環境，避免 CUDA 與 XPU 套件互相覆蓋。
 
@@ -110,16 +113,18 @@ webui-user.bat
 
 ### Intel Arc
 
+目前 `neo-test` 的主要啟動方式：
+
 ```bat
 webui-user-intel-arc.bat
 ```
 
-使用獨立的 `venv-intel-arc`，並由 Forge Neo 安裝器自動安裝 PyTorch XPU 與其他相依套件。完整說明請參閱 [`INTEL_ARC_SETUP.md`](./INTEL_ARC_SETUP.md)。
+使用獨立的 `venv-xpu-official` 與官方 PyTorch 2.14.1+xpu。`webui-user-intel-arc.bat` 直接啟動官方 XPU，不再建立或使用舊 `venv-intel-arc`；既有舊環境保留但不再維護。此官方路徑已隨 **2.31-tw.1** 納入正式版；Intel WD14 GPU 實驗不在本版範圍。完整說明見 [`INTEL_ARC_SETUP.md`](./INTEL_ARC_SETUP.md) 與 [維護／發布決策](docs/decisions/2026-10-19-intel-official-baseline.md)。
 
 兩種版本都保留 Forge Neo 原本的安裝體驗：首次啟動會先以專案內的 `uv` 準備固定版本 Python 3.13.12，再建立對應的虛擬環境，並由 Forge Neo 安裝器自動安裝 PyTorch、核心相依套件與插件相依套件。它不會修改系統 Python，也不會自動安裝顯示卡驅動程式或 Stable Diffusion 主模型。
 
 第一次啟動需要網路連線，下載內容會存放在專案的 `runtime`、`venv-nvidia` 或
-`venv-intel-arc` 目錄。日後啟動會直接重用；若曾經用錯誤的系統 Python 建立舊
+`venv-xpu-official` 目錄。日後啟動會直接重用；若曾經用錯誤的系統 Python 建立舊
 `venv`，新版啟動檔也不會使用或刪除它。
 
 本整合版定期同步 Forge Neo 上游的 `neo` 分支。更新會先進入本專案的 `neo-test` 測試分支，確認可用後才合併至正式的 `neo` 分支；兩者版本可能不同。上游更新也可能改變 Python、PyTorch 或 CUDA 需求。
@@ -207,3 +212,9 @@ Forge Neo 主程式及各插件分別依其原始授權發布。本整合版保�
 ---
 
 如果這個整合版對你有幫助，歡迎提交 Issue、協助測試或改善翻譯。
+
+開發與上游同步請遵守 [A1111 UI Freeze 規範](docs/UI_FREEZE.md)；測試版驗收見 [雙平台實機清單](docs/validation/ui-dual-platform.md)。
+
+官方 XPU 預設使用原生 SDPA；B580 的三模式比較與回復分塊保護，見 [test.6 操作說明](docs/validation/xpu-sdpa-test6.md)。
+
+Kitchen 社群 XPU 實驗已依使用者決定停止採用，專用啟動／建置入口已移除；Intel 後續只維護官方 XPU 路徑，已納入 2.31 正式版。

@@ -285,11 +285,11 @@ class ControlBase:
 
 
 class ControlNet(ControlBase):
-    def __init__(self, control_model, global_average_pooling=False, device=None, load_device=None, manual_cast_dtype=None):
+    def __init__(self, control_model, global_average_pooling=False, device=None, load_device=None, manual_cast_dtype=None, model_patcher=None):
         super().__init__(device)
         self.control_model = control_model
         self.load_device = load_device
-        self.control_model_wrapped = ModelPatcher(self.control_model, load_device=load_device, offload_device=memory_management.unet_offload_device())
+        self.control_model_wrapped = model_patcher if model_patcher is not None else ModelPatcher(self.control_model, load_device=load_device, offload_device=memory_management.unet_offload_device())
         self.global_average_pooling = global_average_pooling
         self.model_sampling_current = None
         self.manual_cast_dtype = manual_cast_dtype
@@ -343,7 +343,7 @@ class ControlNet(ControlBase):
         return self.control_merge(None, control, control_prev, output_dtype)
 
     def copy(self):
-        c = ControlNet(self.control_model, global_average_pooling=self.global_average_pooling, load_device=self.load_device, manual_cast_dtype=self.manual_cast_dtype)
+        c = ControlNet(self.control_model, global_average_pooling=self.global_average_pooling, load_device=self.load_device, manual_cast_dtype=self.manual_cast_dtype, model_patcher=self.control_model_wrapped)
         self.copy_to(c)
         return c
 
@@ -358,8 +358,9 @@ class ControlNet(ControlBase):
 
     def cleanup(self):
         self.model_sampling_current = None
-        if getattr(self, "control_model_wrapped", None) is not None:
-            memory_management.unload_model(self.control_model_wrapped)
+        # Cached/shared wrappers stay registered so the memory manager can offload
+        # them on demand. Removing the registry entry would leave cached GPU weights
+        # outside its accounting. Only per-pass conditioning is cleared here.
         super().cleanup()
 
 
@@ -454,7 +455,7 @@ class ControlLora(ControlNet):
         return c
 
     def cleanup(self):
-        del self.control_model
+        # Also safe before pre_run or after an earlier per-pass cleanup.
         self.control_model = None
         super().cleanup()
 
