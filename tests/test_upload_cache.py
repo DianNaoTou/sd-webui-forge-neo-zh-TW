@@ -23,7 +23,9 @@ class UploadCacheTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.root = Path(self.temp.name)
+        # Gradio resolves upload destinations; Windows TEMP can use an 8.3
+        # alias (RUNNER~1). Compare the same canonical directory spelling.
+        self.root = Path(self.temp.name).resolve()
         self.shared = types.SimpleNamespace(opts=types.SimpleNamespace(temp_dir=''), demo=None)
         import modules
         spec = importlib.util.spec_from_file_location('upload_cache_test', ROOT/'modules/ui_tempdir.py')
@@ -170,7 +172,9 @@ class UploadCacheTests(unittest.TestCase):
         with patch.object(self.mod.tempfile, 'NamedTemporaryFile', tracked):
             path = self.mod.save_pil_to_file(image, cache_dir=self.root)
         self.assertTrue(all(h.closed for h in handles))
-        self.assertEqual(Image.open(path).info['parameters'], image.info['parameters'])
+        with Image.open(path) as preview:
+            self.assertEqual(preview.info['parameters'], image.info['parameters'])
+        image.close()
 
     def test_installer_changes_only_gradio_upload_fallback_and_existing_hooks(self):
         with patch.object(gr.processing_utils, 'save_pil_to_cache'), patch.object(gr.processing_utils, 'async_move_files_to_cache'), patch.object(gr.routes, 'move_uploaded_files_to_cache'):
