@@ -2,6 +2,17 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.31-tw.1 正式版（2026-10-25）
+
+相較上一正式版 **2.30-tw.1**：
+
+- 更新至上游 Forge Neo 2.31，新增 MOSS-Image、Qwen3.5 編碼器、JSON 構圖編輯器與 SLG。
+- 整合 LayerDiffuse 透明圖層生成與 WD14 PixAI／Camie 模型，模型依需要下載。
+- 同步 NVIDIA／Intel 核心套件與官方 XPU 獨立環境，改善模型載入、外掛相容性與操作流程。
+- 正式版 `neo.zip` 加入 Git 更新支援，解壓後可用 `git pull` 更新 `neo`。
+- 補齊多項繁中翻譯與英文切換，修復各種 bug、改善穩定性。
+- 來源為已測試的 Test 3，不含 Intel WD14 OpenVINO GPU 實驗；B580 既有記憶體／驅動限制仍保留。[正式更新說明](docs/releases/2.31-tw.1.md)。
+
 ## 2.31-tw.1-test.3（2026-10-25）
 
 - 擴充檢查專案內附外掛，將 Image2Prompt、Civitai 下載器、WD14 新說明及 LoRA 中繼資料編輯器改為英文介面來源＋繁中語系檔；補上 RadialAttention、ControlNet、PiD、柔性局部重繪與 Ultimate Upscale 等漏翻片段。

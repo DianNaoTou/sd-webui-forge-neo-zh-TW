@@ -1,6 +1,6 @@
 # Intel Arc 安裝與啟動
 
-`neo-test` 的 Intel Arc 現在統一使用官方 PyTorch XPU：
+正式版 **2.31-tw.1** 的 Intel Arc 統一使用官方 PyTorch XPU：
 
 ```bat
 webui-user-intel-arc.bat
@@ -35,7 +35,7 @@ webui-user-intel-arc.bat
 更新後請驗證基本生圖、原本 HR 參數連續兩次、VAE 是否仍 OOM，以及生成後系統反應。A380 與其他 Arc 尚未在本輪驗證。
 原生／Math／分塊三模式對照見 [test.6 操作說明](docs/validation/xpu-sdpa-test6.md)。
 
-**僅修改 `neo-test`；仍等下一次大版本才納入正式 `neo`，不發布 Release。**
+**官方 XPU 路徑已隨 2.31-tw.1 納入正式 `neo`；本版不含 Test 4 的 Intel WD14 OpenVINO GPU 實驗修改。**
 Kitchen 社群 fork 支援已移除；主程式必要的官方 comfy-kitchen 依賴保留。
 詳見 [維護決策](docs/decisions/2026-10-19-intel-official-baseline.md)。
 
