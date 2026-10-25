@@ -1,3 +1,4 @@
+from modules.localization import translate as ui_text
 import os
 import requests
 import json
@@ -32,7 +33,7 @@ def cancel_check_model_updates():
 
 def check_model_updates():
     if is_running():
-        yield f"另一個作業正在執行：{get_type()}"
+        yield ui_text('Another operation is running: {0}', get_type())
         return
     set_running('updates')
     try:
@@ -61,17 +62,17 @@ def check_model_updates():
                     files_to_check.append((root, file, metadata_path))
         total = len(files_to_check)
         if total == 0:
-            yield "沒有可檢查更新的模型。"
+            yield ui_text('No models available to check for updates.')
             return
         api_key = get_civitai_api_key()
         updates = []
         errors = []
         for idx, (_, file, metadata_path) in enumerate(files_to_check, 1):
             if is_cancelled():
-                yield '\n\n'.join(updates + errors + [f"已取消；檢查 {idx-1}/{total} 個檔案。"])
+                yield '\n\n'.join(updates + errors + [ui_text('Cancelled; checked {0}/{1} files.', idx - 1, total)])
                 return
             base = os.path.splitext(file)[0]
-            status = f"[{idx}/{total}] 檢查中：{file}"
+            status = ui_text('[{0}/{1}] Checking: {2}', idx, total, file)
             yield '\n\n'.join(updates + errors + [status])
             try:
                 with open(metadata_path, 'r', encoding='utf-8') as f:
@@ -88,7 +89,7 @@ def check_model_updates():
                     model_id = civ.get('modelId')
                     current_version_id = civ.get('id')
                 if not model_id or not current_version_id:
-                    msg = f"無法判斷模型 ID 或版本：{file}"
+                    msg = ui_text('Cannot determine model ID or version: {0}', file)
                     errors.append(msg)
                     yield '\n\n'.join(updates + errors)
                     continue
@@ -96,7 +97,7 @@ def check_model_updates():
                 latest_info = get_latest_model_info(model_id, api_key=api_key)
                 latest_versions = latest_info.get('modelVersions', [])
                 if not latest_versions:
-                    msg = f"找不到模型版本：{model_id} ({file})"
+                    msg = ui_text('Model version not found: {0} ({1})', model_id, file)
                     errors.append(msg)
                     yield msg
                     continue
@@ -109,19 +110,19 @@ def check_model_updates():
                 model_name = latest_info.get('name', f'Model {model_id}')
                 domain = get_civitai_domains()[0]
                 url = f"https://{domain}/models/{model_id}?modelVersionId={latest_version_id}"
-                update_msg = f"{model_name} 有新版本：[[在瀏覽器開啟]]({url})"
+                update_msg = ui_text('New version of {0}: [[Open in browser]]({1})', model_name, url)
                 updates.append(update_msg)
                 yield '\n\n'.join(updates + errors)
             except Exception as e:
-                msg = f"檢查失敗：{file}: {str(e)}"
+                msg = ui_text('Check failed: {0}: {1}', file, str(e))
                 errors.append(msg)
                 yield '\n\n'.join(updates + errors)
         # Final summary
         if not updates and not errors:
-            yield "所有模型都已是最新版本。"
+            yield ui_text('All models are up to date.')
         elif updates:
-            yield '\n\n'.join(updates + errors + [f"檢查完成，{len(updates)} 個模型有可用更新。"])
+            yield '\n\n'.join(updates + errors + [ui_text('Check complete; updates available for {0} models.', len(updates))])
         elif errors and not updates:
-            yield '\n\n'.join(errors + [f"檢查完成，沒有更新；發生 {len(errors)} 個錯誤。"])
+            yield '\n\n'.join(errors + [ui_text('Check complete; no updates, {0} errors.', len(errors))])
     finally:
         clear_running()

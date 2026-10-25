@@ -2,14 +2,16 @@
 (function () {
     "use strict";
 
+    const uiText = text => (window.localization && window.localization[text]) || text;
+
     // Button HTML as a <ul>
     function getButtonsHtml() {
         let html = '<ul class="custom-card-buttons" style="display:none;gap:0.5em;list-style:none;padding:0;margin:0;">';
         if (typeof opts === 'undefined' || opts.civitai_card_button_open_url !== false) {
-            html += '<li><button class="open-url-btn" title="開啟 Civitai 頁面" style="cursor:pointer;">🌐</button></li>';
+            html += '<li><button class="open-url-btn" title="Open Civitai page" style="cursor:pointer;">🌐</button></li>';
         }
         if (typeof opts === 'undefined' || opts.civitai_card_button_delete !== false) {
-            html += '<li><button class="delete-btn" title="刪除模型" style="cursor:pointer;">❌</button></li>';
+            html += '<li><button class="delete-btn" title="Delete model" style="cursor:pointer;">❌</button></li>';
         }
         html += '</ul>';
         return html;
@@ -31,6 +33,7 @@
     }
 
     function notifySDWebUI(message, type = "info") {
+        message = uiText(message);
         const app = gradioApp();
         const alertBox = app.querySelector('#js_alert_box input, #js_alert_box textarea');
         const alertBtn = app.querySelector('#js_alert_btn button, #js_alert_btn');
@@ -65,7 +68,7 @@
                     e.preventDefault();
                     let modelPath = getModelPath(card);
                     if (!modelPath) {
-                        notifySDWebUI("無法判斷模型路徑，無法開啟資訊頁。", "error");
+                        notifySDWebUI("Cannot determine the model path to open its information page.", "error");
                         return;
                     }
                     let metadataPath = modelPath.replace(/\.[^/.]+$/, '.metadata.json').replace(/\\/g, '/');
@@ -74,7 +77,7 @@
                         ? opts.civitai_preferred_domain : 'civitai.com';
                     try {
                         let resp = await fetch(`/sd-webui-model-downloader/api/metadata?path=${encodeURIComponent(metadataPath)}`);
-                        if (!resp.ok) throw new Error("找不到中繼資料");
+                        if (!resp.ok) throw new Error(uiText("Metadata not found"));
                         let metadata = await resp.json();
                         let modelId = null;
                         if (metadata.civitai && metadata.civitai.modelId) {
@@ -84,21 +87,21 @@
                         } else if (metadata.id) {
                             modelId = metadata.id;
                         }
-                        if (!modelId) throw new Error("中繼資料中沒有模型 ID");
+                        if (!modelId) throw new Error(uiText("No model ID in metadata"));
                         window.open(`https://${domain}/models/${modelId}/`, "_blank");
                     } catch (err) {
-                        notifySDWebUI("無法開啟模型資訊頁：" + err.message, "error");
+                        notifySDWebUI(uiText("Cannot open the model information page: ") + err.message, "error");
                     }
                 };
             }
             if (delBtn) {
                 delBtn.onclick = async function (e) {
                     stopEvent(e);
-                    let rm_confirm = "\n確定要刪除這個模型及其相關檔案嗎？刪除後無法復原。";
+                    let rm_confirm = uiText("Are you sure you want to delete this model and its related files? This cannot be undone.");
                     if (!confirm(rm_confirm)) return false;
                     const modelPath = getModelPath(card);
                     if (!modelPath) {
-                        notifySDWebUI("無法判斷要刪除的模型路徑。", "error");
+                        notifySDWebUI("Cannot determine the model path to delete.", "error");
                         return false;
                     }
                     let apiModelPath = modelPath.replace(/\\/g, '/');
@@ -111,13 +114,13 @@
                         });
                         const result = await resp.json();
                         if (resp.ok && result.success) {
-                            notifySDWebUI(result.message || '模型已刪除。', 'info');
+                            notifySDWebUI(result.message || 'Model deleted.', 'info');
                             card.remove();
                         } else {
-                            notifySDWebUI(result.error || '刪除模型失敗。', 'error');
+                            notifySDWebUI(result.error || 'Failed to delete model.', 'error');
                         }
                     } catch (err) {
-                        notifySDWebUI('刪除模型失敗：' + err.message, 'error');
+                        notifySDWebUI(uiText('Failed to delete model: ') + err.message, 'error');
                     }
                     return false;
                 };

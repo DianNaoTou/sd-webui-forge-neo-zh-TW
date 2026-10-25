@@ -1,5 +1,6 @@
 import json
 import os
+from functools import lru_cache
 
 from modules import errors, scripts
 
@@ -35,3 +36,37 @@ def localization_js(current_localization_name: str) -> str:
                 errors.report(f"Error loading localization from {fn}", exc_info=True)
 
     return f"window.localization = {json.dumps(data)}"
+
+
+@lru_cache(maxsize=32)
+def _read_translation_file(filename, mtime_ns, size):
+    # Stat fields invalidate edited language files without caching an old locale.
+    with open(filename, "r", encoding="utf8") as file:
+        return json.load(file)
+
+
+def translate(text, *args, **kwargs):
+    """Translate callback messages using the selected UI dictionary, then format data.
+
+    Source strings stay English. Format values (paths, prompts, names) are never
+    looked up as translation keys. English/None and missing keys use the source.
+    """
+    from modules import shared
+
+    locale = getattr(shared.opts, "localization", "None")
+    translated = text
+    for filename in localizations.get(locale, ()):
+        try:
+            stat = os.stat(filename)
+            candidate = _read_translation_file(filename, stat.st_mtime_ns, stat.st_size).get(text)
+            if isinstance(candidate, str):
+                translated = candidate
+        except Exception:
+            errors.report(f"Error loading localization from {filename}", exc_info=True)
+    if not args and not kwargs:
+        return translated
+    try:
+        return translated.format(*args, **kwargs)
+    except (KeyError, IndexError, ValueError):
+        # A malformed translation must not interrupt a download or generation.
+        return text.format(*args, **kwargs)

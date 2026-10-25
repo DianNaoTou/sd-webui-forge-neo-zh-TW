@@ -12,7 +12,7 @@
 
 ## 版本與下載
 
-目前測試分支版本：**2.31-tw.1-test.2**（`neo-test`；補齊 ImageStitch 翻譯與 LayerDiffuse 中英文語系切換，延續上游 2.31 整合）。[更新與驗證說明](docs/releases/2.31-tw.1-test.2.md)。固定測試 ZIP 由 CI 通過後建立。
+目前測試分支版本：**2.31-tw.1-test.3**（`neo-test`；擴充內附外掛的語系檔翻譯、修復 Civitai 介面與進度相容性，延續上游 2.31 整合）。[更新與驗證說明](docs/releases/2.31-tw.1-test.3.md)。固定測試 ZIP 由 CI 通過後建立。
 
 目前正式發布版本：**2.30-tw.1**（上游 2.30）。
 

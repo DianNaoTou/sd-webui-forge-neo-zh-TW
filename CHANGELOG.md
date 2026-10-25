@@ -2,6 +2,13 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.31-tw.1-test.3（2026-10-25）
+
+- 擴充檢查專案內附外掛，將 Image2Prompt、Civitai 下載器、WD14 新說明及 LoRA 中繼資料編輯器改為英文介面來源＋繁中語系檔；補上 RadialAttention、ControlNet、PiD、柔性局部重繪與 Ultimate Upscale 等漏翻片段。
+- Civitai／Image2Prompt 動態提示改由目前語系字典格式化，保留使用者資料與舊中文選項相容；修正 Image2Prompt 中文頁籤傳送。
+- 真實 Gradio 測試揭露 Civitai 不相容的 Image.fill_width 與元件類別 update 呼叫，移除無效參數並改用 gr.update，恢復介面與進度更新。
+- 本輪新增 168 個字典詞條，既有翻譯不變。Prompt All-in-One 保留自己的 i18n.json 與獨立語言選單；未宣稱底層日誌／所有錯誤已完成翻譯。[本版說明](docs/releases/2.31-tw.1-test.3.md)。
+
 ## 2.31-tw.1-test.2（2026-10-25）
 
 - 依 ImageStitch 實際 HTML text nodes 補翻譯檔，修復句子被粗體標籤拆開後整句詞條失效；原英文 HTML 不改。

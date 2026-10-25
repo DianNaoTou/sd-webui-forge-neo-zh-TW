@@ -1,4 +1,5 @@
 ﻿""" This module contains the ui for the tagger tab. """
+from modules.localization import translate as ui_text
 from typing import Dict, Tuple, List, Optional
 import gradio as gr
 import re
@@ -98,7 +99,7 @@ def on_interrogate_image(*args) -> COMMON_OUTPUT:
         selected = next((i for i in utils.interrogators.values()
                          if i.name == args[1]), None)
         if getattr(selected, 'require_submit', False):
-            return (None,) * 6 + ('請按「辨識」開始；首次使用此模型時才會下載權重。',)
+            return (None,) * 6 + (ui_text('Press Interrogate to start; weights are downloaded only on the first request for this model.'),)
     # hack brcause image interrogaion occurs twice
     It.odd_increment = It.odd_increment + 1
     if It.odd_increment & 1 == 1:
@@ -537,9 +538,7 @@ def on_ui_tabs():
         common_input = [interrogator, tag_search_selection] + \
                        [tag_input[tag] for tag in TAG_INPUTS]
 
-        gr.Markdown('PixAI Tagger v0.9／Camie Tagger v2：選取模型不會下載；'
-                    '首次按下辨識才會下載至既有 Hugging Face 快取。'
-                    '下載失敗可重試，Intel Arc 環境保留 CPU 推論。')
+        gr.Markdown('PixAI Tagger v0.9 / Camie Tagger v2: selecting a model does not download weights. The first interrogation downloads to the existing Hugging Face cache. Failed downloads can be retried; CPU inference remains available on Intel Arc.')
 
         # interrogation events
         image_submit.click(fn=wrap_gradio_gpu_call(on_interrogate_image_submit),

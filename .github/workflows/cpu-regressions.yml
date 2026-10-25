@@ -29,7 +29,7 @@ jobs:
       - name: Run regression suite with real CPU PyTorch
         run: python -m unittest discover -s tests -v
       - name: WD14 browser event regressions
-        run: node --test tests/test_tagger_frontend.js tests/test_json_builder.js tests/test_localization_nodes.js
+        run: node --test tests/test_tagger_frontend.js tests/test_json_builder.js tests/test_localization_nodes.js tests/test_civitai_localization.js
       - name: Run full regression suite with optimized Python
         run: python -O -m unittest discover -s tests -v
 

@@ -214,9 +214,10 @@ class WD14ModelTests(unittest.TestCase):
         ns=dict(vars(typing),Image=Image,COMMON_OUTPUT=tuple,utils=types.SimpleNamespace(interrogators={'pix':adapter}),It=self.legacy.Interrogator,TAG_INPUTS=[],IOData=types.SimpleNamespace(update_input_glob=Mock(),err=[],update_output_dir=Mock()),QData=Mock(),TaggerModelError=self.mod.TaggerModelError,search_filter=Mock())
         from html import escape
         ns['html_esc']=escape
+        ns['ui_text']=lambda text, *args: text.format(*args)
         exec(compile(ast.Module(body=nodes,type_ignores=[]),str(TAGGER/'ui.py'),'exec'),ns)
         with patch.object(adapter,'interrogate_image',side_effect=self.mod.TaggerModelError('<failed>')) as run:
-            self.assertIn('首次',ns['on_interrogate_image'](Image.new('RGB',(1,1)),adapter.name,'')[6]);run.assert_not_called()
+            self.assertIn('first request',ns['on_interrogate_image'](Image.new('RGB',(1,1)),adapter.name,'')[6]);run.assert_not_called()
             self.assertEqual(ns['on_interrogate_image_submit'](Image.new('RGB',(1,1)),adapter.name,'')[6],'&lt;failed&gt;')
         with patch.object(adapter,'batch_interrogate',side_effect=self.mod.TaggerModelError('批次失敗')):
             self.assertEqual(ns['on_interrogate']('','',adapter.name,'')[6],'批次失敗')
