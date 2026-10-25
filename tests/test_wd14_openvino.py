@@ -113,7 +113,7 @@ class DeviceSelectionTests(unittest.TestCase):
 
     def test_installer_rejects_redirected_environment_before_installing(self):
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory); (root/'runtime').mkdir(); (root/'elsewhere').mkdir()
+            root = Path(directory).resolve(); (root/'runtime').mkdir(); (root/'elsewhere').mkdir()
             try:
                 (root/'runtime/wd14-openvino').symlink_to(root/'elsewhere', target_is_directory=True)
             except OSError:
@@ -125,7 +125,7 @@ class DeviceSelectionTests(unittest.TestCase):
 
     def test_installer_checks_owned_prefix_and_leaves_main_venv_untouched(self):
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory); venv = root/'runtime/wd14-openvino/venv'
+            root = Path(directory).resolve(); venv = root/'runtime/wd14-openvino/venv'
             executable = venv/'Scripts/python.exe'
             executable.parent.mkdir(parents=True); executable.touch()
             probe = dict(prefix=str(venv), base_prefix='bootstrap',
@@ -160,7 +160,7 @@ class DeviceSelectionTests(unittest.TestCase):
 class RealOpenVinoTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
-        self.path = Path(self.temp.name)
+        self.path = Path(self.temp.name).resolve()
         import onnx
         from onnx import helper, TensorProto
         inputs = helper.make_tensor_value_info('pixels', TensorProto.FLOAT, [1, 3, 2, 2])
@@ -217,7 +217,7 @@ class RealOpenVinoTests(unittest.TestCase):
 class WorkerTransportTests(unittest.TestCase):
     def test_successful_worker_roundtrip_uses_current_arrays_and_unload_cleans_files(self):
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory); (root/'tools').mkdir()
+            root = Path(directory).resolve(); (root/'tools').mkdir()
             # Controlled subprocess stands in for GPU hardware, exercising the
             # actual parent IPC, current-input handling and lifecycle on both OSes.
             (root/'tools/wd14_openvino_worker.py').write_text('''
@@ -252,7 +252,7 @@ for line in sys.stdin:
 
     def test_unresponsive_worker_is_terminated_instead_of_leaking(self):
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory); (root/'tools').mkdir()
+            root = Path(directory).resolve(); (root/'tools').mkdir()
             (root/'tools/wd14_openvino_worker.py').write_text('import time; time.sleep(60)\n', encoding='utf-8')
             with self.assertRaises(TimeoutError):
                 backend.GpuSession('fixture.onnx', root=root, python=sys.executable, timeout=0.05)
