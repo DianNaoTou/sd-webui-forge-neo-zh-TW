@@ -81,7 +81,7 @@ class BackendDetectionTests(unittest.TestCase):
 
     def test_repair_commands_target_gpu_indexes(self):
         nvidia = bat_torch_command(NVIDIA_BAT)
-        self.assertIn('torch==2.13.0+cu130', nvidia)
+        self.assertIn('torch==2.14.0+cu130', nvidia)
         self.assertIn('--index-url https://download.pytorch.org/whl/cu130', nvidia)
         self.assertIn('torchvision==', nvidia)
         arc = profiles.environment(ROOT, 'official', {})['TORCH_COMMAND']

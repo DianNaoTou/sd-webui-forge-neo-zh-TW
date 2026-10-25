@@ -191,7 +191,9 @@ class Spectrum(nn.Module):
             return (h_taylor, 0.0) if return_weight else h_taylor
 
         h_cheb = self.cheb.predict(t_star)
-        assert (w := self.w) is not None
+        w = self.w
+        if w is None:
+            raise ValueError("Spectrum mix weight must not be None")
         h_mix = (1 - w) * h_taylor + w * h_cheb
         return (h_mix, float(w)) if return_weight else h_mix
 

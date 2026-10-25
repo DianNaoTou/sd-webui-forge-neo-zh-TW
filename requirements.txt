@@ -1,9 +1,9 @@
-GitPython==3.1.57
+GitPython==3.1.62
 Pillow==10.4.0
-accelerate==1.14.0
+accelerate==1.15.0
 audioop-lts==0.2.2;python_version>="3.13"
 av==17.1.0
-comfy-kitchen==0.2.38
+comfy-kitchen==0.2.40
 diffusers==0.37.1
 diskcache==5.6.3
 einops==0.8.2
@@ -32,5 +32,6 @@ scikit-image==0.25.2
 spandrel-extra-arches==0.2.0
 spandrel==0.4.2
 torchsde==0.2.6
-tqdm==4.70.0
+tqdm==4.70.1
 transformers==4.57.6
+MarkupSafe==2.1.5

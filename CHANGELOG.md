@@ -2,6 +2,14 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.31-tw.1-test.1（2026-10-25）
+
+- 完整合併上游 2.31 至 `0c388f8b`，新增 MOSS-Image、Qwen3.5 文字編碼器、SLG、融合 QKV LoRA 與繁中 JSON 構圖編輯器；保留 Test 9 全部功能。
+- 同步 Alpha 門檻、X/Y/Z VAE／成本排序、CPU 量化判斷、混合精度與 GGUF 修補。修正字串前綴篩選、None VAE 檔名、清理失敗阻斷還原、數字 LoRA 強度，Spectrum 在 `-O` 的未賦值崩潰，以及 JSON 載入／跳脫／可選欄位保留問題。
+- 新 CUDA 預設 Torch 2.14.0／vision 0.29.0，Intel 維持官方 2.14.1+xpu／0.29.1+xpu；Kitchen 升至 0.2.40。保留 Gradio／Pillow／HEIF 相容組合，新增 MarkupSafe 2.1.5 約束。Python bootstrap 與 Nunchaku 已驗證安裝矩陣暫維持。
+- 保留 A1111 UI Freeze、XPU 隔離與注意力修補、既有 ONNX 選用參數、插件、設定／模型／輸出和 ZIP Git 更新機制。僅更新測試分支，正式分支不變。
+- 新增真實 CPU 小型 MOSS／Qwen 數值、SLG、RGBA、VAE 還原及 JSON 前端事件測試，擴充 Linux／Windows CI。完整 GPU 模型與品質仍待實機驗證。[本版說明](docs/releases/2.31-tw.1-test.1.md)。
+
 ## 2.30-tw.2-test.9（2026-10-23）
 
 - 新增 LayerDiffuse 繁體中文插件，功能預設關閉；以官方原碼與 Forge Neo Fix 3 為來源，排除第三方 Git 資訊與 Python 快取，不新增套件安裝器。

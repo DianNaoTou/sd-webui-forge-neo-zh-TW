@@ -12,7 +12,7 @@
 
 ## 版本與下載
 
-目前測試分支版本：**2.30-tw.2-test.9**（`neo-test`；新增繁中 LayerDiffuse 可選功能，預設關閉）。[Test 9 說明與實機清單](docs/releases/2.30-tw.2-test.9.md)。CUDA／XPU 生成仍待實機驗證；固定版 ZIP 由既有 CI 通過後建立。
+目前測試分支版本：**2.31-tw.1-test.1**（`neo-test`；同步上游 2.31、MOSS-Image、繁中 JSON 構圖編輯器與相容性修正）。[更新、安裝與實機清單](docs/releases/2.31-tw.1-test.1.md)。CUDA／XPU 生成仍待實機驗證；固定測試 ZIP 由 CI 通過後建立。
 
 目前正式發布版本：**2.30-tw.1**（上游 2.30）。
 

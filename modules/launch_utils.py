@@ -248,11 +248,11 @@ def run_extensions_installers(settings_file):
 
 def prepare_environment():
     torch_index_url = os.environ.get("TORCH_INDEX_URL", "https://download.pytorch.org/whl/cu130")
-    torch_command = os.environ.get("TORCH_COMMAND", f"pip install torch==2.13.0+cu130 torchvision==0.28.0+cu130 --extra-index-url {torch_index_url}")
+    torch_command = os.environ.get("TORCH_COMMAND", f"pip install torch==2.14.0+cu130 torchvision==0.29.0+cu130 --extra-index-url {torch_index_url}")
     xformers_package = os.environ.get("XFORMERS_PACKAGE", f"xformers==0.0.35 --extra-index-url {torch_index_url}")
-    pynvml_package = os.environ.get("PYNVML_PACKAGE", "nvidia-ml-py==13.610.43")
+    pynvml_package = os.environ.get("PYNVML_PACKAGE", "nvidia-ml-py==13.615.71")
 
-    packaging_package = os.environ.get("PACKAGING_PACKAGE", "packaging==26.2")
+    packaging_package = os.environ.get("PACKAGING_PACKAGE", "packaging==26.3")
     gradio_package = os.environ.get("GRADIO_PACKAGE", "gradio==4.40.0 gradio_rangeslider==0.0.8")
     requirements_file = os.environ.get("REQS_FILE", "requirements.txt")
 
@@ -313,23 +313,21 @@ assert cuda or xpu or mps
     ver_PY = f"cp{sys.version_info.major}{sys.version_info.minor}"
     ver_SAGE = "2.2.0"
     ver_FLASH = "2.8.3"
-    ver_TRITON = "3.7.1"
+    ver_TRITON = "3.9"  # upstream upper bound
     ver_TORCH, ver_CUDA = _torch_version()
     v_TORCH = ver_TORCH.rsplit(".", 1)[0]
     v_CUDA = f"{ver_CUDA[0:-1]}.{ver_CUDA[-1]}"
 
     if os.name == "nt":
-        ver_TRITON += ".post27"
-
         sage_package = os.environ.get("SAGE_PACKAGE", f"https://github.com/woct0rdho/SageAttention/releases/download/v{ver_SAGE}-windows.post6/sageattention-{ver_SAGE}+{ver_CUDA}torch2.10.0andhigher.post6-cp310-abi3-win_amd64.whl")
-        flash_package = os.environ.get("FLASH_PACKAGE", f"https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.9.52/flash_attn-{ver_FLASH}+{ver_CUDA}torch{v_TORCH}-{ver_PY}-{ver_PY}-win_amd64.whl")
-        triton_package = os.environ.get("TRITION_PACKAGE", f"triton-windows=={ver_TRITON}")
+        flash_package = os.environ.get("FLASH_PACKAGE", f"https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.10.2/flash_attn-{ver_FLASH}+{ver_CUDA}torch{v_TORCH}-{ver_PY}-{ver_PY}-win_amd64.whl")
+        triton_package = os.environ.get("TRITION_PACKAGE", f"triton-windows<{ver_TRITON}")
         nunchaku_platform = "win_amd64"
 
     else:
         sage_package = os.environ.get("SAGE_PACKAGE", f"sageattention=={ver_SAGE}")
-        flash_package = os.environ.get("FLASH_PACKAGE", f"https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.9.47/flash_attn-{ver_FLASH}+{ver_CUDA}torch{v_TORCH}-{ver_PY}-{ver_PY}-linux_x86_64.whl")
-        triton_package = os.environ.get("TRITION_PACKAGE", f"triton=={ver_TRITON}")
+        flash_package = os.environ.get("FLASH_PACKAGE", f"https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.10.0/flash_attn-{ver_FLASH}+{ver_CUDA}torch{v_TORCH}-{ver_PY}-{ver_PY}-linux_x86_64.whl")
+        triton_package = os.environ.get("TRITION_PACKAGE", f"triton<{ver_TRITON}")
         nunchaku_platform = "linux_x86_64"
 
     nunchaku_package = os.environ.get("NUNCHAKU_PACKAGE") or dependency_utils.nunchaku_wheel(v_TORCH, v_CUDA, ver_PY, nunchaku_platform)
