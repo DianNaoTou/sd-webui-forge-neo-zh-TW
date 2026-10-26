@@ -2,6 +2,12 @@
 
 本專案的重要變更會記錄在此處。
 
+## 測試分支追加更新（2026-10-26）
+
+- Prompt All-in-One 整合 Physton 原版最新 `e66d417c`（2026-10-13）與 Neo v0.3.5 `cecd70ed`，保留 Neo API／token counter、非阻塞翻譯、品質預設、拖曳修正與繁中預設。
+- 同步句號／分號分割、引號保護、空行保留、分隔符最佳化與可選行號／標籤高度樣式；新選項預設關閉。外部提示詞同步保留原字串，避免 LoRA 切換後遺留觸發詞。
+- 整合修正：分句保留停用標籤狀態；空行選項加入啟動時的設定讀取。重建前端與 CSS；223 項提示詞回歸及 5 項 UI Freeze 檢查通過，瀏覽器／GPU 實測尚未進行。[整合紀錄](docs/reviews/2026-10-26-prompt-all-in-one.md)。
+
 ## 2.31-tw.1-test.5（2026-10-25）
 
 - 依 B580 使用者對 Test 4 的初步功能正常回報，將 WD14 GPU 流程改為唯一 Intel Arc 啟動入口：`webui-user-intel-arc.bat` 使用獨立 OpenVINO worker，刪除額外 GPU BAT，淘汰原 CPU-only 啟動內容。
