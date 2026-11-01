@@ -145,6 +145,41 @@ class XPUProfileTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError,'custom XPU'):
                 profiles.verify_runtime('official')
 
+    @unittest.skipUnless(os.name == 'nt', 'Windows junction behavior')
+    def test_existing_valid_junction_is_reused_without_recreation(self):
+        import _winapi
+        source = self.root / 'extensions'
+        source.mkdir()
+        state = self.root / 'profile'
+        state.mkdir()
+        link = state / 'extensions'
+        _winapi.CreateJunction(str(source), str(link))
+        with patch.object(_winapi, 'CreateJunction', side_effect=AssertionError('unexpected rebuild')):
+            profiles.initialize_extension_link(self.root, state)
+        self.assertTrue(link.is_junction())
+        self.assertEqual(link.resolve(), source.resolve())
+
+    @unittest.skipUnless(os.name == 'nt', 'Windows junction behavior')
+    def test_dangling_junction_is_repaired_without_deleting_target(self):
+        import _winapi
+        source = self.root / 'extensions'
+        source.mkdir()
+        marker = source / 'keep.txt'
+        marker.write_text('safe')
+        old = self.root / 'old-extensions'
+        old.mkdir()
+        state = self.root / 'profile'
+        state.mkdir()
+        link = state / 'extensions'
+        _winapi.CreateJunction(str(old), str(link))
+        old.rmdir()
+        self.assertTrue(link.is_junction())
+        self.assertFalse(link.exists())
+        profiles.initialize_extension_link(self.root, state)
+        self.assertTrue(link.is_junction())
+        self.assertEqual(link.resolve(), source.resolve())
+        self.assertEqual(marker.read_text(), 'safe')
+
     def test_data_directory_junction_creation_and_existing_path_protection(self):
         source=self.root/'extensions'
         source.mkdir()
