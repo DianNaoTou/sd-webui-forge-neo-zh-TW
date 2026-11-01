@@ -42,6 +42,10 @@ def inside(path, parent):
 
 
 def safe_target(root, name, models):
+    # Windows TEMP can use an 8.3 alias (RUNNER~1). Compare canonical paths so
+    # safe files are not mistaken for paths outside their own project.
+    root = root.resolve()
+    models = models.resolve()
     if name not in FILES:
         raise RuntimeError('Refusing a path outside the code allowlist: ' + name)
     target = root / name
@@ -87,6 +91,7 @@ def save_manifest(transaction, manifest):
 
 
 def rollback(root, transaction):
+    root = root.resolve()
     manifest = json.loads((transaction / 'manifest.json').read_text(encoding='utf-8'))
     if root.resolve() != Path(manifest['root']).resolve():
         raise RuntimeError('Backup belongs to a different project.')

@@ -69,7 +69,7 @@ def make_checkpoint_manager_ui():
 
     ui_checkpoint = gr.Dropdown(label="Checkpoint", value=None, choices=None, elem_id="setting_sd_model_checkpoint", elem_classes=["model_selection"])
 
-    ui_vae = gr.Dropdown(label="VAE / Text Encoder", value=None, choices=None, multiselect=True, allow_custom_value=True, elem_id="setting_sd_modules", elem_classes=["model_selection"])
+    ui_vae = gr.Dropdown(label="VAE / Text Encoder", value=None, choices=None, multiselect=True, elem_id="setting_sd_modules", elem_classes=["model_selection"])
 
     def refresh_model_list():
         ckpt_list, vae_list = refresh_models()
@@ -96,6 +96,7 @@ def find_files_with_extensions(base_path: os.PathLike, extensions: list[str]) ->
     return found_files
 
 
+@_selection_transaction
 def refresh_models() -> tuple[list[os.PathLike], list[os.PathLike]]:
     shared_items.refresh_checkpoints()
     shared_items.refresh_vae_list()
@@ -200,10 +201,7 @@ def checkpoint_change(ckpt_name: str, preset: str, save=True, refresh=True) -> b
     current_ckpt_info = sd_models.get_closet_checkpoint_match(getattr(shared.opts, "sd_model_checkpoint", ""))
     if new_ckpt_info is None and ckpt_name:
         raise ValueError(f"Checkpoint not found: {ckpt_name}")
-    if new_ckpt_info == current_ckpt_info:
-        # Other options may have changed while a preset/override was applied.
-        refresh_model_loading_parameters(refresh=refresh)
-        return False
+    changed = new_ckpt_info != current_ckpt_info
 
     shared.opts.set("sd_model_checkpoint", ckpt_name)
     if preset is not None:
@@ -212,7 +210,7 @@ def checkpoint_change(ckpt_name: str, preset: str, save=True, refresh=True) -> b
     if save:
         shared.opts.save(shared.config_filename)
     refresh_model_loading_parameters(refresh=refresh)
-    return True
+    return changed
 
 
 @_selection_transaction
@@ -227,10 +225,9 @@ def modules_change(module_values: list, preset: str, save=True, refresh=True) ->
             raise FileNotFoundError(f"Additional module not registered: {v}. Refresh the model list or explicitly clear VAE / Text Encoder.")
     modules.sort()
 
-    # skip further processing if value unchanged
-    if modules == getattr(shared.opts, "forge_additional_modules", []):
-        refresh_model_loading_parameters(refresh=refresh)
-        return False
+    # The global value can already match while this preset still remembers old
+    # modules. Persist the preset slot even for an unchanged/empty global value.
+    changed = modules != getattr(shared.opts, "forge_additional_modules", [])
 
     shared.opts.set("forge_additional_modules", modules)
     if preset is not None:
@@ -239,7 +236,7 @@ def modules_change(module_values: list, preset: str, save=True, refresh=True) ->
     if save:
         shared.opts.save(shared.config_filename)
     refresh_model_loading_parameters(refresh=refresh)
-    return True
+    return changed
 
 
 @_selection_transaction
@@ -360,6 +357,7 @@ def _load_presets(ui_checkpoint: str, ui_vae: list[str], ui_forge_unet_dtype: st
     shared.opts.save(shared.config_filename)
 
 
+@_selection_transaction
 def on_preset_change(preset: str):
     assert preset is not None
     shared.opts.set("forge_preset", preset)
@@ -386,11 +384,13 @@ def on_preset_change(preset: str):
     # a different combination of model weights.
     if not shared.opts.sd_modules_dropdown_use_short:
         modules_value = [module_map.get(m, m) for m in modules_value]
+    module_choices = list(module_list) if shared.opts.sd_modules_dropdown_use_short else list(module_map.values())
+    module_choices = sorted(set(module_choices + modules_value))
 
     return [
         # ui_checkpoint, ui_vae, ui_forge_unet_dtype
         gr.update(value=getattr(shared.opts, f"forge_checkpoint_{preset}", None) or shared.opts.sd_model_checkpoint),
-        gr.update(value=modules_value),
+        gr.update(value=modules_value, choices=module_choices),
         gr.update(value=getattr(shared.opts, f"forge_unet_storage_dtype_{preset}", "Automatic")),
         # ui_txt2img_steps, ui_txt2img_hr_steps, ui_img2img_steps
         gr.update(value=v) if (v := getattr(shared.opts, f"{preset}_t2i_step", 20)) > 0 else gr.skip(),

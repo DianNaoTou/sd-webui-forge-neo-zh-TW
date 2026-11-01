@@ -108,6 +108,7 @@ class ModelSelectionTests(unittest.TestCase):
         self.opts.set('forge_additional_modules_anima', ['gone.safetensors'])
         updates = self.ns['on_preset_change']('anima')
         self.assertEqual(updates[1]['value'], ['gone.safetensors'])
+        self.assertIn('gone.safetensors', updates[1]['choices'])
 
     def test_unset_preset_checkpoint_uses_current_checkpoint(self):
         self.opts.set('forge_checkpoint_xl', None)
@@ -143,6 +144,16 @@ class ModelSelectionTests(unittest.TestCase):
     def test_same_checkpoint_callback_refreshes_stale_parameters(self):
         self.assertFalse(self.ns["checkpoint_change"]("SDXL", "xl"))
         self.assertEqual(self.data.forge_loading_parameters["additional_modules"], [])
+
+    def test_empty_global_still_clears_old_preset_slot(self):
+        self.opts.set('forge_additional_modules_xl', [self.vae, self.te])
+        self.assertFalse(self.ns['modules_change']([], 'xl'))
+        self.assertEqual(self.opts.forge_additional_modules_xl, [])
+
+    def test_unchanged_checkpoint_still_updates_preset_slot(self):
+        self.opts.set('forge_checkpoint_xl', 'ANIMA')
+        self.assertFalse(self.ns['checkpoint_change']('SDXL', 'xl'))
+        self.assertEqual(self.opts.forge_checkpoint_xl, 'SDXL')
 
     def test_invalid_checkpoint_is_not_silently_reused(self):
         with self.assertRaises(ValueError):

@@ -80,7 +80,7 @@ class RepairTests(unittest.TestCase):
         calls = []
 
         def fail_second(path, data):
-            if path == self.root / repair.FILES[1] and not calls:
+            if path.resolve() == (self.root / repair.FILES[1]).resolve() and not calls:
                 calls.append(True)
                 raise OSError('simulated failed write')
             return write(path, data)
@@ -140,7 +140,7 @@ class RepairTests(unittest.TestCase):
         try:
             transaction = self.apply()
             manifest = json.loads((transaction / 'manifest.json').read_text())
-            self.assertTrue(any(Path(item['resolved']) == target for item in manifest['model_inventory']))
+            self.assertTrue(any(Path(item['resolved']) == target.resolve() for item in manifest['model_inventory']))
             repair.rollback(self.root, transaction)
             self.assertTrue(link.is_junction())
             self.assertEqual(model.read_bytes(), b'untouched')

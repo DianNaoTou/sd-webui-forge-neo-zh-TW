@@ -16,7 +16,7 @@ checkpoint 相同時提前返回，導致 `shared.opts`、畫面和 `model_data.
 
 | 檔案 | 原因及行為 |
 | --- | --- |
-| `modules_forge/main_entry.py` | Preset 完整 tuple 一次發布、一次保存；相同 checkpoint/空白模組也更新；`None` 正規化為空清單；依序初始化選單及 Preset；序列化選模 callback；缺失選項維持可見並明確報錯，失敗不沿用舊參數。 |
+| `modules_forge/main_entry.py` | Preset 完整 tuple 一次發布、一次保存；相同 checkpoint/空白模組也更新 Preset 記憶與載入參數；`None` 正規化為空清單；依序初始化選單及 Preset；序列化選模/清單 callback；缺失選項維持可見並明確報錯，失敗不沿用舊參數。 |
 | `modules/sd_models.py` | 單次載入使用同一份參數及模組清單快照，快取 hash 只描述實際交給 loader 的內容。 |
 | `modules/sysinfo.py` | API/override dtype 改變也更新載入參數；修正 checkpoint 分支跌入一般設定 setter 的 `if/else` 結構。 |
 | `modules_forge/patch_basic.py` | 任何載入例外均保留原始檔與既有 `.corrupted` 備份；保留真正例外鏈，取消自動改名/刪除。 |
@@ -78,8 +78,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File '<交易目錄>\rollback.ps1
 
 - 基準原始碼跑新增同步測試：14 項中 8 failure、5 error；關鍵空白模組/相同 checkpoint 殘留測試確實失敗。
   後續另增加 dtype-only API 測試；上述基準數字是增加該項之前的紀錄。
-- 本地同步/回滾及既有路徑、XPU profile、settings-version 合計 **48 項，45 通過、3 項 Windows 專用跳過**。
-  新增同步/回滾另以 `python -O` 執行 **26 項，25 通過、1 項 Windows Junction 跳過**。修改的核心 Python 檔案編譯通過。
+- 本地同步/回滾及既有路徑、XPU profile、settings-version 合計 **50 項，47 通過、3 項 Windows 專用跳過**。
+  新增同步/回滾另以 `python -O` 執行 **28 項，27 通過、1 項 Windows Junction 跳過**。修改的核心 Python 檔案編譯通過。
 - Windows 原生 Junction、PowerShell 解析和既有完整測試交由 PR CI 驗證；本地沒有 PowerShell/CPU Torch，
   `test_forge_231.py` 在本地因缺少 Torch 無法匯入，不能宣稱完整既有套件已通過。
 - 尚未讀取使用者實機的完整 traceback/config；已證明的缺陷不代表已排除所有外掛/API/瀏覽器事件情境。
