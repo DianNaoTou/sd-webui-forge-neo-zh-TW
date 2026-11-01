@@ -57,6 +57,17 @@ jobs:
         run: python -m unittest discover -s tests -p test_settings_version.py -v
       - name: Official XPU isolation without GPU inference
         run: python -m unittest discover -s tests -p test_xpu_profiles.py -v
+      - name: Model selection and file protection
+        run: python -m unittest discover -s tests -p test_model_selection_sync.py -v
+      - name: Transactional repair and rollback
+        run: python -m unittest discover -s tests -p test_model_selection_repair.py -v
+      - name: Parse Windows repair entry point
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile("$PWD/tools/repair-model-selection.ps1", [ref]$tokens, [ref]$errors) | Out-Null
+          if ($errors.Count) { throw ($errors | Out-String) }
       - name: Portable ZIP and ordinary Git pull protection
         run: python -m unittest discover -s tests -p test_git_zip_update.py -v
 

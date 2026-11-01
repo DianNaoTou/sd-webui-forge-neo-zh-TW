@@ -320,12 +320,16 @@ def apply_token_merging(sd_model, token_merging_ratio):
 
 @torch.inference_mode()
 def forge_model_reload():
-    current_hash = str(model_data.forge_loading_parameters)
+    # One load must use one snapshot, including when a UI event publishes a new
+    # selection while the previous model is being unloaded/loaded.
+    loading_parameters = dict(model_data.forge_loading_parameters)
+    loading_parameters["additional_modules"] = list(loading_parameters.get("additional_modules", []))
+    current_hash = str(loading_parameters)
 
     if model_data.forge_hash == current_hash:
         return model_data.sd_model, False
 
-    print("Loading Model: " + str(model_data.forge_loading_parameters))
+    print("Loading Model: " + str(loading_parameters))
 
     timer = Timer()
 
@@ -346,15 +350,15 @@ def forge_model_reload():
     timer.record("unload existing model")
 
     try:
-        checkpoint_info = model_data.forge_loading_parameters["checkpoint_info"]
+        checkpoint_info = loading_parameters["checkpoint_info"]
         assert checkpoint_info is not None
     except Exception:
         raise ValueError("Failed to find available model...") from None
 
     state_dict = checkpoint_info.filename
-    additional_state_dicts = model_data.forge_loading_parameters.get("additional_modules", [])
+    additional_state_dicts = loading_parameters.get("additional_modules", [])
 
-    dynamic_args.forge_unet_storage_dtype = model_data.forge_loading_parameters.get("unet_storage_dtype", None)
+    dynamic_args.forge_unet_storage_dtype = loading_parameters.get("unet_storage_dtype", None)
     dynamic_args.embedding_dir = cmd_opts.embeddings_dir
 
     try:

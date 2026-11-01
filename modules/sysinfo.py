@@ -225,10 +225,14 @@ def set_config(req: dict[str, Any], is_api=False, run_callbacks=True, save_confi
             checkpoint_changed = main_entry.checkpoint_change(v, preset=None, save=False, refresh=False)
             if checkpoint_changed:
                 should_refresh_model_loading_params = True
-        if k == "forge_additional_modules":
+        elif k == "forge_additional_modules":
             modules_changed = main_entry.modules_change(v, preset=None, save=False, refresh=False)
             if modules_changed:
                 should_refresh_model_loading_params = True
+
+        elif k == "forge_unet_storage_dtype":
+            main_entry.dtype_change(v, preset=None, save=False, refresh=False)
+            should_refresh_model_loading_params = True
 
         # set all other options
         else:
