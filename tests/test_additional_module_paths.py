@@ -35,7 +35,7 @@ class AdditionalModulePathTests(unittest.TestCase):
             self.assertEqual(resolve([old], {current.name: str(current)}), [str(current)])
             self.assertEqual(old, str(Path(temp) / "old" / current.name))
 
-    def test_missing_or_ambiguous_path_skipped(self):
+    def test_missing_or_ambiguous_path_reports_error(self):
         with tempfile.TemporaryDirectory() as temp:
             first = Path(temp) / "a" / "same.safetensors"
             second = Path(temp) / "b" / "same.safetensors"
@@ -43,8 +43,10 @@ class AdditionalModulePathTests(unittest.TestCase):
                 path.parent.mkdir()
                 path.write_bytes(b"test")
             old = str(Path(temp) / "gone" / "same.safetensors")
-            self.assertEqual(resolve([old], {str(first): str(first), str(second): str(second)}), [])
-            self.assertEqual(resolve([str(Path(temp) / "missing.safetensors")], {}), [])
+            with self.assertRaises(FileNotFoundError):
+                resolve([old], {str(first): str(first), str(second): str(second)})
+            with self.assertRaises(FileNotFoundError):
+                resolve([str(Path(temp) / "missing.safetensors")], {})
 
 
 if __name__ == "__main__":

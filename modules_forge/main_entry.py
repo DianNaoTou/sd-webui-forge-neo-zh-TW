@@ -1,5 +1,7 @@
 import logging
 import os.path
+from functools import wraps
+from threading import RLock
 from typing import Callable
 
 import gradio as gr
@@ -29,6 +31,7 @@ ui_checkpoint: gr.Dropdown
 ui_vae: gr.Dropdown
 ui_forge_unet_dtype: gr.Radio
 _event_refresh: Dependency
+_event_initial_models: Dependency
 
 forge_unet_storage_dtype_options: dict[str, tuple[torch.dtype, bool]] = {
     "Automatic": (None, False),
@@ -42,10 +45,19 @@ forge_unet_storage_dtype_options: dict[str, tuple[torch.dtype, bool]] = {
 
 module_list: dict[str, os.PathLike] = {}
 module_map: dict[str, str] = {}
+_selection_lock = RLock()
+
+
+def _selection_transaction(function):
+    @wraps(function)
+    def synchronized(*args, **kwargs):
+        with _selection_lock:
+            return function(*args, **kwargs)
+    return synchronized
 
 
 def make_checkpoint_manager_ui():
-    global ui_forge_preset, ui_checkpoint, ui_vae, ui_forge_unet_dtype, _event_refresh
+    global ui_forge_preset, ui_checkpoint, ui_vae, ui_forge_unet_dtype, _event_refresh, _event_initial_models
 
     if shared.opts.sd_model_checkpoint in [None, "None", "none", ""]:
         if len(sd_models.checkpoints_list) == 0:
@@ -65,7 +77,7 @@ def make_checkpoint_manager_ui():
 
     refresh_button = ui_common.ToolButton(value=ui_common.refresh_symbol, elem_id="forge_refresh_checkpoint", tooltip="Refresh")
     _event_refresh = refresh_button.click(fn=refresh_model_list, outputs=[ui_checkpoint, ui_vae], queue=False)
-    Context.root_block.load(fn=refresh_model_list, outputs=[ui_checkpoint, ui_vae], queue=False)
+    _event_initial_models = Context.root_block.load(fn=refresh_model_list, outputs=[ui_checkpoint, ui_vae], queue=False)
 
     ui_forge_unet_dtype = gr.Dropdown(label="Diffusion in Low Bits", value=None, choices=list(forge_unet_storage_dtype_options.keys()), elem_id="forge_ui_dtype")
 
@@ -84,6 +96,7 @@ def find_files_with_extensions(base_path: os.PathLike, extensions: list[str]) ->
     return found_files
 
 
+@_selection_transaction
 def refresh_models() -> tuple[list[os.PathLike], list[os.PathLike]]:
     shared_items.refresh_checkpoints()
     shared_items.refresh_vae_list()
@@ -116,7 +129,7 @@ def refresh_models() -> tuple[list[os.PathLike], list[os.PathLike]]:
 
 
 def validate_additional_modules(selected, available):
-    """Resolve moved files by unique basename; omit missing or ambiguous entries.
+    """Resolve moved files by unique basename; fail on missing or ambiguous entries.
 
     Never download files, rewrite preferences, or guess when multiple candidates exist.
     """
@@ -131,8 +144,7 @@ def validate_additional_modules(selected, available):
         else:
             matches = {p for p in candidates.get(os.path.basename(old).casefold(), set()) if os.path.isfile(p)}
             if len(matches) != 1:
-                logger.warning("Additional module unavailable or ambiguous; skipping: %s", old)
-                continue
+                raise FileNotFoundError(f"Additional module unavailable or ambiguous: {old}. Select the correct file or explicitly clear VAE / Text Encoder.")
             resolved = matches.pop()
             logger.warning("Additional module path relocated for this load: %s -> %s", old, resolved)
         if resolved not in result:
@@ -140,6 +152,7 @@ def validate_additional_modules(selected, available):
     return result
 
 
+@_selection_transaction
 def refresh_model_loading_parameters(*, refresh: bool = True):
     if not refresh:
         return
@@ -155,7 +168,11 @@ def refresh_model_loading_parameters(*, refresh: bool = True):
 
     # Refresh the registered model paths before resolving settings moved from another drive.
     refresh_models()
-    valid_modules = validate_additional_modules(shared.opts.forge_additional_modules, module_list)
+    try:
+        valid_modules = validate_additional_modules(shared.opts.forge_additional_modules, module_list)
+    except (FileNotFoundError, ValueError):
+        model_data.forge_loading_parameters = {}
+        raise
     model_data.forge_loading_parameters = dict(checkpoint_info=checkpoint_info, additional_modules=valid_modules, unet_storage_dtype=unet_storage_dtype)
 
     ckpt: str = checkpoint_info.filename
@@ -177,12 +194,14 @@ def refresh_model_loading_parameters(*, refresh: bool = True):
     processing.need_global_unload = True
 
 
+@_selection_transaction
 def checkpoint_change(ckpt_name: str, preset: str, save=True, refresh=True) -> bool:
     """`ckpt_name` accepts valid aliases; returns `True` if checkpoint changed"""
     new_ckpt_info = sd_models.get_closet_checkpoint_match(ckpt_name)
     current_ckpt_info = sd_models.get_closet_checkpoint_match(getattr(shared.opts, "sd_model_checkpoint", ""))
-    if new_ckpt_info == current_ckpt_info:
-        return False
+    if new_ckpt_info is None and ckpt_name:
+        raise ValueError(f"Checkpoint not found: {ckpt_name}")
+    changed = new_ckpt_info != current_ckpt_info
 
     shared.opts.set("sd_model_checkpoint", ckpt_name)
     if preset is not None:
@@ -191,21 +210,24 @@ def checkpoint_change(ckpt_name: str, preset: str, save=True, refresh=True) -> b
     if save:
         shared.opts.save(shared.config_filename)
     refresh_model_loading_parameters(refresh=refresh)
-    return True
+    return changed
 
 
+@_selection_transaction
 def modules_change(module_values: list, preset: str, save=True, refresh=True) -> bool:
     """`module_values` accepts file paths or just the module names; returns `True` if modules changed"""
     modules = []
-    for v in module_values:
+    for v in module_values or []:
         module_name = os.path.basename(v)  # If the input is a filepath, extract the filename
         if module_name in module_list:
             modules.append(module_list[module_name])
+        else:
+            raise FileNotFoundError(f"Additional module not registered: {v}. Refresh the model list or explicitly clear VAE / Text Encoder.")
     modules.sort()
 
-    # skip further processing if value unchanged
-    if modules == getattr(shared.opts, "forge_additional_modules", []):
-        return False
+    # The global value can already match while this preset still remembers old
+    # modules. Persist the preset slot even for an unchanged/empty global value.
+    changed = modules != getattr(shared.opts, "forge_additional_modules", [])
 
     shared.opts.set("forge_additional_modules", modules)
     if preset is not None:
@@ -214,9 +236,10 @@ def modules_change(module_values: list, preset: str, save=True, refresh=True) ->
     if save:
         shared.opts.save(shared.config_filename)
     refresh_model_loading_parameters(refresh=refresh)
-    return True
+    return changed
 
 
+@_selection_transaction
 def dtype_change(dtype: str, preset: str, save=True, refresh=True) -> bool:
     shared.opts.set("forge_unet_storage_dtype", dtype)
     if preset is not None:
@@ -292,18 +315,49 @@ def forge_main_entry():
         queue=False,
         show_progress=False,
     ).then(js="clickLoraRefresh", fn=None, queue=False, show_progress=False)
-    Context.root_block.load(on_preset_change, inputs=[ui_forge_preset], outputs=output_targets, queue=False, show_progress=False)
+    # Choices must exist before filtering preset modules. Programmatic Dropdown
+    # updates do not fire .input(), so explicitly commit the initial preset too.
+    _event_initial_models.then(on_preset_change, inputs=[ui_forge_preset], outputs=output_targets, queue=False, show_progress=False).success(
+        fn=_load_presets,
+        inputs=[ui_checkpoint, ui_vae, ui_forge_unet_dtype, ui_forge_preset],
+        queue=False,
+        show_progress=False,
+    )
 
-    refresh_model_loading_parameters()
+    refresh_models()
+    # On startup the active preset, rather than stale global module paths, is
+    # the selection shown by the UI. Synchronize it before any initial load.
+    preset = shared.opts.forge_preset
+    try:
+        _load_presets(
+            getattr(shared.opts, f"forge_checkpoint_{preset}", None) or shared.opts.sd_model_checkpoint,
+            getattr(shared.opts, f"forge_additional_modules_{preset}", []),
+            getattr(shared.opts, f"forge_unet_storage_dtype_{preset}", "Automatic"),
+            preset,
+        )
+    except (FileNotFoundError, ValueError):
+        # Keep the controls available so the user can explicitly correct a
+        # missing preset module. Do not load the previous global selection.
+        sd_models.model_data.forge_loading_parameters = {}
+        logger.exception("Initial preset could not be applied; correct Checkpoint / VAE / Text Encoder before generating")
     _refreshed_callback()
 
 
+@_selection_transaction
 def _load_presets(ui_checkpoint: str, ui_vae: list[str], ui_forge_unet_dtype: str, ui_forge_preset: str):
-    dtype_change(ui_forge_unet_dtype, ui_forge_preset, save=False, refresh=False)
-    modules_change(ui_vae, ui_forge_preset, save=False, refresh=False)
-    checkpoint_change(ui_checkpoint, ui_forge_preset, save=True, refresh=True)
+    try:
+        dtype_change(ui_forge_unet_dtype, ui_forge_preset, save=False, refresh=False)
+        modules_change(ui_vae, ui_forge_preset, save=False, refresh=False)
+        checkpoint_change(ui_checkpoint, ui_forge_preset, save=False, refresh=False)
+        # Publish the complete tuple once, even when checkpoint is unchanged.
+        refresh_model_loading_parameters()
+    except (FileNotFoundError, ValueError):
+        sd_models.model_data.forge_loading_parameters = {}
+        raise
+    shared.opts.save(shared.config_filename)
 
 
+@_selection_transaction
 def on_preset_change(preset: str):
     assert preset is not None
     shared.opts.set("forge_preset", preset)
@@ -325,14 +379,18 @@ def on_preset_change(preset: str):
     batch_args_i2i["value"] = getattr(shared.opts, f"{preset}_i2i_batch_size", 1)
 
     modules_value = [os.path.basename(m) for m in getattr(shared.opts, f"forge_additional_modules_{preset}", [])]
-    modules_value = [m for m in modules_value if m in module_list]
+    # Keep missing selections visible: only an explicit clear may remove them.
+    # modules_change will report unresolved entries rather than silently loading
+    # a different combination of model weights.
     if not shared.opts.sd_modules_dropdown_use_short:
-        modules_value = [module_map[m] for m in modules_value if m in module_map]
+        modules_value = [module_map.get(m, m) for m in modules_value]
+    module_choices = list(module_list) if shared.opts.sd_modules_dropdown_use_short else list(module_map.values())
+    module_choices = sorted(set(module_choices + modules_value))
 
     return [
         # ui_checkpoint, ui_vae, ui_forge_unet_dtype
-        gr.update(value=getattr(shared.opts, f"forge_checkpoint_{preset}", shared.opts.sd_model_checkpoint)),
-        gr.update(value=modules_value),
+        gr.update(value=getattr(shared.opts, f"forge_checkpoint_{preset}", None) or shared.opts.sd_model_checkpoint),
+        gr.update(value=modules_value, choices=module_choices),
         gr.update(value=getattr(shared.opts, f"forge_unet_storage_dtype_{preset}", "Automatic")),
         # ui_txt2img_steps, ui_txt2img_hr_steps, ui_img2img_steps
         gr.update(value=v) if (v := getattr(shared.opts, f"{preset}_t2i_step", 20)) > 0 else gr.skip(),

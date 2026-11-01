@@ -47,16 +47,11 @@ def build_loaded(module, loader_name):
             for path in list(args) + list(kwargs.values()):
                 if isinstance(path, str) and os.path.isfile(path):
                     print('Failed to read file "{}"'.format(path))
-                    backup_file = "{}.corrupted".format(path)
-                    if os.path.exists(backup_file):
-                        os.remove(backup_file)
-                    os.replace(path, backup_file)
-                    print(' - Forge has renamed the corrupted file to "{}"'.format(backup_file))
-                    print(" - Please try downloading the model again")
+                    print(" - File left unchanged. A loader exception does not prove file corruption.")
             print("\n")
 
             display(e, f"{module.__name__}.{loader_name}")
-            raise BufferError("Failed to load model...") from None
+            raise BufferError("Failed to load model; original files were left unchanged.") from e
 
     setattr(module, loader_name, loader)
 
