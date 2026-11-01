@@ -42,7 +42,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$env:TEMP\forge-model-repai
 程式檔備份會保留 Windows 原始換行和實際位元組。
 
 可用 `-NoLaunch` 只套用並執行回歸，不啟動。可用 `-Python` 指定既有 Python；
-預設優先用 `venv-xpu-official\Scripts\python.exe`，再嘗試一般 venv/PATH。
+預設先尋找專案 managed Python，再嘗試官方 XPU venv、一般 venv/PATH；只使用能執行的 Python 3.13，損壞的 venv 不會被當作修復工具的唯一入口。
 `-ModelRoot` 可明確指定既有模型根目錄；未指定時檢查專案 `models`，並記錄實際解析位置及所有下層 Junction。
 更新器本身不會開啟權重雜湊、搬移、刪除、覆蓋或下載模型；啟動 Forge 後正常選模仍會讀取權重及模型 metadata。
 

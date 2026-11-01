@@ -68,6 +68,35 @@ jobs:
           $errors = $null
           [System.Management.Automation.Language.Parser]::ParseFile("$PWD/tools/repair-model-selection.ps1", [ref]$tokens, [ref]$errors) | Out-Null
           if ($errors.Count) { throw ($errors | Out-String) }
+      - name: Real PowerShell apply and offline rollback without user models or GPU
+        shell: pwsh
+        env:
+          FIX_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          $project = Join-Path $env:RUNNER_TEMP 'forge-repair-smoke'
+          $base = 'bd3604b5a3e900436c7f03b9e8bb0d66913dee17'
+          git clone --shared --no-checkout . $project
+          if ($LASTEXITCODE) { throw 'Fixture clone failed' }
+          git -C $project fetch --no-tags https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW.git $base
+          if ($LASTEXITCODE) { throw 'Fixture base fetch failed' }
+          git -C $project checkout -b neo-test $base
+          if ($LASTEXITCODE) { throw 'Fixture checkout failed' }
+          $models = Join-Path $project 'models'
+          New-Item -ItemType Directory -Force $models | Out-Null
+          $weight = Join-Path $models 'fixture.safetensors'
+          [IO.File]::WriteAllText($weight, 'never change this model fixture')
+          $before = (Get-FileHash $weight -Algorithm SHA256).Hash
+          $python = (Get-Command python.exe).Source
+          & powershell -NoProfile -ExecutionPolicy Bypass -File "$PWD/tools/repair-model-selection.ps1" -Root $project -Revision $env:FIX_SHA -Python $python -NoLaunch
+          if ($LASTEXITCODE) { throw 'PowerShell repair failed' }
+          $backupRoot = Join-Path $env:LOCALAPPDATA 'ForgeNeoRepair'
+          $backup = Get-ChildItem $backupRoot -Directory | Sort-Object Name -Descending | Select-Object -First 1
+          & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $backup.FullName 'rollback.ps1')
+          if ($LASTEXITCODE) { throw 'Offline rollback failed' }
+          git -C $project diff --exit-code
+          if ($LASTEXITCODE) { throw 'Rollback did not restore exact tracked content' }
+          if ((Get-FileHash $weight -Algorithm SHA256).Hash -ne $before) { throw 'Model fixture changed' }
+          if ((git -C $project rev-parse HEAD) -ne $base) { throw 'Local HEAD moved' }
       - name: Portable ZIP and ordinary Git pull protection
         run: python -m unittest discover -s tests -p test_git_zip_update.py -v
 

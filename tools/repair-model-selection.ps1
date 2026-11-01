@@ -19,17 +19,24 @@ $running = @(Get-CimInstance Win32_Process | Where-Object {
     )
 })
 if ($running.Count) { throw 'Close Forge/project Python processes before updating or rolling back. Nothing was changed.' }
-if (-not $Python) {
-    foreach ($candidate in @('venv-xpu-official\Scripts\python.exe', 'venv\Scripts\python.exe')) {
-        $path = Join-Path $Root $candidate
-        if (Test-Path -LiteralPath $path -PathType Leaf) { $Python = $path; break }
-    }
-}
-if (-not $Python) {
+$candidates = @()
+if ($Python) { $candidates += $Python }
+else {
+    $managed = @(Get-ChildItem -Path (Join-Path $Root 'runtime\python\*\python.exe') -File -ErrorAction SilentlyContinue)
+    $candidates += @($managed | ForEach-Object { $_.FullName })
+    $candidates += @((Join-Path $Root 'venv-xpu-official\Scripts\python.exe'), (Join-Path $Root 'venv\Scripts\python.exe'))
     $command = Get-Command python.exe -ErrorAction SilentlyContinue
-    if ($command) { $Python = $command.Source }
+    if ($command) { $candidates += $command.Source }
 }
-if (-not $Python) { throw 'Python was not found. Pass -Python with your existing Python 3.13 executable. No environment was removed.' }
+$Python = $null
+foreach ($candidate in $candidates) {
+    if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) { continue }
+    try {
+        & $candidate -I -c 'import sys, venv; sys.exit(0 if sys.version_info[:2] == (3, 13) else 1)' 2>$null
+        if ($LASTEXITCODE -eq 0) { $Python = $candidate; break }
+    } catch { continue }
+}
+if (-not $Python) { throw 'A working Python 3.13 was not found. Pass -Python with your existing base interpreter. No environment was removed.' }
 if ($Rollback) {
     $helper = Join-Path $Rollback 'repair_model_selection.py'
     if (-not (Test-Path -LiteralPath $helper -PathType Leaf)) { throw 'Rollback helper is missing from the backup directory.' }
