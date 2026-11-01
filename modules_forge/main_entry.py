@@ -115,6 +115,31 @@ def refresh_models() -> tuple[list[os.PathLike], list[os.PathLike]]:
         return sorted(ckpt_list), sorted(module_map.values())
 
 
+def validate_additional_modules(selected, available):
+    """Resolve moved files by unique basename; omit missing or ambiguous entries.
+
+    Never download files, rewrite preferences, or guess when multiple candidates exist.
+    """
+    result = []
+    candidates = {}
+    for name, location in available.items():
+        candidates.setdefault(os.path.basename(name).casefold(), set()).add(os.fspath(location))
+    for location in selected or []:
+        old = os.fspath(location)
+        if os.path.isfile(old):
+            resolved = old
+        else:
+            matches = {p for p in candidates.get(os.path.basename(old).casefold(), set()) if os.path.isfile(p)}
+            if len(matches) != 1:
+                logger.warning("Additional module unavailable or ambiguous; skipping: %s", old)
+                continue
+            resolved = matches.pop()
+            logger.warning("Additional module path relocated for this load: %s -> %s", old, resolved)
+        if resolved not in result:
+            result.append(resolved)
+    return result
+
+
 def refresh_model_loading_parameters(*, refresh: bool = True):
     if not refresh:
         return
@@ -128,10 +153,13 @@ def refresh_model_loading_parameters(*, refresh: bool = True):
 
     unet_storage_dtype, lora_fp16 = forge_unet_storage_dtype_options.get(shared.opts.forge_unet_storage_dtype, (None, False))
 
-    model_data.forge_loading_parameters = dict(checkpoint_info=checkpoint_info, additional_modules=shared.opts.forge_additional_modules, unet_storage_dtype=unet_storage_dtype)
+    # Refresh the registered model paths before resolving settings moved from another drive.
+    refresh_models()
+    valid_modules = validate_additional_modules(shared.opts.forge_additional_modules, module_list)
+    model_data.forge_loading_parameters = dict(checkpoint_info=checkpoint_info, additional_modules=valid_modules, unet_storage_dtype=unet_storage_dtype)
 
     ckpt: str = checkpoint_info.filename
-    modules: list[str] = [os.path.basename(x) for x in shared.opts.forge_additional_modules]
+    modules: list[str] = [os.path.basename(x) for x in valid_modules]
     dtype = str(unet_storage_dtype or [torch.float16, torch.bfloat16])
 
     logger.info("Model Selected:")
@@ -297,8 +325,9 @@ def on_preset_change(preset: str):
     batch_args_i2i["value"] = getattr(shared.opts, f"{preset}_i2i_batch_size", 1)
 
     modules_value = [os.path.basename(m) for m in getattr(shared.opts, f"forge_additional_modules_{preset}", [])]
+    modules_value = [m for m in modules_value if m in module_list]
     if not shared.opts.sd_modules_dropdown_use_short:
-        modules_value = [module_map[m] for m in modules_value]
+        modules_value = [module_map[m] for m in modules_value if m in module_map]
 
     return [
         # ui_checkpoint, ui_vae, ui_forge_unet_dtype
