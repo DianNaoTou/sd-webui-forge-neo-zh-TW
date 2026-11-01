@@ -73,10 +73,17 @@ def initialize_extension_link(root, state):
     link = state / 'extensions'
     if not source.is_dir():
         raise RuntimeError('Bundled extensions directory is missing')
-    if link.exists() or link.is_symlink():
-        if link.resolve() != source or not link.is_junction():
-            raise RuntimeError('Profile extensions path is not the owned source junction; leaving it untouched.')
-        return
+    # A moved project may retain a dangling Windows junction. Path.exists()
+    # follows its target and returns False in that case, even though the
+    # junction itself still occupies the directory entry (WinError 183).
+    if link.is_junction():
+        if link.resolve() == source:
+            return  # Verified target: reuse without touching extensions.
+        # Only remove a known directory junction, never its contents/target.
+        # A normal directory or symbolic link is deliberately not removed.
+        link.rmdir()
+    elif link.is_symlink() or link.exists():
+        raise RuntimeError('Profile extensions path is not the owned source junction; leaving it untouched.')
     import _winapi
     _winapi.CreateJunction(str(source), str(link))
 
