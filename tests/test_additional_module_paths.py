@@ -31,8 +31,6 @@ class AdditionalModulePathTests(unittest.TestCase):
             current = Path(temp) / "models" / "VAE" / "qwen_image_vae.safetensors"
             current.parent.mkdir(parents=True)
             current.write_bytes(b"test")
-            selected = [r"G:\\old-project\\models\\VAE\\qwen_image_vae.safetensors"]
-            # Windows backslashes are interpreted as separators on Windows only.
             old = str(Path(temp) / "old" / current.name)
             self.assertEqual(resolve([old], {current.name: str(current)}), [str(current)])
             self.assertEqual(old, str(Path(temp) / "old" / current.name))
@@ -45,7 +43,7 @@ class AdditionalModulePathTests(unittest.TestCase):
                 path.parent.mkdir()
                 path.write_bytes(b"test")
             old = str(Path(temp) / "gone" / "same.safetensors")
-            self.assertEqual(resolve([old], {"one": str(first), "two": str(second)}), [])
+            self.assertEqual(resolve([old], {str(first): str(first), str(second): str(second)}), [])
             self.assertEqual(resolve([str(Path(temp) / "missing.safetensors")], {}), [])
 
 
