@@ -9466,5 +9466,14 @@
   "Column Count": "欄數",
   "Row Count": "列數",
   "Calculate": "計算",
-  "Subject Replacement": "主體標籤替換"
+  "Subject Replacement": "主體標籤替換",
+  "[Moss-Image] Reference Method": "[Moss-Image] 參考圖片模式",
+  "Model Arch": "模型架構",
+  "Preferred VAE / Text Encoder": "偏好使用的 VAE／文字編碼器",
+  "Change Models": "切換模型",
+  "Text Encoder": "文字編碼器",
+  "ai-toolkit": "ai-toolkit",
+  "Moss-Image-Edit": "Moss-Image-Edit",
+  "Prompt S/R (LoRA)": "提示詞搜尋／取代（LoRA）",
+  "Invalid additional modules": "附加模組資料無效"
 }

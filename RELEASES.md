@@ -4,7 +4,7 @@
 
 目前正式版：**[2.31-tw.1](docs/releases/2.31-tw.1.md)**；上一正式版為 **2.30-tw.1**。
 
-目前測試版：**[2.31-tw.1-test.5](docs/releases/2.31-tw.1-test.5.md)**。B580 使用者回報 Test 4 GPU 功能初步正常，本版將該流程改為唯一 Intel 啟動入口；不修改正式版。
+目前測試版：**[2.31-tw.1-test.6](docs/releases/2.31-tw.1-test.6.md)**。同步上游 32 個提交，新增 ANIMA RGBA／Moss 編輯、精度與 LoRA 修正及繁中；GPU 實機未測。
 
 ## 如何選擇
 
@@ -12,7 +12,7 @@
 |---|---|---|
 | 最新正式版：2.31-tw.1 | 一般安裝與後續 Git 更新 | [neo.zip（含 Git）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.31-tw.1/neo.zip) |
 | 上一正式版：2.30-tw.1 | 回退或比對上一版本 | [歷史發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.30-tw.1) |
-| 測試版：2.31-tw.1-test.5 | 統一 Intel 啟動入口與 WD14 GPU 加速 | [neo-test.zip（含 Git）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.31-tw.1-test.5/neo-test.zip) |
+| 測試版：2.31-tw.1-test.6 | 上游同步、繁中與相容性修正 | [neo-test.zip（含 Git）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.31-tw.1-test.6/neo-test.zip) |
 
 本次正式版以使用者已測試的 **Test 3** 為來源，**不含 Test 4 的 Intel WD14 GPU 修改**。正式版 Intel WD14 維持 CPU；Intel 生圖使用既有官方 XPU profile。使用者於 2026-10-25 明確授權本次 2.31 大版本整合，此次已符合先前「下一次大版本才納入官方 XPU」的發布安排。
 
@@ -50,7 +50,7 @@ git pull --ff-only
 
 ## 版本呈現
 
-正式版啟動與介面資訊使用 `neo 2.31-tw.1`；測試分支目前使用 `neo 2.31-tw.1-test.5`。`-test` 表示測試分支，並非新的正式發布。正式發布前移除 `-test`，並依當次更新調整上游版本及 `tw` 修訂號。舊版程式保持不變，仍顯示 `neo 2.29.1`，其整合版發布名稱為 `2.29.1-tw.1`。
+正式版啟動與介面資訊使用 `neo 2.31-tw.1`；測試分支目前使用 `neo 2.31-tw.1-test.6`。`-test` 表示測試分支，並非新的正式發布。正式發布前移除 `-test`，並依當次更新調整上游版本及 `tw` 修訂號。舊版程式保持不變，仍顯示 `neo 2.29.1`，其整合版發布名稱為 `2.29.1-tw.1`。
 
 ## 發布紀錄規則
 

@@ -2,6 +2,12 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.31-tw.1-test.6（2026-11-07）
+
+- 同步 Forge Neo 上游 32 個提交至 4f4284b0；新增 ANIMA RGBA、Moss 編輯、XYZ 文字編碼器軸，修正精度與 LoRA，補齊繁中。
+- 保留既有 XPU／WD14／UI Freeze／模型路徑及插件清理保護，補上模型卡片空資料與短／完整名稱修正。
+- 變更、檢查與回滾方式：[本版說明](docs/releases/2.31-tw.1-test.6.md)。GPU 實機未測。
+
 ## 測試分支追加更新（2026-10-26）
 
 - Prompt All-in-One 整合 Physton 原版最新 `e66d417c`（2026-10-13）與 Neo v0.3.5 `cecd70ed`，保留 Neo API／token counter、非阻塞翻譯、品質預設、拖曳修正與繁中預設。

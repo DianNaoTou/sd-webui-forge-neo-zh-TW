@@ -12,18 +12,16 @@
 
 ## 版本與下載
 
-目前測試分支版本：**2.31-tw.1-test.5**（`neo-test`）。Intel Arc 統一使用 `webui-user-intel-arc.bat`，預設啟用獨立 OpenVINO WD14 GPU 加速；移除 Test 4 額外的 `webui-user-intel-arc-wd14-gpu.bat`。使用者已回報 B580 初步功能正常，其他模型與效能仍待驗證。[Test 5 更新說明](docs/releases/2.31-tw.1-test.5.md)。
+目前測試分支版本：**2.31-tw.1-test.6**（`neo-test`）。同步上游 32 個提交至 `4f4284b0`，新增 ANIMA RGBA、Moss 編輯與 XYZ 文字編碼器比較，修正 Attention 精度及 LoRA 載入處理，補齊繁中翻譯。保留 Intel 官方 XPU 與 WD14 OpenVINO 隔離環境。GPU 實機尚待驗證。[更新說明](docs/releases/2.31-tw.1-test.6.md)。
 
-- [Test 5 測試 ZIP（含 Git）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.31-tw.1-test.5/neo-test.zip)
-
-首次 Intel 啟動會準備 `runtime/wd14-openvino/venv`；沿用 Test 4 既有環境與編譯快取。GPU 初始化或推論失敗仍會明確記錄並退回 CPU。NVIDIA 啟動方式不變，正式版不納入本次修改。
+- [測試 ZIP（含 Git）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.31-tw.1-test.6/neo-test.zip)
 
 目前正式發布版本：**2.31-tw.1**（上游 2.31），相較上一正式版 **2.30-tw.1** 新增 MOSS／JSON 構圖、LayerDiffuse、WD14 新模型，改善繁中與多項穩定性問題。
 
 - [下載正式版 neo.zip（含 Git，可更新）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.31-tw.1/neo.zip)
 - [2.31-tw.1 正式發布頁與更新說明](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.31-tw.1)
 - [2.30-tw.1 上一正式版](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.30-tw.1)
-- [最新測試版發布紀錄](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.31-tw.1-test.5)
+- [最新測試版發布紀錄](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.31-tw.1-test.6)
 
 新版 **Release 附件 `neo.zip`** 包含 Git 資訊；安裝 Git 後，在解壓的專案資料夾執行 `git pull` 即可更新正式分支 `neo`。GitHub 的 Source code ZIP／Code → Download ZIP 仍不包含 Git 資訊，舊 ZIP 不會自動取得此功能。已有安裝請使用原有 Git 更新方式，不要用 ZIP 覆蓋個人模型或設定。
 

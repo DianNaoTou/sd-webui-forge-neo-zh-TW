@@ -165,6 +165,8 @@ def load_huggingface_component(guess, component_name, lib_name, cls_name, repo_p
                 from backend.nn.wan_vae import WanVAE
 
                 config = WanVAE.load_config(config_path)
+                config["image_channels"] = int(state_dict["encoder.conv1.weight"].shape[1])
+                config["conv_out_channels"] = int(state_dict["decoder.head.2.weight"].shape[0])
                 dtype = memory_management.vae_dtype(allowed_dtypes=[torch.bfloat16, torch.float16, torch.float32])
 
             with no_init_weights():
@@ -326,7 +328,7 @@ def load_huggingface_component(guess, component_name, lib_name, cls_name, repo_p
                 },
             )
 
-            load_state_dict(model, state_dict, log_name=cls_name, ignore_start=["mtp", "visual", "model.lm_head"])
+            load_state_dict(model, state_dict, log_name=cls_name, ignore_start=["mtp", "model.lm_head"])
             return model
         if cls_name in ["T5EncoderModel", "UMT5EncoderModel"]:
             assert isinstance(state_dict, dict) and len(state_dict) > 16, "You do not have T5 state dict!"
@@ -442,7 +444,7 @@ def load_huggingface_component(guess, component_name, lib_name, cls_name, repo_p
 
             unet_config = guess.unet_config.copy()
             state_dict_parameters = utils.calculate_parameters(state_dict)
-            quant_config = detect_quantization(state_dict, is_unet=True)
+            quant_config = "nunchaku" if guess.nunchaku else detect_quantization(state_dict, is_unet=True)
 
             override_dtype = backend.args.dynamic_args.forge_unet_storage_dtype
 

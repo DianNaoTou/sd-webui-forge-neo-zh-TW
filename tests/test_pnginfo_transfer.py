@@ -81,7 +81,7 @@ class PNGInfoTransferTests(unittest.TestCase):
                         import modules
                         with patch.dict('sys.modules', {'modules.ui': types.SimpleNamespace(sRound=lambda x: x)}):
                             moved, w, h = transfer(image)
-                        self.assertEqual((moved.size, moved.mode, w, h), ((832, 1216), 'RGB', 832, 1216))
+                        self.assertEqual((moved.size, moved.mode, w, h), ((832, 1216), 'RGBA', 832, 1216))
 
     def test_nullable_fields_and_existing_types_remain_usable(self):
         with gr.Blocks(analytics_enabled=False):
