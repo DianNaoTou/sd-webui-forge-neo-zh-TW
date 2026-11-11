@@ -29,10 +29,12 @@ install_requirements(main_req_file)
 
 if not launch.is_installed("insightface"):
     try:
-        launch.run_pip("install insightface", "insightface (for ControlNet Preprocessor)")
+        launch.run_pip("install insightface==2.1 --no-deps", "insightface (for ControlNet Preprocessor)")
     except Exception as e:
         print("Failed to install insightface; Please manually install it")
         display(e, "cnet-insightface")
+
+# The shared installer above selects CPU/GPU ORT without overlapping providers.
 
 
 def try_install_from_wheel(pkg_name: str, wheel_url: str):

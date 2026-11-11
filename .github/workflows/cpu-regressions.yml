@@ -49,6 +49,8 @@ jobs:
         run: python -c "import audioop, gradio, fastapi; assert gradio.__version__ == '4.40.0'; assert fastapi.__version__ == '0.127.1'"
       - name: Windows 2.31 integration regressions
         run: python -m unittest discover -s tests -p test_forge_231.py -v
+      - name: Windows 2.32 accelerator and preprocessor regressions
+        run: python -m unittest discover -s tests -p test_forge_232.py -v
       - name: Windows English-source UI and localization contracts
         run: python -m unittest discover -s tests -p test_reversible_localization.py -v
       - name: Native Windows upload sharing protection

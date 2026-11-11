@@ -2,6 +2,12 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.32-tw.1-test.1（2026-11-11）
+
+- 同步 Forge Neo 2.32 上游 5 個提交至 a31a8ba0；更新 GPU 實際運算檢查、Qwen3-VL 裝置配置及 ControlNet InsightFace 安裝。
+- 保留 CUDA／XPU 與 ONNX 分流、WD14 OpenVINO 隔離及既有修補；新增 38 個詞條至單一 zh_Hant 語言檔，保留英文切換。
+- 僅整合測試分支，正式版維持 2.31-tw.1。[本版說明](docs/releases/2.32-tw.1-test.1.md)。GPU 實機未測。
+
 ## 2.31-tw.1-test.6（2026-11-07）
 
 - 同步 Forge Neo 上游 32 個提交至 4f4284b0；新增 ANIMA RGBA、Moss 編輯、XYZ 文字編碼器軸，修正精度與 LoRA，補齊繁中。

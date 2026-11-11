@@ -12,16 +12,16 @@
 
 ## 版本與下載
 
-目前測試分支版本：**2.31-tw.1-test.6**（`neo-test`）。同步上游 32 個提交至 `4f4284b0`，新增 ANIMA RGBA、Moss 編輯與 XYZ 文字編碼器比較，修正 Attention 精度及 LoRA 載入處理，補齊繁中翻譯。保留 Intel 官方 XPU 與 WD14 OpenVINO 隔離環境。GPU 實機尚待驗證。[更新說明](docs/releases/2.31-tw.1-test.6.md)。
+目前測試分支版本：**2.32-tw.1-test.1**（`neo-test`）。同步上游 2.32 至 `a31a8ba0`，整合 GPU 實際運算檢查、視覺編碼器裝置修正及 ControlNet 依賴更新。保留 Intel 官方 XPU、WD14 OpenVINO 隔離與既有相容性修正，補齊主介面繁中翻譯。GPU 實機尚待驗證。[更新說明](docs/releases/2.32-tw.1-test.1.md)。
 
-- [測試 ZIP（含 Git）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.31-tw.1-test.6/neo-test.zip)
+- [測試 ZIP（含 Git）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.32-tw.1-test.1/neo-test.zip)
 
 目前正式發布版本：**2.31-tw.1**（上游 2.31），相較上一正式版 **2.30-tw.1** 新增 MOSS／JSON 構圖、LayerDiffuse、WD14 新模型，改善繁中與多項穩定性問題。
 
 - [下載正式版 neo.zip（含 Git，可更新）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.31-tw.1/neo.zip)
 - [2.31-tw.1 正式發布頁與更新說明](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.31-tw.1)
 - [2.30-tw.1 上一正式版](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.30-tw.1)
-- [最新測試版發布紀錄](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.31-tw.1-test.6)
+- [最新測試版發布紀錄](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.32-tw.1-test.1)
 
 新版 **Release 附件 `neo.zip`** 包含 Git 資訊；安裝 Git 後，在解壓的專案資料夾執行 `git pull` 即可更新正式分支 `neo`。GitHub 的 Source code ZIP／Code → Download ZIP 仍不包含 Git 資訊，舊 ZIP 不會自動取得此功能。已有安裝請使用原有 Git 更新方式，不要用 ZIP 覆蓋個人模型或設定。
 
