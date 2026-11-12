@@ -67,3 +67,13 @@
 ## 2026-10-25：2.31 正式版發布授權
 
 使用者完成簡單測試後，明確要求將 Intel WD14 GPU 修改前的 Test 3 升至正式分支。正式版號為 `2.31-tw.1`，本次授權使官方 XPU 基準隨 2.31 大版本正式納入；上文 10-19 當時的暫緩狀態保留為歷史紀錄。本次不包含 Test 4 的 OpenVINO worker、GPU 啟動檔或相關依賴修改。B580 既有 OOM／DEVICE_LOST 限制保留，未宣稱全面修復。
+
+
+## 2026-10-25：Test 5 統一 WD14 GPU 啟動入口
+
+使用者回報 Test 4 專用 GPU 啟動檔在 B580 功能正常，明確要求以該流程取代原 Intel Arc 啟動方式，捨棄雙 BAT 選擇。本次僅更新 `neo-test`、發布 `2.31-tw.1-test.5`：保留 `webui-user-intel-arc.bat` 名稱但改為 GPU 準備入口，刪除重複的 `webui-user-intel-arc-wd14-gpu.bat`，保留失敗時 CPU 自動退回及既有官方 XPU profile。NVIDIA 與正式 `neo` 不變。
+
+
+## 2026-11-12：2.32 正式版整合
+
+正式版 2.32-tw.1 以 f4a31296（2.32-tw.1-test.1）為發布基準，包含官方 XPU、單一 Intel Arc 啟動入口及獨立 WD14 OpenVINO worker。這次發布取代先前正式版排除 WD14 GPU 的範圍限制；不引入基準之後的上游程式變更。歷史版本與其原有說明保留。

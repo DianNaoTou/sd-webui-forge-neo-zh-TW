@@ -21,7 +21,7 @@ jobs:
       - name: Install isolated CPU test dependencies
         run: |
           python -m pip install torch==2.14.1+cpu --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install packaging filelock tqdm Pillow==10.4.0 numpy==2.3.5 comfy-kitchen==0.2.40 einops==0.8.2 "huggingface-hub>=0.34,<1.0" gradio==4.40.0 fastapi==0.127.1 httpx==0.28.1 pydantic==2.10.6
+          python -m pip install packaging filelock tqdm Pillow==10.4.0 numpy==2.3.5 comfy-kitchen==0.2.41 einops==0.8.2 "huggingface-hub>=0.34,<1.0" gradio==4.40.0 fastapi==0.127.1 httpx==0.28.1 pydantic==2.10.6
       - name: Require real Gradio HTTP test runtime
         run: python -c "import gradio, fastapi; assert gradio.__version__ == '4.40.0'; assert fastapi.__version__ == '0.127.1'"
       - name: Compile core Python files
@@ -44,11 +44,13 @@ jobs:
       - name: Install Windows CPU numerical test runtime
         run: python -m pip install torch==2.14.1+cpu --index-url https://download.pytorch.org/whl/cpu
       - name: Install UI file handling test dependencies
-        run: python -m pip install audioop-lts==0.2.2 numpy==2.3.5 comfy-kitchen==0.2.40 einops==0.8.2 Pillow==10.4.0 "huggingface-hub>=0.34,<1.0" gradio==4.40.0 fastapi==0.127.1 httpx==0.28.1 pydantic==2.10.6
+        run: python -m pip install audioop-lts==0.2.2 numpy==2.3.5 comfy-kitchen==0.2.41 einops==0.8.2 Pillow==10.4.0 "huggingface-hub>=0.34,<1.0" gradio==4.40.0 fastapi==0.127.1 httpx==0.28.1 pydantic==2.10.6
       - name: Require real Windows Gradio HTTP test runtime
         run: python -c "import audioop, gradio, fastapi; assert gradio.__version__ == '4.40.0'; assert fastapi.__version__ == '0.127.1'"
       - name: Windows 2.31 integration regressions
         run: python -m unittest discover -s tests -p test_forge_231.py -v
+      - name: Windows 2.32 accelerator and preprocessor regressions
+        run: python -m unittest discover -s tests -p test_forge_232.py -v
       - name: Windows English-source UI and localization contracts
         run: python -m unittest discover -s tests -p test_reversible_localization.py -v
       - name: Native Windows upload sharing protection
@@ -60,9 +62,31 @@ jobs:
       - name: Portable ZIP and ordinary Git pull protection
         run: python -m unittest discover -s tests -p test_git_zip_update.py -v
 
+  wd14-openvino:
+    name: WD14 OpenVINO isolation (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install worker test runtime without WebUI or Torch
+        run: python -m pip install numpy==2.3.5 openvino==2026.3.1 onnx==1.20.1 onnxruntime==1.30.0
+      - name: Require actual OpenVINO and ONNX runtimes
+        run: python -c "import openvino, onnx, onnxruntime; print(openvino.__version__, onnxruntime.__version__)"
+      - name: Worker transport, real CPU numerics, fallback and isolation
+        run: python -m unittest discover -s tests -p test_wd14_openvino.py -v
+      - name: Optimized worker regressions
+        run: python -O -m unittest discover -s tests -p test_wd14_openvino.py -v
+
   publish-test:
     if: github.event_name == 'push' && github.ref == 'refs/heads/neo-test'
-    needs: [regression, windows-file-io]
+    needs: [regression, windows-file-io, wd14-openvino]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     concurrency:
@@ -181,7 +205,7 @@ jobs:
 
   publish-stable:
     if: github.event_name == 'push' && github.ref == 'refs/heads/neo'
-    needs: [regression, windows-file-io]
+    needs: [regression, windows-file-io, wd14-openvino]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     concurrency:
@@ -209,13 +233,17 @@ jobs:
           with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
               output.write(f'version={version}\n')
           PY
-      - name: Verify release scope excludes Intel WD14 GPU experiment
+      - name: Verify formal runtime matches the validated 2.32 source
+        if: steps.version.outputs.version == '2.32-tw.1'
         run: |
+          git fetch --no-tags --depth=1 origin f4a31296dcdbd22be9434e2d814dc449b242f681
           python - <<'PYCODE'
-          from pathlib import Path
-          for name in ('webui-user-intel-arc-wd14-gpu.bat', 'tools/launch_wd14_gpu.py', 'tools/wd14_openvino_worker.py', 'extensions/stable-diffusion-webui-tagger-fork/tagger/openvino_backend.py'):
-              assert not Path(name).exists(), name
-          assert 'FORGE_WD14_OPENVINO' not in Path('extensions/stable-diffusion-webui-tagger-fork/tagger/interrogator.py').read_text(encoding='utf-8')
+          import subprocess
+          changed = subprocess.check_output(['git', 'diff', '--name-only', 'f4a31296dcdbd22be9434e2d814dc449b242f681', 'HEAD'], text=True).splitlines()
+          allowed = {'modules_forge/forge_version.py', '.github/workflows/cpu-regressions.yml'}
+          unexpected = [name for name in changed if name not in allowed and not name.endswith('.md')]
+          if unexpected:
+              raise SystemExit('Unexpected runtime changes: ' + ', '.join(unexpected))
           PYCODE
       - name: Preserve an already published formal version
         id: existing

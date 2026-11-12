@@ -1,12 +1,21 @@
 # Intel Arc 安裝與啟動
 
-正式版 **2.31-tw.1** 的 Intel Arc 統一使用官方 PyTorch XPU：
+正式版 **2.32-tw.1** 的 Intel Arc 統一使用官方 PyTorch XPU 與 WD14 GPU 啟動流程：
 
 ```bat
 webui-user-intel-arc.bat
 ```
 
-僅保留 `webui-user-intel-arc.bat` 一個 Intel 啟動入口，直接執行官方 XPU 流程，支援額外參數。原 `webui-user-intel-xpu-official.bat` 已移除。
+僅保留 `webui-user-intel-arc.bat` 一個 Intel 啟動入口，執行 WD14 GPU 準備與官方 XPU 流程，支援額外參數。原 `webui-user-intel-xpu-official.bat` 已移除。
+
+
+## WD14 GPU 加速與單一啟動入口
+
+`webui-user-intel-arc.bat` 現在先執行 `tools/launch_wd14_gpu.py`，準備獨立 OpenVINO worker，再進入官方 XPU profile。Test 4 的 `webui-user-intel-arc-wd14-gpu.bat` 已移除，原 CPU-only BAT 內容不再保留。
+
+首次會建立 `runtime/wd14-openvino/venv`（OpenVINO 2026.3.1／numpy 2.3.5）；已使用 Test 4 者沿用環境與編譯快取，不必重裝。GPU 設定、載入或推論失敗仍自動退回 CPU，且保留錯誤原因。套件不裝入生圖 venv，不替換 Torch／ONNX Runtime。明確選用 CPU 的參數仍優先。
+
+多 GPU 可執行 `webui-user-intel-arc.bat --wd14-device GPU.0`，索引請依實際裝置名稱確認。其他生圖參數照常傳入。GPU 初始化或辨識失敗時自動退回 CPU。
 
 - Python：專案專用 3.13.12，由啟動器準備，不修改系統 Python。
 - 依賴：Torch 2.14.1+xpu／TorchVision 0.29.1+xpu。
@@ -19,9 +28,9 @@ webui-user-intel-arc.bat
 
 需要 Windows 10／11 64 位元、Git、Intel Arc 與相容驅動。首次啟動會建立官方環境、安裝依賴並驗證 XPU；已有官方環境可直接沿用。預設網址為 http://127.0.0.1:7862 。
 
-## Test 7 啟動設定與快取修正
+## 設定版本與快取相容處理
 
-全新設定包含正確版本標記。若先前 test.6 建立的設定仍缺標記，第一次啟動 Test 7
+全新設定包含正確版本標記。若先前 test.6 建立的設定仍缺標記，第一次啟動新版
 會顯示設定版本提醒；確認繼續後按 Enter，程式先在 `runtime/xpu-ab/official`
 留下 `config-before-version-*.json` 原檔備份，再只更新版本標記。
 既有提示詞、路徑及插件設定保留；這是記錄使用者確認，不是自動完成所有舊格式遷移。
@@ -35,7 +44,7 @@ webui-user-intel-arc.bat
 更新後請驗證基本生圖、原本 HR 參數連續兩次、VAE 是否仍 OOM，以及生成後系統反應。A380 與其他 Arc 尚未在本輪驗證。
 原生／Math／分塊三模式對照見 [test.6 操作說明](docs/validation/xpu-sdpa-test6.md)。
 
-**官方 XPU 路徑已隨 2.31-tw.1 納入正式 `neo`；本版不含 Test 4 的 Intel WD14 OpenVINO GPU 實驗修改。**
+**2.32-tw.1 正式版同時包含官方 XPU 生圖與獨立 WD14 OpenVINO GPU 辨識流程；WD14 套件與生圖環境分開安裝。**
 Kitchen 社群 fork 支援已移除；主程式必要的官方 comfy-kitchen 依賴保留。
 詳見 [維護決策](docs/decisions/2026-10-19-intel-official-baseline.md)。
 

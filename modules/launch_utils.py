@@ -292,10 +292,10 @@ def prepare_environment():
     if not args.skip_torch_cuda_test:
         TORCH_CHECK: str = """
 import torch
-cuda = hasattr(torch, "cuda") and torch.cuda.is_available()
-xpu = hasattr(torch, "xpu") and torch.xpu.is_available()
-mps = hasattr(torch, "mps") and torch.mps.is_available()
-assert cuda or xpu or mps
+device = torch.accelerator.current_accelerator(check_available=True)
+if device is None:
+    raise RuntimeError("No compute device (GPU) is available")
+torch.ones([1], device=device).mul_(2.0).cpu()
         """
 
         success, err = check_run_python(TORCH_CHECK, return_error=True)

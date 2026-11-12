@@ -44,3 +44,21 @@ test('English UI reload leaves original ImageStitch text intact after Chinese',(
         assert.deepEqual(render(c,original),original);
     }
 });
+test('2.32 labels and prompt placeholders switch through the single main dictionary',()=>{
+    const labels=['Distilled CFG Scale','Hires CFG Scale','Hires Checkpoint',
+        'Hires VAE / Text Encoder','LoRA Replacements','Grid Margins','Low Threshold','High Threshold'];
+    const c=context(dictionary); vm.runInContext(engine,c);
+    assert.deepEqual(render(c,labels),labels.map(s=>dictionary[s]));
+    for(const label of labels) assert.match(dictionary[label],/[\u4e00-\u9fff]/);
+    const placeholder='Prompt\n(Ctrl+Enter to Generate ; Alt+Enter to Skip ; Esc to Interrupt)';
+    const apply=()=>{
+        c.node={placeholder}; c.document.createTreeWalker=()=>({nextNode:()=>null});
+        c.NodeFilter={SHOW_TEXT:4};
+        vm.runInContext('processNode(node)',c);
+        return c.node.placeholder;
+    };
+    assert.equal(apply(),dictionary[placeholder]);
+    c.localization={}; c.window.localization=c.localization;
+    assert.deepEqual(render(c,labels),labels);
+    assert.equal(apply(),placeholder);
+});

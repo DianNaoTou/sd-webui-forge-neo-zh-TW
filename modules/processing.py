@@ -811,7 +811,7 @@ def process_images(p: StableDiffusionProcessing) -> Processed:
         _vae_override = p.override_settings.pop("sd_vae", None)
 
         # apply any options overrides
-        set_config(p.override_settings, is_api=True, run_callbacks=False, save_config=False)
+        set_config(p.override_settings, is_api=True, run_callbacks=False, save_config=False, disable_log=hasattr(p, "is_xyz_pass"))
 
         # load/reload model and manage prompt cache as needed
         if getattr(p, "txt2img_upscale", False):
@@ -843,7 +843,7 @@ def process_images(p: StableDiffusionProcessing) -> Processed:
         finally:
             try:
                 if p.override_settings_restore_afterwards:
-                    set_config(stored_opts, save_config=False)
+                    set_config(stored_opts, save_config=False, disable_log=hasattr(p, "is_xyz_pass"))
             finally:
                 if _vae_override is not None:
                     try:

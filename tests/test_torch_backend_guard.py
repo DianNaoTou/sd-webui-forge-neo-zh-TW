@@ -67,7 +67,7 @@ class BackendDetectionTests(unittest.TestCase):
     def test_intel_arc_is_the_single_official_entry(self):
         source = ARC_BAT.read_text(encoding='utf-8')
         self.assertIn('call bootstrap-python.bat', source)
-        self.assertIn('"%PYTHON%" tools\\launch_xpu_profile.py official  %*', source)
+        self.assertIn('"%PYTHON%" tools\\launch_wd14_gpu.py %*', source)
         self.assertIn('if errorlevel 1 goto :failed', source)
         self.assertIn('exit /b 0', source)
         self.assertIn('exit /b 1', source)

@@ -136,6 +136,9 @@ class Interrogator:
         unloaded = False
 
         if self.model is not None:
+            close = getattr(self.model, "close", None)
+            if callable(close):
+                close()
             del self.model
             self.model = None
             unloaded = True
@@ -355,6 +358,11 @@ def get_onnxrt():
             onnxruntime.preload_dlls(directory="")
         else:
             onnxruntime.preload_dlls()
+    if os.environ.get("FORGE_WD14_OPENVINO") == "1" and not torch.version.cuda and not use_cpu:
+        device = shared.cmd_opts.additional_device_ids or ""
+        if not device.startswith("cpu:"):
+            from tagger.openvino_backend import OpenVinoRuntime
+            return OpenVinoRuntime(onnxruntime)
     return onnxruntime
 
 

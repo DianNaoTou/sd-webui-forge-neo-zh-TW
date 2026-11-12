@@ -13,6 +13,14 @@ export default {
             this.$refs.highlightPrompt.hide()
         })*/
     },
+    /**
+     * 需要在 round-trip / rebuild 中保留的自訂屬性
+     * _appendTag() 已處理的屬性（value, localValue, disabled, type）不在此列
+     * 新增自訂屬性時只需在此陣列追加
+     */
+    RESTOREABLE_PROPERTIES: [
+        'splitNoComma',
+    ],
     methods: {
         _setTag(tag) {
             if (typeof tag['type'] === 'string' && tag.type === 'wrap') {
@@ -175,7 +183,19 @@ export default {
             }
             return false
         },
-        _appendTag(value, localValue = '', disabled = false, index = -1, type = 'text') {
+        /**
+         * 建立一個新 tag 並插入 tags 陣列。
+         *
+         * @param {string}  value     - 標籤文字
+         * @param {string}  localValue - 當地語言翻譯值
+         * @param {boolean} disabled   - 是否停用
+         * @param {number}  index      - 插入位置（-1 = 末端）
+         * @param {string}  type       - 'text' | 'wrap'
+         * @param {object}  [opts]     - 可選設定
+         * @param {object}  [opts.source] - 舊 tag 或儲存資料；提供時自動還原 RESTOREABLE_PROPERTIES
+         * @returns {number} 新 tag 的 index，失敗回傳 -1
+         */
+        _appendTag(value, localValue = '', disabled = false, index = -1, type = 'text', { source } = {}) {
             if (value === '') return -1
             // 唯一数：当前时间戳+随机数
             const id = Date.now() + (Math.random() * 1000000).toFixed(0)
@@ -196,10 +216,53 @@ export default {
             } else {
                 index = this.tags.push(tag)
             }
+            // 若提供 source，自動還原自訂屬性（splitNoComma 等）
+            if (source) this._restoreTagProperties(tag, source)
             this.$nextTick(() => {
                 if (this.$refs['promptTagEdit-' + id]) autoSizeInput(this.$refs['promptTagEdit-' + id][0])
             })
             return index - 1
+        },
+        /**
+         * 從 source 建立 tag，自動還原所有自訂屬性。
+         *
+         * 透過 _appendTag({ source }) 自動觸發 _restoreTagProperties，
+         * 呼叫端無需手動處理。
+         * localValue、disabled、type 從 source 提取，無需手動傳入。
+         *
+         * @param {string} value - 標籤文字
+         * @param {number} index - 插入位置（-1 = 末端）
+         * @param {object|null} source - 舊 tag 或儲存資料，用於還原屬性
+         * @returns {number} 新 tag 的 index，失敗回傳 -1
+         */
+        _restoreTag(value, index, source) {
+            const localValue = source?.localValue || ''
+            const disabled = !!source?.disabled
+            const type = source?.type || 'text'
+            // 透過 _appendTag 的 { source } 參數自動觸發 _restoreTagProperties
+            return this._appendTag(value, localValue, disabled, index, type, { source })
+        },
+        /**
+         * 從 source 還原自訂屬性到已建立的 tag 上。
+         *
+         * 原因：_appendTag() 只建立核心欄位（value, localValue, disabled, type），
+         * 但 tag 上可能有其他自訂屬性（如 splitNoComma）需要在 round-trip（儲存→載入）
+         * 或 rebuild（textarea 重建）時保留。
+         *
+         * 做法：只複製 RESTOREABLE_PROPERTIES 中定義的屬性，避免無差別複製
+         * 導入 _setTag() 計算的屬性（weightNum/incWeight/decWeight/originalValue 等）。
+         * 新增自訂屬性時只需在 RESTOREABLE_PROPERTIES 陣列中追加。
+         *
+         * 防禦：tag 無效（undefined / -1 index）或 source 為空時直接返回，
+         * 不將邊界檢查外洩至呼叫端。
+         */
+        _restoreTagProperties(tag, source) {
+            if (!source || !tag) return
+            this.$options.RESTOREABLE_PROPERTIES.forEach(prop => {
+                if (source[prop] !== undefined) {
+                    tag[prop] = source[prop]
+                }
+            })
         },
         renderTag(id) {
             let tag = this.tags.find(tag => tag.id === id)

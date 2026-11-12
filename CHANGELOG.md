@@ -2,6 +2,44 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.32-tw.1 正式版（2026-11-12）
+
+- 更新至 Forge Neo 2.32，新增 ANIMA RGBA、Moss-Image 編輯與 XYZ 文字編碼器比較，改善模型排序、精度與 LoRA 載入。
+- 更新 GPU 啟動運算檢查、Qwen3-VL 裝置配置與 ControlNet 相依套件安裝。
+- 整合 Intel Arc 官方 XPU 與獨立 WD14 OpenVINO GPU 流程，保留自動退回 CPU、設定／模型路徑與相容性修正。
+- 同步 Prompt All-in-One 的提示詞分割、行號及空行處理更新，補齊繁中與中英文切換。
+- 補入上游新版介紹與使用說明，專案介紹統一使用「繁體中文整合版」。
+- 提供正式版 `neo.zip` 與 SHA-256 校驗檔，Git 更新追蹤 `neo`。[正式版說明](docs/releases/2.32-tw.1.md)。
+
+## 2.32-tw.1-test.1（2026-11-11）
+
+- 同步 Forge Neo 2.32 上游 5 個提交至 a31a8ba0；更新 GPU 實際運算檢查、Qwen3-VL 裝置配置及 ControlNet InsightFace 安裝。
+- 保留 CUDA／XPU 與 ONNX 分流、WD14 OpenVINO 隔離及既有修補；新增 38 個詞條至單一 zh_Hant 語言檔，保留英文切換。
+- 僅整合測試分支，正式版維持 2.31-tw.1。[本版說明](docs/releases/2.32-tw.1-test.1.md)。GPU 實機未測。
+
+## 2.31-tw.1-test.6（2026-11-07）
+
+- 同步 Forge Neo 上游 32 個提交至 4f4284b0；新增 ANIMA RGBA、Moss 編輯、XYZ 文字編碼器軸，修正精度與 LoRA，補齊繁中。
+- 保留既有 XPU／WD14／UI Freeze／模型路徑及插件清理保護，補上模型卡片空資料與短／完整名稱修正。
+- 變更、檢查與回滾方式：[本版說明](docs/releases/2.31-tw.1-test.6.md)。GPU 實機未測。
+
+## 測試分支追加更新（2026-10-26）
+
+- Prompt All-in-One 整合 Physton 原版最新 `e66d417c`（2026-10-13）與 Neo v0.3.5 `cecd70ed`，保留 Neo API／token counter、非阻塞翻譯、品質預設、拖曳修正與繁中預設。
+- 同步句號／分號分割、引號保護、空行保留、分隔符最佳化與可選行號／標籤高度樣式；新選項預設關閉。外部提示詞同步保留原字串，避免 LoRA 切換後遺留觸發詞。
+- 整合修正：分句保留停用標籤狀態；空行選項加入啟動時的設定讀取。重建前端與 CSS；223 項提示詞回歸及 5 項 UI Freeze 檢查通過，瀏覽器／GPU 實測尚未進行。[整合紀錄](docs/reviews/2026-10-26-prompt-all-in-one.md)。
+
+## 2.31-tw.1-test.5（2026-10-25）
+
+- 依 B580 使用者對 Test 4 的初步功能正常回報，將 WD14 GPU 流程改為唯一 Intel Arc 啟動入口：`webui-user-intel-arc.bat` 使用獨立 OpenVINO worker，刪除額外 GPU BAT，淘汰原 CPU-only 啟動內容。
+- 保留失敗退回 CPU、官方 XPU profile、環境與快取；NVIDIA 與正式版不變。沿用測試分支新增的 Forge Couple 繁中詞條，更新安裝／版本文件。[本版說明](docs/releases/2.31-tw.1-test.5.md)。
+
+## 2.31-tw.1-test.4（2026-10-25）
+
+- 新增 `webui-user-intel-arc-wd14-gpu.bat`，以獨立 OpenVINO GPU worker 嘗試加速 WD14、PixAI 與 Camie 的 ONNX 模型；原始 Intel 啟動檔保留 CPU 路徑，NVIDIA 路徑不變。
+- GPU 套件僅裝到 `runtime/wd14-openvino/venv`，不替換生圖環境的 Torch／ONNX Runtime；模型前後處理與標籤過濾沿用既有實作。GPU 初始化或推論失敗會明確記錄並退回 CPU。
+- 支援獨顯辨識與指定 GPU 裝置、編譯快取、工作逾時與模型卸載清理，加入 Windows／Linux 隔離回歸及真實 OpenVINO CPU 數值比較。B580 GPU 效能與完整模型相容性仍待實機測試。[本版說明](docs/releases/2.31-tw.1-test.4.md)。
+
 ## 2.31-tw.1 正式版（2026-10-25）
 
 相較上一正式版 **2.30-tw.1**：
@@ -206,14 +244,14 @@
 - 測試分支整合 Civitai Model Downloader v1.2.0，加入下載器、設定頁、狀態訊息與模型卡片操作的繁體中文翻譯。
 - 補齊 LoRA 模型資訊視窗的訓練標籤、觸發詞、權重說明和卡片圖示提示文字。
 - 首次安裝自動下載並驗證共用放大模型，提供下載進度條，且在內建放大、SD Upscale 與終極 SD 放大顯示繁中用途說明。
-- 以 Forge Neo 最新 `neo` 分支為基礎建立 DianNaoTou 台灣繁體中文整合版。
+- 以 Forge Neo 最新 `neo` 分支為基礎建立 DianNaoTou 繁體中文整合版。
 - 加入完整 `zh_Hant` 語言檔，共 9,142 條介面翻譯。
-- 全新安裝預設使用台灣繁體中文介面。
+- 全新安裝預設使用繁體中文介面。
 - 整合 ADetailer-Neo。
 - 整合 forge-neo-image2prompt，包含本機相容性修正。
 - 整合 sd-webui-prompt-all-in-one-neo，包含繁體中文翻譯。
 - 整合 stable-diffusion-webui-tagger-fork，包含介面與相容性修正。
-- 內建 Ultimate SD Upscale，保留原生 SD Upscale，並加入完整台灣繁體中文介面。
+- 內建 Ultimate SD Upscale，保留原生 SD Upscale，並加入完整繁體中文介面。
 - 增加繁體中文 README，並保留上游英文原文。
 - 新增 Intel Arc 通用啟動檔，沿用 Forge Neo 原始自動安裝流程並安裝 PyTorch XPU。
 - NVIDIA 與 Intel Arc 使用獨立虛擬環境，避免 CUDA 與 XPU 套件互相覆蓋。

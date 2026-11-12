@@ -140,6 +140,7 @@ class MOSSNumericsTests(unittest.TestCase):
         import comfy_kitchen as ck
         from einops import rearrange
         ns = dict(torch=torch, nn=torch.nn, math=math, rearrange=rearrange,
+                  dynamic_args=types.SimpleNamespace(moss_reference_method=None,ref_latents=[]),
                   memory_management=types.SimpleNamespace(is_device_mps=lambda d:False,is_intel_xpu=lambda:False,is_directml_enabled=lambda:False))
         flux = ast.parse((ROOT/'backend/nn/flux.py').read_text())
         nodes = [n for n in flux.body if isinstance(n,(ast.FunctionDef,ast.ClassDef)) and n.name in ('rope','timestep_embedding','EmbedND')]
@@ -185,7 +186,7 @@ class CLITests(unittest.TestCase):
             self.assertFalse(ns[name](torch.device('cpu')))
 
     def test_numeric_and_scheduled_lora_strengths(self):
-        networks=types.SimpleNamespace(load_networks=Mock(),available_networks={})
+        networks=types.SimpleNamespace(load_networks=Mock(return_value={}),available_networks={},failed_networks={})
         shared=types.SimpleNamespace(opts=types.SimpleNamespace(sd_lora='None',lora_add_hashes_to_infotext=False))
         ns=load_nodes('extensions-builtin/sd_forge_lora/extra_networks_lora.py',['activate'],
                       {'networks':networks,'shared':shared},class_name='ExtraNetworkLora')
