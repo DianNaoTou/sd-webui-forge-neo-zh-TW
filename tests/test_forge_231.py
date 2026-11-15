@@ -141,7 +141,7 @@ class MOSSNumericsTests(unittest.TestCase):
         from einops import rearrange
         ns = dict(torch=torch, nn=torch.nn, math=math, rearrange=rearrange,
                   dynamic_args=types.SimpleNamespace(moss_reference_method=None,ref_latents=[]),
-                  memory_management=types.SimpleNamespace(is_device_mps=lambda d:False,is_intel_xpu=lambda:False,is_directml_enabled=lambda:False))
+                  memory_management=types.SimpleNamespace(is_device_mps=lambda d:False,is_intel_xpu=lambda:False,supports_fp64=lambda d:True))
         flux = ast.parse((ROOT/'backend/nn/flux.py').read_text())
         nodes = [n for n in flux.body if isinstance(n,(ast.FunctionDef,ast.ClassDef)) and n.name in ('rope','timestep_embedding','EmbedND')]
         exec(compile(ast.Module(body=nodes,type_ignores=[]),'flux-cpu','exec'),ns)
@@ -150,6 +150,7 @@ class MOSSNumericsTests(unittest.TestCase):
             out = F.scaled_dot_product_attention(*[a.reshape(batch,length,heads,-1).transpose(1,2) for a in (q,k,v)])
             return out.transpose(1,2).reshape(batch,length,width)
         ns.update(ck=ck, attention_function=attention,
+                  fp16_fix=lambda x:torch.nan_to_num(x,nan=0.0,posinf=65504,neginf=-65504) if x.dtype==torch.float16 else x,
                   weights_manual_cast=lambda module,x:(module.weight,None,None),
                   main_stream_worker=lambda *a:nullcontext(),
                   linear_input_act=lambda layer,x,act:layer((4*torch.tanh(x.chunk(2,-1)[1]/4)*torch.sigmoid(x.chunk(2,-1)[1]))*(25*torch.tanh(x.chunk(2,-1)[0]/25))))

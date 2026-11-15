@@ -1,27 +1,27 @@
 # Stable Diffusion WebUI Forge Neo
-## DianNaoTou 台灣繁體中文整合版
+## DianNaoTou 繁體中文整合版
 
 > 本整合版目前以繁體中文使用者為主要對象；上游英文原文保留於 [README_EN.md](./README_EN.md)。其他語言使用者可參考 [Forge Neo 上游專案](https://github.com/Haoming02/sd-webui-forge-classic)。
 
 <p align="center"><img src="html/ui.webp" width="512" alt="Stable Diffusion WebUI Forge Neo 介面"></p>
 
 > [!IMPORTANT]
-> 本專案是由 **DianNaoTou** 維護的非官方台灣繁體中文整合版，以
+> 本專案是由 **DianNaoTou** 維護的非官方繁體中文整合版，以
 > [Haoming02/sd-webui-forge-classic](https://github.com/Haoming02/sd-webui-forge-classic)
 > 的 `neo` 分支為基礎。Forge Neo 與各插件的著作權仍屬原作者所有。
 
 ## 版本與下載
 
-目前測試分支版本：**2.32-tw.1-test.1**（`neo-test`）。同步上游 2.32 至 `a31a8ba0`，整合 GPU 實際運算檢查、視覺編碼器裝置修正及 ControlNet 依賴更新。保留 Intel 官方 XPU、WD14 OpenVINO 隔離與既有相容性修正，補齊主介面繁中翻譯。GPU 實機尚待驗證。[更新說明](docs/releases/2.32-tw.1-test.1.md)。
+目前測試分支版本：**2.32-tw.1-test.2**（`neo-test`）。同步上游至 `e67193d9`，整合 GGUF／IQ 格式、參考圖處理、MOSS FP16 與擴充管理頁；補上整合回歸修正，新增繁中集中於單一主語言檔。保留 Intel XPU、WD14 OpenVINO 隔離與相容性限制。GPU 實機尚待驗證。[更新說明](docs/releases/2.32-tw.1-test.2.md)。
 
-- [測試 ZIP（含 Git）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.32-tw.1-test.1/neo-test.zip)
+- [測試 ZIP（含 Git）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.32-tw.1-test.2/neo-test.zip)
 
 目前正式發布版本：**2.31-tw.1**（上游 2.31），相較上一正式版 **2.30-tw.1** 新增 MOSS／JSON 構圖、LayerDiffuse、WD14 新模型，改善繁中與多項穩定性問題。
 
 - [下載正式版 neo.zip（含 Git，可更新）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.31-tw.1/neo.zip)
 - [2.31-tw.1 正式發布頁與更新說明](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.31-tw.1)
 - [2.30-tw.1 上一正式版](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.30-tw.1)
-- [最新測試版發布紀錄](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.32-tw.1-test.1)
+- [最新測試版發布紀錄](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.32-tw.1-test.2)
 
 新版 **Release 附件 `neo.zip`** 包含 Git 資訊；安裝 Git 後，在解壓的專案資料夾執行 `git pull` 即可更新正式分支 `neo`。GitHub 的 Source code ZIP／Code → Download ZIP 仍不包含 Git 資訊，舊 ZIP 不會自動取得此功能。已有安裝請使用原有 Git 更新方式，不要用 ZIP 覆蓋個人模型或設定。
 
@@ -36,9 +36,9 @@ Intel B580 高解析度修復仍可能較慢，連續生成的 OOM／DEVICE_LOST
 Stable Diffusion WebUI Forge Neo 是以 AUTOMATIC1111 Stable Diffusion WebUI 為基礎的圖像生成介面，著重於模型相容性、顯存管理、推論效能與易用性。
 
 這個整合版的目標，是提供一套可直接安裝、同時維護 **NVIDIA** 與
-**Intel Arc** 執行環境的台灣繁體中文 Forge Neo：
+**Intel Arc** 執行環境的繁體中文 Forge Neo：
 
-- 完整台灣繁體中文介面。
+- 完整繁體中文介面。
 - 補齊 Forge Neo 設定頁面的翻譯。
 - 整合常用插件及其繁體中文化修正。
 - 保留原專案的安裝與自動下載機制。

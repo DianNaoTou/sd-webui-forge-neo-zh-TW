@@ -41,7 +41,7 @@ class UltimateUpscaleIntegrationTests(unittest.TestCase):
 
     def test_traditional_chinese_ui_strings(self):
         localization = json.loads((ROOT / "localizations/zh_Hant.json").read_text(encoding="utf-8"))
-        localization.update(json.loads((EXTENSION / "localizations/zh_Hant.json").read_text(encoding="utf-8")))
+        self.assertFalse((EXTENSION / "localizations/zh_Hant.json").exists(), "Bundled translations belong in the main dictionary")
         expected = {
             "Ultimate SD upscale": "終極 SD 放大",
             "Upscaler": "放大演算法",

@@ -2,6 +2,13 @@
 
 本專案的重要變更會記錄在此處。
 
+## 2.32-tw.1-test.2（2026-11-15）
+
+- 同步上游 8 筆提交至 `e67193d9`：GGUF／IQ 與 Qwen 編碼器映射、參考圖尺寸與編碼、MOSS FP16、DirectML 移除及擴充管理頁更新。
+- 修正參考圖失敗後快取、彩色／透明度辨識、擴充索引回傳數量、單核心更新檢查與預設篩選一致性；保留 CUDA／XPU、ONNX 與 Gradio 相容限制。
+- 新翻譯集中 `localizations/zh_Hant.json`，Ultimate Upscale 的 28 個詞條合回主語言檔；保留英文來源與 API 值。
+- CPU 一般／最佳化模式各 226 項：222 通過、4 略過；前端 20 項通過。Windows／GPU 與完整模型待驗證。[本版說明](docs/releases/2.32-tw.1-test.2.md)。
+
 ## 2.32-tw.1-test.1（2026-11-11）
 
 - 同步 Forge Neo 2.32 上游 5 個提交至 a31a8ba0；更新 GPU 實際運算檢查、Qwen3-VL 裝置配置及 ControlNet InsightFace 安裝。
