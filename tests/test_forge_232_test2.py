@@ -124,7 +124,7 @@ class ExtensionUITests(unittest.TestCase):
         import modules
         ui=types.ModuleType('modules.ui')
         ui.wrap_gradio_call=lambda fn,**kw:fn
-        ui.wrap_gradio_call_no_job=lambda fn,**kw:fn
+        ui.wrap_gradio_call_no_job=Mock(side_effect=lambda fn,**kw:fn)
         ui.create_refresh_button=Mock()
         shared=types.SimpleNamespace(cmd_opts=types.SimpleNamespace(disable_extension_access=False,
             disable_all_extensions=False,disable_extra_extensions=False),
@@ -161,6 +161,12 @@ class ExtensionUITests(unittest.TestCase):
         ns['install_extension_from_url'].return_value=('installed','ok')
         returned=ns['install_extension_from_index']('https://example.test/a',[],'hide','any',0,'',False)
         self.assertEqual(len(returned),len(dep['outputs']))
+        self.assertEqual(returned[2:],('', 'ok'))
+        self.assertIsInstance(ui.blocks[dep['outputs'][-1]],gr.HTML)
+        import modules
+        wrapped=next(c for c in modules.ui.wrap_gradio_call_no_job.call_args_list
+                     if c.args[0] is ns['install_extension_from_index'])
+        self.assertEqual(len(wrapped.kwargs['extra_outputs'])+1,len(dep['outputs']))
         apply=next(x for x in ui.config['dependencies'] if x.get('js')=='extensions_apply')
         self.assertNotEqual(apply['inputs'][0],apply['inputs'][1])
 

@@ -4,7 +4,7 @@
 
 目前正式分支版本：**2.32-tw.1**（[neo](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/tree/neo)）；本輪僅更新測試分支。
 
-目前測試版：**[2.32-tw.1-test.2](docs/releases/2.32-tw.1-test.2.md)**。整合上游 8 筆更新至 `e67193d9`，包含 GGUF／IQ、參考圖、MOSS FP16 與擴充頁；繁中集中主語言檔，GPU 實機未測。
+目前測試版：**[2.32-tw.1-test.3](docs/releases/2.32-tw.1-test.3.md)**。整合上游 8 筆更新至 `e67193d9`，包含 GGUF／IQ、參考圖、MOSS FP16 與擴充頁；繁中集中主語言檔，GPU 實機未測。
 
 ## 如何選擇
 
@@ -12,7 +12,7 @@
 |---|---|---|
 | 最新正式版：2.32-tw.1 | 一般安裝與後續 Git 更新 | [正式發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/latest) |
 | 歷史正式版：2.30-tw.1 | 回退或比對上一版本 | [歷史發布頁](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.30-tw.1) |
-| 測試版：2.32-tw.1-test.2 | 上游同步、繁中與相容性修正 | [neo-test.zip（含 Git）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.32-tw.1-test.2/neo-test.zip) |
+| 測試版：2.32-tw.1-test.3 | 上游同步、繁中與相容性修正 | [neo-test.zip（含 Git）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.32-tw.1-test.3/neo-test.zip) |
 
 正式版 Release 附件 `neo.zip` 包含精簡 Git 資訊，追蹤 `origin/neo`；測試版附件 `neo-test.zip` 追蹤 `origin/neo-test`。電腦須先安裝 Git，在專案資料夾執行 `git pull` 即可更新對應分支。打包會驗證精確提交、追蹤分支與 checksum，不包含模型、虛擬環境、個人設定或輸出。
 
@@ -20,7 +20,7 @@
 
 ## 本次與歷史說明
 
-- [2.32-tw.1-test.2：本次測試更新](docs/releases/2.32-tw.1-test.2.md)
+- [2.32-tw.1-test.3：本次測試更新](docs/releases/2.32-tw.1-test.3.md)
 - [2.31-tw.1：歷史更新與已知限制](docs/releases/2.31-tw.1.md)
 - [2.30-tw.1：歷史更新與已知限制](docs/releases/2.30-tw.1.md)
 - [2.29.2-tw.1：歷史更新與已知限制](docs/releases/2.29.2-tw.1.md)
@@ -49,7 +49,7 @@ git pull --ff-only
 
 ## 版本呈現
 
-正式版啟動與介面資訊使用 `neo 2.32-tw.1`；測試分支目前使用 `neo 2.32-tw.1-test.2`。`-test` 表示測試分支，並非新的正式發布。正式發布前移除 `-test`，並依當次更新調整上游版本及 `tw` 修訂號。舊版程式保持不變，仍顯示 `neo 2.29.1`，其整合版發布名稱為 `2.29.1-tw.1`。
+正式版啟動與介面資訊使用 `neo 2.32-tw.1`；測試分支目前使用 `neo 2.32-tw.1-test.3`。`-test` 表示測試分支，並非新的正式發布。正式發布前移除 `-test`，並依當次更新調整上游版本及 `tw` 修訂號。舊版程式保持不變，仍顯示 `neo 2.29.1`，其整合版發布名稱為 `2.29.1-tw.1`。
 
 ## 發布紀錄規則
 

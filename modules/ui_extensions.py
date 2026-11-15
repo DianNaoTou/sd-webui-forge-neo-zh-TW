@@ -413,7 +413,7 @@ def install_extension_from_index(url, selected_tags, showing_type, filtering_typ
 
     code, _ = refresh_available_extensions_from_data(selected_tags, showing_type, filtering_type, sort_column, filter_text, new_only)
 
-    return code, ext_table, message, ""
+    return code, ext_table, "", message
 
 
 def refresh_available_extensions(url, selected_tags, showing_type, filtering_type, sort_column, filter_text, new_only):
@@ -634,9 +634,9 @@ def create_ui():
                 ).success(fn=lambda: [gr.update(visible=True)] * 2, outputs=[extensions_filter, search_extensions_text], show_progress=False)
 
                 install_extension_button.click(
-                    fn=modules.ui.wrap_gradio_call_no_job(install_extension_from_index, extra_outputs=[gr.skip(), gr.skip()]),
+                    fn=modules.ui.wrap_gradio_call_no_job(install_extension_from_index, extra_outputs=[gr.skip(), gr.skip(), gr.skip()]),
                     inputs=[extension_to_install, selected_tags, showing_type, filtering_type, sort_column, search_extensions_text, new_only],
-                    outputs=[available_extensions_table, extensions_table, install_result, extension_to_install],
+                    outputs=[available_extensions_table, extensions_table, extension_to_install, install_result],
                 )
 
                 search_extensions_text.change(
