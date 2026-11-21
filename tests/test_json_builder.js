@@ -48,7 +48,7 @@ test('plain caption mode and malformed imports are handled without evaluation', 
 class Element {
     constructor(tag='div') {
         this.tagName=tag.toUpperCase(); this.children=[]; this.events={}; this.attrs={};
-        this.style={setProperty(){}}; this.dataset={}; this.value=''; this.className='';
+        this.style={setProperty(){},removeProperty(){}}; this.dataset={}; this.value=''; this.className='';
         this.clientWidth=900; this.clientHeight=600; this.scrollHeight=20;
         this.classList={add:n=>this.classes.add(n),remove:n=>this.classes.delete(n)};
         this.classes=new Set(); this.isConnected=true;
@@ -56,22 +56,29 @@ class Element {
     appendChild(x) {this.children.push(x);return x;}
     append(...xs) {xs.forEach(x=>this.appendChild(x));}
     setAttribute(k,v) {this.attrs[k]=v;if(k==='class')this.className=v;}
-    addEventListener(k,fn) {this.events[k]=fn;}
+    addEventListener(k,fn) {
+        (this.listeners ||= {})[k] ||= [];
+        this.listeners[k].push(fn);
+        this.events[k]=(event={})=>Promise.all([...this.listeners[k]].map(listener=>listener(event)));
+    }
+    removeEventListener(k,fn) {this.listeners[k]=this.listeners[k].filter(f=>f!==fn);}
+
     getBoundingClientRect(){return {width:800,height:500,left:0,top:0};}
     querySelectorAll(selector) {
         return this.children.flatMap(child => {
             if (!(child instanceof Element)) return [];
-            const matches=selector.startsWith('.') && child.className.split(' ').includes(selector.slice(1));
+            const matches=selector.startsWith('.') ? child.className.split(' ').includes(selector.slice(1)) :
+                selector.startsWith('[data-prompt-link-key=') && child.dataset.promptLinkKey===selector.split('"')[1];
             return [...(matches?[child]:[]),...child.querySelectorAll(selector)];
         });
     }
     querySelector(selector) {return this.querySelectorAll(selector)[0] || null;}
-    focus(){} remove(){} click(){this.events.click?.({});}
+    focus(){} remove(){} click(){return this.events.click?.({});}
 }
 function frontend(translation={}) {
     const elements = new Map();
     const tab=new Element(); elements.set('tab_sd-forge-json-builder',tab);
-    for(const id of ['txt2img_prompt','txt2img_width','txt2img_height','img2img_prompt','img2img_width','img2img_height']) {
+    for(const id of ['txt2img_prompt','txt2img_neg_prompt','txt2img_width','txt2img_height','img2img_prompt','img2img_neg_prompt','img2img_width','img2img_height']) {
         const control=new Element(); control.input=new Element(id.endsWith('prompt')?'textarea':'input');
         control.querySelector=()=>control.input; elements.set(id,control);
     }
@@ -80,7 +87,7 @@ function frontend(translation={}) {
     const context=vm.createContext({document,window:{localization:translation},
         onUiLoaded:fn=>fn(), requestAnimationFrame:fn=>fn(),
         ResizeObserver:class{observe(){}unobserve(){}},getComputedStyle:()=>({borderTopWidth:'0',borderBottomWidth:'0'}),
-        updateInput:el=>updates.push(el),switch_to_txt2img:()=>switches.push('txt2img'),switch_to_img2img:()=>switches.push('img2img'),
+        updateInput:el=>{updates.push(el);el.events.input?.({});},switch_to_txt2img:()=>switches.push('txt2img'),switch_to_img2img:()=>switches.push('img2img'),
         alert:e=>alerts.push(String(e)),prompt:()=>null,console});
     vm.runInContext(code('compile')+code('decompile')+code('main'),context);
     return {tab,elements,updates,switches,alerts,context};
@@ -146,4 +153,42 @@ test('imports reject invalid dimensions and out-of-canvas coordinates before edi
         const d=draft(); mutate(d);
         assert.throws(()=>c.decompilePrompt(JSON.stringify(d),1024,768));
     }
+});
+
+test('linked caption edits and target changes restore the previous main prompt',async()=> {
+    const ui=frontend();
+    const target=ui.tab.querySelector('.jb-target');
+    const caption=ui.tab.querySelector('.jb-sum-caption');
+    const prompt=ui.elements.get('txt2img_prompt').input;
+    prompt.value='original prompt'; caption.value='region'; await caption.events.input();
+    await caption.events.dblclick(); assert.equal(prompt.value,'region');
+    prompt.value='new region'; await prompt.events.input(); assert.equal(caption.value,'new region');
+    caption.value='edited region'; await caption.events.input(); assert.equal(prompt.value,'edited region');
+    target.value='img2img'; await target.events.change(); assert.equal(prompt.value,'original prompt');
+    assert.equal(caption.value,'edited region');
+});
+test('linked styles preserve negative content before clearing the style selection',async()=> {
+    const ui=frontend();
+    const caption=ui.tab.querySelector('.jb-sum-caption');
+    const prompt=ui.elements.get('txt2img_prompt').input;
+    const negative=ui.elements.get('txt2img_neg_prompt').input;
+    const dropdown=new Element(); const token=new Element();token.textContent='sample';let cleared=false;
+    dropdown.querySelectorAll=()=>cleared?[]:[token];
+    dropdown.querySelector=()=>({click(){cleared=true;}});
+    ui.elements.set('txt2img_styles',dropdown);
+    ui.context.fetch=async()=>({json:async()=>[{name:'sample',prompt:'style, {prompt}',negative_prompt:'bad style'}]});
+    prompt.value='original';negative.value='original negative';caption.value='caption';await caption.events.input();
+    await caption.events.dblclick();await caption.events.dblclick();
+    assert.equal(caption.value,'style, caption');assert.equal(prompt.value,'original');
+    assert.equal(negative.value,'original negative, bad style');assert.equal(cleared,true);
+});
+test('canvas resolution change rescales boxes without dropping optional metadata',()=> {
+    const ui=frontend(),d=draft();d.items[0].tags=['sign'];d.summary.palette=['red'];
+    ui.tab.querySelector('.jb-load-prompt').click();ui.tab.querySelector('.jb-dialog-input').value=JSON.stringify(d);
+    ui.tab.querySelector('.jb-dialog-load').click();
+    const width=ui.tab.querySelector('.jb-width');width.value=2048;width.events.input();width.events.change();
+    ui.tab.querySelector('.jb-send-t2i').click();
+    const result=compiler().decompilePrompt(ui.elements.get('txt2img_prompt').input.value,2048,768);
+    assert.deepEqual(JSON.parse(JSON.stringify(result.items[0].bbox)),[64,48,512,160]);
+    assert.equal(result.items[0].tags[0],'sign');assert.equal(result.summary.palette[0],'red');
 });

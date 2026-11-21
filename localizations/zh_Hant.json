@@ -9541,5 +9541,16 @@
   "(applies to reference images from img2img and ImageStitch)": "（套用於圖生圖與 ImageStitch 的參考圖）",
   "(set to 0 for no limit)": "（設為 0 表示不限制）",
   "Extension hidden: {count}": "已隱藏 {count} 個擴充套件",
-  "Saved Current Webui/Extension State to \"{filename}\"": "已儲存目前 WebUI／擴充套件狀態至「{filename}」"
+  "Saved Current Webui/Extension State to \"{filename}\"": "已儲存目前 WebUI／擴充套件狀態至「{filename}」",
+  "Expand items": "展開項目",
+  "Expand Items": "展開項目",
+  "Collapse Items": "收合項目",
+  "Fit to View": "符合檢視範圍",
+  "How to Use": "使用方式",
+  "Load Background From File": "從檔案載入背景",
+  "Prompt target": "提示詞目標",
+  "Reset Background": "重設背景",
+  "Use Selected Gallery Image": "使用圖庫選取的圖片",
+  "Load from Prompt": "從提示詞讀取",
+  "Each item defines a region: choose object, character or text, enter a caption, then drag or resize its box. Double-click a box to bring it to the front.\nChoose a Prompt target before linking fields or using a gallery image. Double-click a caption to link it with that target's main prompt for autocomplete. Double-click again to unlink; the previous main prompt is restored.\nSend to txt2img or Send to img2img compiles the layout and transfers its dimensions. Load Prompt opens the import dialog; Load from Prompt reads the selected target. Save/Load JSON stores the draft.\nExtra is appended after the JSON, for example LoRA syntax. Scroll to zoom, middle-drag to pan, and double-click empty space or use Fit to View to reset. Background images are visual guides only.": "每個項目代表一個區域：選擇物件、角色或文字，輸入描述，再拖曳方框或調整大小。雙擊方框可將它移到最上層。\n連動欄位或使用圖庫圖片前，請先選擇「提示詞目標」。雙擊描述欄位，可借用該目標的主提示詞欄使用自動補全；再次雙擊解除連動，並還原原本的主提示詞。\n「傳送至文生圖／圖生圖」會編譯構圖並傳送尺寸。「載入提示詞」開啟匯入視窗；「從提示詞讀取」讀取所選目標。JSON 可儲存或載入構圖草稿。\n「額外內容」附加在 JSON 之後，例如 LoRA 語法。滾輪縮放、中鍵拖曳平移；雙擊空白處或按放大鏡重設檢視。背景圖片僅作視覺參考，不會自動傳入生成流程。"
 }

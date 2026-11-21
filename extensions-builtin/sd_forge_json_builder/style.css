@@ -14,7 +14,7 @@
 /* ----- canvas ----- */
 
 .jb-canvas {
-    flex: 2 1 0;
+    flex: 9 1 0;
     min-width: 0;
     display: flex;
     align-items: center;
@@ -156,7 +156,7 @@
 /* ----- side panel ----- */
 
 .jb-side {
-    flex: 1 1 0;
+    flex: 5 1 0;
     min-width: 300px;
     min-height: 0;
     display: flex;
@@ -212,6 +212,13 @@
 .jb-list-toolbar {
     display: flex;
     gap: 8px;
+    position: relative;
+}
+
+.jb-expand-items {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .jb-row {
@@ -248,13 +255,21 @@
     min-width: 0;
 }
 
+.jb-top>.jb-section:first-child {
+    flex: 3 1 0;
+}
+
 .jb-top .jb-row label {
     width: 32px;
 }
 
+.jb-save .jb-row {
+    flex-direction: column;
+    align-items: stretch;
+}
+
 .jb-save .jb-row>button {
-    flex: 1 1 0;
-    min-width: 0;
+    flex: none;
 }
 
 /* ----- inputs ----- */
@@ -381,6 +396,19 @@
     border-color: var(--button-secondary-border-color-hover);
 }
 
+.jb-fit-canvas,
+.jb-help,
+.jb-bg-btn {
+    box-sizing: border-box;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--button-secondary-background-fill) !important;
+}
+
 /* ----- list items ----- */
 
 .jb-item {
@@ -463,14 +491,14 @@ button.jb-remove:hover {
     border: none;
 }
 
-.jb-submit .jb-send-t2i,
-.jb-submit .jb-send-i2i {
+.jb-submit .jb-send-prompt,
+.jb-submit .jb-load-prompt {
     flex: 1 1 0;
     border-color: var(--border-color-primary);
 }
 
-.jb-submit .jb-send-t2i:hover,
-.jb-submit .jb-send-i2i:hover {
+.jb-submit .jb-send-prompt:hover,
+.jb-submit .jb-load-prompt:hover {
     border-color: var(--button-primary-border-color-hover);
 }
 
@@ -480,8 +508,7 @@ button.jb-remove:hover {
     border: 1px solid var(--error-text-color) !important;
 }
 
-/* ----- load prompt modal ----- */
-
+/* Standalone import dialog retained from the integrated UI. */
 .jb-modal {
     position: fixed;
     inset: 0;

@@ -12,16 +12,16 @@
 
 ## 版本與下載
 
-目前測試分支版本：**2.32-tw.1-test.3**（`neo-test`）。同步上游至 `e67193d9`，整合 GGUF／IQ 格式、參考圖處理、MOSS FP16 與擴充管理頁；補上整合回歸修正，新增繁中集中於單一主語言檔。保留 Intel XPU、WD14 OpenVINO 隔離與相容性限制。GPU 實機尚待驗證。[更新說明](docs/releases/2.32-tw.1-test.3.md)。
+目前測試分支版本：**2.32-tw.1-test.4**（`neo-test`）。同步上游 10 個提交至 `db117cb2`，新增 GGUF NVFP4、改善量化權重載入、JSON 構圖與模型清單。JSON 編輯器保留獨立頁籤與跨頁傳送，整合欄位連動、背景參考及畫布縮放，補齊繁中。保留 Intel XPU／WD14 OpenVINO 隔離。GPU 實機尚待驗證。[更新說明](docs/releases/2.32-tw.1-test.4.md)。
 
-- [測試 ZIP（含 Git）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.32-tw.1-test.3/neo-test.zip)
+- [測試 ZIP（含 Git）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.32-tw.1-test.4/neo-test.zip)
 
-目前正式發布版本：**2.31-tw.1**（上游 2.31），相較上一正式版 **2.30-tw.1** 新增 MOSS／JSON 構圖、LayerDiffuse、WD14 新模型，改善繁中與多項穩定性問題。
+目前正式發布版本：**2.32-tw.1**（上游 2.32），新增 ANIMA RGBA、Moss-Image 編輯、XYZ 文字編碼器比較，整合 Intel WD14 OpenVINO GPU 辨識與繁中翻譯。
 
-- [下載正式版 neo.zip（含 Git，可更新）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.31-tw.1/neo.zip)
-- [2.31-tw.1 正式發布頁與更新說明](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.31-tw.1)
+- [下載正式版 neo.zip（含 Git，可更新）](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/download/2.32-tw.1/neo.zip)
+- [2.32-tw.1 正式發布頁與更新說明](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.32-tw.1)
 - [2.30-tw.1 上一正式版](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.30-tw.1)
-- [最新測試版發布紀錄](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.32-tw.1-test.3)
+- [最新測試版發布紀錄](https://github.com/DianNaoTou/sd-webui-forge-neo-zh-TW/releases/tag/2.32-tw.1-test.4)
 
 新版 **Release 附件 `neo.zip`** 包含 Git 資訊；安裝 Git 後，在解壓的專案資料夾執行 `git pull` 即可更新正式分支 `neo`。GitHub 的 Source code ZIP／Code → Download ZIP 仍不包含 Git 資訊，舊 ZIP 不會自動取得此功能。已有安裝請使用原有 Git 更新方式，不要用 ZIP 覆蓋個人模型或設定。
 
